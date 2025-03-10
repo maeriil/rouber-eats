@@ -1,0 +1,119 @@
+[entries."assets/images/achievement.png"]
+hash = "950affd9c9433f6108cbf33574450c158a394b7a0bc2ca998bcf58336c10dd46"
+asset_id = 81186057703014
+
+[entries."assets/images/address.png"]
+hash = "75bab8a02faec5f6ea39f3f24af64f6cb3926c51b03b25457da9241e033f2a87"
+asset_id = 97962498493341
+
+[entries."assets/images/bag.png"]
+hash = "25fc01072113554978fea59926aa2831d71cdd0876c7d901d2f714734ebc05db"
+asset_id = 127412392264416
+
+[entries."assets/images/battery_full.png"]
+hash = "7d260f7e2f8786db45616759c996a86a14eb53cdcb45e7452f7ef41247756818"
+asset_id = 125998018797054
+
+[entries."assets/images/car.png"]
+hash = "9cdc5dadeb9bc430a5c7277db5704479e9969b315ee519fe4da2d7a52aa14582"
+asset_id = 115034243777395
+
+[entries."assets/images/cart.png"]
+hash = "df20b84f53e4ba7376494e730a9dc7a8fcc21c56fd6b4fc78a01704e67a6f56c"
+asset_id = 90404677131740
+
+[entries."assets/images/chat.png"]
+hash = "4a1c9226c9fb7bba586511481d5de76d4f4afe73f5cd8210209615b3de137543"
+asset_id = 101500373119828
+
+[entries."assets/images/check.png"]
+hash = "df872053f33cbeba515c06d7c5256df6689ac4891458ea34b9319d0126a6b11d"
+asset_id = 90636678315012
+
+[entries."assets/images/checklist.png"]
+hash = "ea2659de14da45c75da0c5c244cbbd9ead7e18b8eba8cd18679592f53df13c78"
+asset_id = 122144730096549
+
+[entries."assets/images/chevron_left.png"]
+hash = "8619efb30c366c03c3c2e962fd7efc65641ffb641c8c37e5f43c08f2502ea2f3"
+asset_id = 126438640593639
+
+[entries."assets/images/chevron_right.png"]
+hash = "7d33e2c818c2b0fdbe68799f1ee4838e7eddb0ac206f41b74dfc1a0d0a5c9558"
+asset_id = 130663680264703
+
+[entries."assets/images/clock.png"]
+hash = "f2b1827d166ce63a8bd3a530288b7d8d1f1c087f202129b4a83c8779e86a32c7"
+asset_id = 76635367217590
+
+[entries."assets/images/confetti.png"]
+hash = "b1b872e914be1331f4b1fa83b83b4356ed642a1d945f4471aa0a1058f2c088ff"
+asset_id = 77239712954230
+
+[entries."assets/images/cross.png"]
+hash = "3b6af2b302d5582ad1f54687e27bba935c09f92a3ae52f76cbc29f6ccca14118"
+asset_id = 126647323192275
+
+[entries."assets/images/double_arrow.png"]
+hash = "58b8b6a8e50dc4acc07f0545c4edf0ce8a1ed5cd2df614e96d09832975ea5628"
+asset_id = 81758847625504
+
+[entries."assets/images/drawstring_bag.png"]
+hash = "394d5e4dc55f01b128bccecda1b730c25c2dc1b5efa9fa96403a28c433df4bfa"
+asset_id = 100270621856083
+
+[entries."assets/images/exclamation.png"]
+hash = "0b3990d18845b6d607fe877ac9e918b242b4055ce1e5bdabe72d5f87c1c946f6"
+asset_id = 112762753615261
+
+[entries."assets/images/expand_arrow.png"]
+hash = "6e511cd58229abd1a57d9a0fd0c5c7acd0ebcc666df8b7c96b216acd1dc6aae6"
+asset_id = 74041241173845
+
+[entries."assets/images/food.png"]
+hash = "545ecce8ddc5e706f4cf1eff5c5a3095fcb8b9287a934aacc5b3bfdc3131a695"
+asset_id = 139535785344437
+
+[entries."assets/images/home.png"]
+hash = "d6273fdd0966126d79a1e165342e7d29e3c301db7bbf1902be658938539e0452"
+asset_id = 97678301757572
+
+[entries."assets/images/information.png"]
+hash = "dfc0a67290e023753d0a1dbb12129ed90e1a9f545377dc0028b5752462042967"
+asset_id = 126735013234073
+
+[entries."assets/images/mail.png"]
+hash = "7f72b6f734c230c96f88170820213f32f0318320819aaebceeab3e7c9aca7038"
+asset_id = 115119773206384
+
+[entries."assets/images/pickup.png"]
+hash = "519850ecf43bb007a4c8a04e3771a75f22dc6163c60dd798476ca3a72732cbab"
+asset_id = 81238474592618
+
+[entries."assets/images/plus.png"]
+hash = "496eb00c765dc221fa18adcc7127a655f24d013aefa6be97b02d091bcd9e05b6"
+asset_id = 98455173639561
+
+[entries."assets/images/settings.png"]
+hash = "2ab10e30c8e177ba17b5c1a44c2413a795e59adfb8a5e12208e990bfc01f23e7"
+asset_id = 122653279725588
+
+[entries."assets/images/shop.png"]
+hash = "aee0b8875ef34cca5c67743b06ef94aa3ae79fc39ffb8996cf345689297e0b8c"
+asset_id = 128189376120825
+
+[entries."assets/images/signal.png"]
+hash = "ca5399c5936161f6eaf2b10ffdda5016c581fd46619be0b4c91c7a800028b8e6"
+asset_id = 87885280662051
+
+[entries."assets/images/tutorial.png"]
+hash = "88d7c4a7347dba2d3b94d54beb75b742ac41422437a1d7143dfc363150e79670"
+asset_id = 111681438454335
+
+[entries."assets/images/vip.png"]
+hash = "2589c97ec70df2dd8e95d97fed039ca66da8029cd053e29d15a6c4a75c185aa5"
+asset_id = 128376517626202
+
+[entries."assets/images/wifi.png"]
+hash = "ee03c27007a4acb0ceb0a51a0fef22ee142a4aad0c4cee995eea637353d0fbdc"
+asset_id = 82362573362192

@@ -1,0 +1,18 @@
+[package]
+name = "pq/rouber-eats"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+jecs = "ukendio/jecs@0.5.5"
+jabby = "alicesaidhi/jabby@0.2.1"
+vide = "centau/vide@0.3.1"
+planck = "yetanotherclown/planck@0.2.0-rc.1"
+planckjabby = "yetanotherclown/planck-jabby@0.2.0-rc.1"
+planckrunservice = "yetanotherclown/planck-runservice@0.2.0-rc.1"
+greentea = "corecii/greentea@0.4.11"
+rewire = "sayhisam1/rewire@0.3.0"
+ripple = "littensy/ripple@0.9.3"
+future = "yetanotherclown/luau-futures@^2.0.0-beta.3"
+yetanothernet = "yetanotherclown/yetanothernet@0.10.0-alpha.4"
