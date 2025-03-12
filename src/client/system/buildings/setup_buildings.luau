@@ -10,32 +10,68 @@ local create_restaurant = require(ReplicatedStorage.common.ecs.prefabs.create_re
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local pair = jecs.pair
 local events = require(ReplicatedStorage.common.events)
+local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local noob = workspace:FindFirstChild("Noob") :: Model
 local noob_id = ref(noob)
 
+local function setup_the_house_req(model: Model, serverid: types.Entity)
+	local e, cleanup = ref(model)
+	world:set(e, c.Cleanup, cleanup)
+	world:set(e, c.EntityId, serverid)
+
+	create_house(model)
+end
+
+local function setup_the_restaurant_req(model: Model, serverid: types.Entity)
+	local e, cleanup = ref(model)
+	world:set(e, c.Cleanup, cleanup)
+	world:set(e, c.EntityId, serverid)
+
+	create_restaurant(model)
+	basic_order(noob, model)
+end
+
+local function setup_the_apartment_req(model: Model, serverid: types.Entity) end
+
 local function system()
+	--[[
+		These are the initial bulk creation when client first joins. When we successfully create it
+		we should let the server know so server can queue the next batch of stuff to create
+		The reason we use this approach is because there might be an order of how an item should be created as we
+		might assume some components/data may exist
+	]]
+	for _, models, server_ids in events.BulkCreateApartments:query():client():iter() do
+		for k = 1, #server_ids do
+			setup_the_apartment_req(models[k], server_ids[k])
+		end
+		events.IFinishedSettingUpAptsInitiially:send()
+	end
+	for _, models, server_ids in events.BulkCreateHouses:query():client():iter() do
+		for k = 1, #server_ids do
+			setup_the_house_req(models[k], server_ids[k])
+		end
+		events.IFinishedSettingUpHousesInitiially:send()
+	end
+	for _, models, server_ids in events.BulkCreateRestaurants:query():client():iter() do
+		for k = 1, #server_ids do
+			setup_the_restaurant_req(models[k], server_ids[k])
+		end
+		events.IFinishedSettingUpRestaurantInitiially:send()
+	end
+
+	--[[
+		These are the regular setups for buildings
+	]]
 	for _, model, serverid in events.CreateApartment:query():client():iter() do
 	end
-
 	for _, model, serverid in events.CreateHouse:query():client():iter() do
-		local e, cleanup = ref(model)
-		world:set(e, c.Cleanup, cleanup)
-		world:set(e, c.EntityId, serverid)
-
-		create_house(model)
+		setup_the_house_req(model, serverid)
 	end
-
 	for _, model, serverid in events.CreateRestaurant:query():client():iter() do
-		local e, cleanup = ref(model)
-		world:set(e, c.Cleanup, cleanup)
-		world:set(e, c.EntityId, serverid)
-
-		create_restaurant(model)
-		print(`!!! SETTING UP DIALOGUES FOR NOOB`)
-		basic_order(noob, model)
+		setup_the_restaurant_req(model, serverid)
 	end
 end
 

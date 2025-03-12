@@ -9,12 +9,13 @@ type Entity = types.Entity
 
 export type PlayerDetails = {
 	-- Boolean value indicating whether their client world has been setup with
-	-- apartments and house, mansions and etc
-	has_setup_residence: boolean,
-
-	-- Similar to above except whether we have setup the restaurants to their client
-	-- world
+	-- house, should do the same for restaurants, and any types of buildings we may add
+	has_setup_house: boolean,
+	sent_req_to_setup_house: boolean,
 	has_setup_restaurant: boolean,
+	sent_req_to_setup_restaurant: boolean,
+	has_setup_apartments: boolean,
+	sent_req_to_setup_apartments: boolean,
 
 	-- Players can have only one residence, so this entity points to the residence they own
 	residence: Entity,

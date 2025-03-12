@@ -12,6 +12,7 @@ type props = {
 	order: can<number>?,
 	zindex: can<number>?,
 	rotation: can<number>?,
+	clips: can<boolean>?,
 
 	[number]: any,
 }
@@ -28,6 +29,7 @@ local function pane(props: props)
 		BorderSizePixel = 0,
 		ZIndex = props.zindex,
 		Rotation = props.rotation,
+		ClipsDescendants = props.clips,
 
 		unpack(props),
 	}

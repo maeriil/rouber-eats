@@ -12,11 +12,19 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local function system()
-	for _, player in events.IFinishedSettingUpBuildingsInitiially:query():server():iter() do
+	for i, player in events.IFinishedSettingUpRestaurantInitiially:query():server():iter() do
 		local store = playerstore[player]
-
 		store.has_setup_restaurant = true
-		store.has_setup_residence = true
+	end
+
+	for i, player in events.IFinishedSettingUpHousesInitiially:query():server():iter() do
+		local store = playerstore[player]
+		store.has_setup_house = true
+	end
+
+	for i, player in events.IFinishedSettingUpAptsInitiially:query():server():iter() do
+		local store = playerstore[player]
+		store.has_setup_apartments = true
 	end
 end
 

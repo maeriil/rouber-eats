@@ -64,11 +64,11 @@ return {
 	-- Bulk is mainly used for initial purposes. Initially, the server will send an array of
 	-- items and we need to iterate and setup. Once it finishes bulk creating, we fire back
 	-- on server, and it will perform next bulk add, and etc etc.
-	BulkCreateHouses = route.new(standard) :: Route<Model, Entity>,
+	BulkCreateHouses = route.new(standard) :: Route<{ Model }, { Entity }>,
 	IFinishedSettingUpHousesInitiially = route.new(standard) :: Route<>,
-	BulkCreateApartments = route.new(standard) :: Route<Model, Entity>,
+	BulkCreateApartments = route.new(standard) :: Route<{ Model }, { Entity }>,
 	IFinishedSettingUpAptsInitiially = route.new(standard) :: Route<>,
-	BulkCreateRestaurants = route.new(standard) :: Route<Model, Entity>,
+	BulkCreateRestaurants = route.new(standard) :: Route<{ Model }, { Entity }>,
 	IFinishedSettingUpRestaurantInitiially = route.new(standard) :: Route<>,
 
 	CreateHouse = route.new(standard) :: Route<Model, Entity>,

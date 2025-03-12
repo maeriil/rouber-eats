@@ -1,3 +1,47 @@
+[entries."assets/images/CardEffect_test.svg"]
+hash = "524bdcf0aa2e842a08df8aba118e94f48ba9f835d750b1d2e42970fcbeed40d2"
+asset_id = 124434407722310
+
+[entries."assets/images/ExitButton.svg"]
+hash = "06789e56aefb5bba0c984be018cd8103fa20e4d0952f2256b4aacab61987f521"
+asset_id = 101224825839546
+
+[entries."assets/images/ExitButtonInverted.svg"]
+hash = "2a6f5c31c32e313616e42e641090fc319b15ad0aed91c1f00124fefc2cb40f53"
+asset_id = 135155603345133
+
+[entries."assets/images/Order_List_Back.png"]
+hash = "d0ef92a634169896fb3f9b5a3714f2df060870e0e5f28b7808df682d250bbcc6"
+asset_id = 126126494446320
+
+[entries."assets/images/Order_List_Front.png"]
+hash = "ad78233fc3cca027b642f0f0de35245589a50a725a9c6d5db2a90cf207d0f46d"
+asset_id = 70502070150372
+
+[entries."assets/images/Sidebar_Main.png"]
+hash = "7e7cbf3e596a155621119b1e685d2cf4c859ddb15282f58cb0ba2656b6f2726f"
+asset_id = 116974007477757
+
+[entries."assets/images/Sidebar_Side.png"]
+hash = "14a2d4b74d4f8bd261e4927917db8761c50d49fa393997dc75f6d152e2aa2121"
+asset_id = 131100412612049
+
+[entries."assets/images/SiderbarPattern.png"]
+hash = "db857525461c39e52253d9ca6fab2bb9723da296377ea1aff78d0c106487edd5"
+asset_id = 128045156855763
+
+[entries."assets/images/SiderbarPatternInverted.png"]
+hash = "4aba424ee0dfaaeca24c5d283f859a9fca26b3adebbf1cfae65732c5cf0c8901"
+asset_id = 90188759870952
+
+[entries."assets/images/Title_Back.png"]
+hash = "a6647388c0f4288134322a967531f35ce95a69365589781a2ae702756587a19a"
+asset_id = 70394450755891
+
+[entries."assets/images/Title_Front.png"]
+hash = "091a28ef2dc684a87cd054850ce4c8fc2cc93d05c7f5c18510b9ed6670a71c16"
+asset_id = 81690712017944
+
 [entries."assets/images/achievement.png"]
 hash = "950affd9c9433f6108cbf33574450c158a394b7a0bc2ca998bcf58336c10dd46"
 asset_id = 81186057703014
@@ -73,6 +117,10 @@ asset_id = 74041241173845
 [entries."assets/images/food.png"]
 hash = "545ecce8ddc5e706f4cf1eff5c5a3095fcb8b9287a934aacc5b3bfdc3131a695"
 asset_id = 139535785344437
+
+[entries."assets/images/food_mascot1.png"]
+hash = "f5c77c9cb18b3cdca038bd894f8809d4dde3637a12bdd5cfd06f8271bd9ea882"
+asset_id = 136259483706242
 
 [entries."assets/images/home.png"]
 hash = "d6273fdd0966126d79a1e165342e7d29e3c301db7bbf1902be658938539e0452"

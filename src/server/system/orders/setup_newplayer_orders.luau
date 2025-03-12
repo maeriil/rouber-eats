@@ -20,7 +20,11 @@ local function system()
 		if store.has_sent_existing_world_order then
 			continue
 		end
-		if not store.has_setup_residence or not store.has_setup_restaurant then
+		if
+			not store.has_setup_apartments
+			or not store.has_setup_restaurant
+			or not store.has_setup_house
+		then
 			-- We need the client to have setup their restaurants and etc at least once
 			print("player has not setup their houses/restaurants yet...")
 			continue

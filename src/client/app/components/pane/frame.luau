@@ -17,6 +17,7 @@ type props = {
 	-- color: can<ColorSequence>?,
 	transparency: can<number>?,
 	-- colorrot: can<number>?,
+	clips: can<boolean>?,
 
 	[number]: any,
 }
@@ -34,6 +35,7 @@ local function frame(props: props)
 		ZIndex = props.zindex,
 		Rotation = props.rotation,
 		AutomaticSize = props.autosz or Enum.AutomaticSize.None,
+		ClipsDescendants = props.clips,
 
 		-- we should instead pass it as props if we need to
 		-- create "UIGradient" {

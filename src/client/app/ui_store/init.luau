@@ -16,7 +16,7 @@ local sources = {
 	-- open their phone, we want to show an option to start working
 	-- The server most likely will update this as well
 	IsWorking = source(false),
-	ShowPhone = source(true),
+	ShowPhone = source(false),
 	PhonePage = source(phone_pages.Resting :: phone_pages.PhonePages) :: vide.Source<phone_pages.PhonePages>,
 
 	page = source(ui_pages.Game),

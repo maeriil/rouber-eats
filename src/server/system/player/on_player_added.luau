@@ -26,8 +26,12 @@ local function not_setup_player()
 			-- setup the player store
 
 			playerstore[player] = {
-				has_setup_residence = false,
 				has_setup_restaurant = false,
+				has_setup_apartments = false,
+				has_setup_house = false,
+				sent_req_to_setup_apartments = false,
+				sent_req_to_setup_house = false,
+				sent_req_to_setup_restaurant = false,
 				residence = (1 :: unknown) :: Entity,
 				unlocked_house = false,
 				unlocked_mansion = false,

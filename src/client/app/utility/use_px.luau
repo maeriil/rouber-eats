@@ -8,7 +8,10 @@ local source = vide.source
     Base resolution is the resolution we use to create our stories. By default, we should
     probably use 1920x1080 but this might be something worth changing?
 ]=]
-local BASE_RESOLUTION = Vector2.new(1280, 832)
+-- local BASE_RESOLUTION = Vector2.new(1280, 832)
+-- local BASE_RESOLUTION = Vector2.new(2560, 1440)
+local BASE_RESOLUTION = Vector2.new(1920, 1080)
+-- local BASE_RESOLUTION = Vector2.new(852, 393)
 
 --//TODO: Document this
 local MIN_SCALE = 0.5
@@ -54,6 +57,7 @@ local function use_px()
 		local centered = width + (height - width) * DOMINANT_AXIS
 
 		local final = math.max(math.pow(2, centered), MIN_SCALE)
+		print("FINAL SCALE ", final)
 		scale(final)
 	end
 

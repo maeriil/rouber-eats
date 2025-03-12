@@ -1,5 +1,7 @@
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 do
 	-- update debug related stuff here
@@ -20,6 +22,17 @@ startup({
 })
 
 local app = require(script.app)
+local ui_store = require(script.app.ui_store)
+
+UserInputService.InputBegan:Connect(function(i: InputObject, a1: boolean)
+	if i.KeyCode == Enum.KeyCode.P then
+		print("toggling phone")
+		ui_store.ShowPhone(not ui_store.ShowPhone())
+	end
+end)
+
+print(GuiService:GetGuiInset())
+
 local vide = require(script.app.vide_setup)
 local player = Players.LocalPlayer
 local gui = player.PlayerGui
