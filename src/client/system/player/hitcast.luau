@@ -1,0 +1,78 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local basepartmap = require(ReplicatedStorage.client.store.basepartmap)
+local c = require(ReplicatedStorage.common.ecs.components)
+local gizmo = require(ReplicatedStorage.common.utility.gizmo)
+local jecs = require(ReplicatedStorage.pkg.jecs)
+local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local phases = require(ReplicatedStorage.common.ecs.phases)
+local world = require(ReplicatedStorage.common.ecs.world)
+local __ = jecs.Wildcard
+
+local function on_door_check(part: BasePart)
+	local id = basepartmap[part]
+	if id == nil or not world:contains(id) or not world:has(id, c.DoormatZone) then
+		return false
+	end
+
+	if world:has(c.Client, c.IsCutscenePlaying) then
+		-- if cutscene is playing then we dont want to do things like tp or open door etc
+		return true
+	end
+
+	world:set(id, c.CastStatus, true)
+	return true
+end
+
+local function on_teleport_check(part: BasePart)
+	local id = basepartmap[part]
+	if id == nil or not world:contains(id) or not world:has(id, c.TeleportZone) then
+		return false
+	end
+
+	if world:has(id, pairs.TPCooldown) then
+		return true
+	end
+
+	if world:has(c.Client, c.IsCutscenePlaying) then
+		return true
+	end
+
+	--TODO: we might want to not cast and direclty send event to server, who knows
+	world:set(id, c.CastStatus, true)
+	return true
+end
+
+local function system()
+	local params, hrp, radius = world:get(c.Client, c.OverParams, c.PrimaryPart, c.Radius)
+	if not world:has(c.Client, c.Model) or params == nil or hrp == nil or radius == nil then
+		return
+	end
+
+	local current_pos = hrp.Position
+
+	local result = workspace:GetPartBoundsInRadius(current_pos, radius, params)
+	local set = {}
+
+	gizmo.sphere.drawWithStyle({
+		alwaysOnTop = true,
+		color = Color3.fromRGB(255, 0, 0),
+		transparency = 0.5,
+	}, current_pos, radius)
+
+	for _, instance in result do
+		if set[instance] then
+			continue
+		end
+
+		if on_door_check(instance) or on_teleport_check(instance) then
+			table.insert(set, instance)
+		end
+	end
+end
+
+return {
+	name = script.Name,
+	system = system,
+	phase = phases.Phases.SteppedPhases.PlayerCast,
+	runConditions = {},
+}

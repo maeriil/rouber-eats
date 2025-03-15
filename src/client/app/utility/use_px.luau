@@ -14,7 +14,7 @@ local BASE_RESOLUTION = Vector2.new(1920, 1080)
 -- local BASE_RESOLUTION = Vector2.new(852, 393)
 
 --//TODO: Document this
-local MIN_SCALE = 0.5
+local MIN_SCALE = 0.35
 
 --//TODO: Document this
 local DOMINANT_AXIS = 0.5
@@ -57,7 +57,6 @@ local function use_px()
 		local centered = width + (height - width) * DOMINANT_AXIS
 
 		local final = math.max(math.pow(2, centered), MIN_SCALE)
-		print("FINAL SCALE ", final)
 		scale(final)
 	end
 

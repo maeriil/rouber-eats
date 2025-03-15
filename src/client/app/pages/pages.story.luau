@@ -1,10 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HudScreen = require(script.Parent.HudScreen)
+local Mock_Delivery_list =
+	require(ReplicatedStorage.client.app.pages.RouberScreen._MOCKS.Mock_Delivery_list)
+local PhoneScreen = require(script.Parent.PhoneScreen)
+local RouberScreen = require(script.Parent.RouberScreen)
+local change_page = require(ReplicatedStorage.client.app.utility.change_page)
 local frame = require(ReplicatedStorage.client.app.components.pane.frame)
-local gamepage = require(script.Parent.gamepage)
-local go_back_page = require(ReplicatedStorage.client.app.utility.go_back_page)
-local phonehomepage = require(script.Parent.phonehomepage)
-local ui_pages = require(ReplicatedStorage.client.app.ui_store.ui_pages)
-local ui_store = require(ReplicatedStorage.client.app.ui_store)
+local types = require(ReplicatedStorage.types)
+local uistore = require(ReplicatedStorage.client.app.uistore)
 local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local vide = require(ReplicatedStorage.pkg.vide)
 
@@ -15,9 +18,14 @@ local create = vide.create
 local px = use_px.px
 
 local function story()
+	local page = uistore.page
+	local hud: types.GamePages = "HudScreen"
+	local phone: types.GamePages = "PhoneScreen"
+	local rouber: types.GamePages = "RouberScreen"
 	use_px.use_px()
-	local page = ui_store.page
-	local function change_page() end
+
+	change_page("RouberScreen")
+	uistore.DeliveryOrderList(Mock_Delivery_list)
 
 	return switch(page) {
 		[""] = function()
@@ -31,17 +39,14 @@ local function story()
 				},
 			}
 		end,
-		[ui_pages.Game] = function()
-			return gamepage {
-				page = page,
-				change_page = change_page,
-				go_back_page = go_back_page,
-			}
+		[hud] = function()
+			return HudScreen {}
 		end,
-		[ui_pages.PhoneHome] = function()
-			return phonehomepage {
-				page = page,
-			}
+		[phone] = function()
+			return PhoneScreen {}
+		end,
+		[rouber] = function()
+			return RouberScreen {}
 		end,
 	}
 end

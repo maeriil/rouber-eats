@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local types = require(ReplicatedStorage.types)
-local ui_store = require(ReplicatedStorage.client.app.ui_store)
+local uistore = require(ReplicatedStorage.client.app.uistore)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
@@ -34,10 +34,10 @@ local dialogue_start_q = world:query(c.Dialogue):with(c.Start):cached()
 local function start_dialogue()
 	for i, details in dialogue_start_q:iter() do
 		world:remove(i, c.Start)
-		ui_store.DialogueAuthor(details.author)
-		ui_store.DialogueResponse(details.initial_text)
-		ui_store.DialogueResponseId(i)
-		ui_store.IsTalkingWithNPC(true)
+		uistore.DialogueAuthor(details.author)
+		uistore.DialogueResponse(details.initial_text)
+		uistore.DialogueResponseId(i)
+		uistore.IsTalkingWithNPC(true)
 
 		world:add(i, c.ActiveDialogue)
 	end
@@ -50,8 +50,8 @@ local function process_active_dialogue()
 			local text = if type(details.response) == "function"
 				then details.response()
 				else details.response
-			ui_store.DialogueResponse(text)
-			ui_store.DialogueResponseId(i)
+			uistore.DialogueResponse(text)
+			uistore.DialogueResponseId(i)
 		end
 
 		world:remove(i, c.ActiveDialogue)
@@ -121,7 +121,7 @@ local function render_dialog_choices()
 		end
 		choicequeue:clear()
 
-		ui_store.DialogueChoices(content :: any)
+		uistore.DialogueChoices(content :: any)
 		world:remove(i, c.PendingChoices)
 		world:remove(i, c.ActiveDialogue)
 	end
@@ -130,7 +130,7 @@ end
 local function terminate_dialogue()
 	for i in world:each(c.TerminateDialogue) do
 		world:remove(i, c.TerminateDialogue)
-		ui_store.IsTalkingWithNPC(false)
+		uistore.IsTalkingWithNPC(false)
 	end
 end
 

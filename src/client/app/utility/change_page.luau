@@ -1,19 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ui_pages = require(ReplicatedStorage.client.app.ui_store.ui_pages)
-local ui_store = require(ReplicatedStorage.client.app.ui_store)
+local types = require(ReplicatedStorage.types)
+local uistore = require(ReplicatedStorage.client.app.uistore)
 
-local function change_page(page: string)
-	local found = false
-	for i, page_name in ui_pages do
-		if page_name == page then
-			found = true
-		end
-	end
-
-	assert(found, `Attempted to navigate to unknown page {page}`)
-
-	local currpage = ui_store.page
-	local lastpage = ui_store.lastpage
+local function change_page(page: types.GamePages)
+	local currpage = uistore.page
+	local lastpage = uistore.lastpage
 
 	lastpage(currpage())
 	currpage(page)

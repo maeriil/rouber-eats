@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local jecs = require(ReplicatedStorage.pkg.jecs)
 local types = require(ReplicatedStorage.types)
 local yetanothernet = require(ReplicatedStorage.pkg.yetanothernet)
 type Entity = types.Entity
@@ -64,19 +63,19 @@ return {
 	-- Bulk is mainly used for initial purposes. Initially, the server will send an array of
 	-- items and we need to iterate and setup. Once it finishes bulk creating, we fire back
 	-- on server, and it will perform next bulk add, and etc etc.
-	BulkCreateHouses = route.new(standard) :: Route<{ Model }, { Entity }>,
+	BulkCreateHouses = route.new(standard) :: Route<{ Model }, { Entity }, { types.BuildingRemoteParams }>,
 	IFinishedSettingUpHousesInitiially = route.new(standard) :: Route<>,
-	BulkCreateApartments = route.new(standard) :: Route<{ Model }, { Entity }>,
+	BulkCreateApartments = route.new(standard) :: Route<{ Model }, { Entity }, { types.BuildingRemoteParams }>,
 	IFinishedSettingUpAptsInitiially = route.new(standard) :: Route<>,
-	BulkCreateRestaurants = route.new(standard) :: Route<{ Model }, { Entity }>,
+	BulkCreateRestaurants = route.new(standard) :: Route<{ Model }, { Entity }, { types.BuildingRemoteParams }>,
 	IFinishedSettingUpRestaurantInitiially = route.new(standard) :: Route<>,
 
-	CreateHouse = route.new(standard) :: Route<Model, Entity>,
-	CreateApartment = route.new(standard) :: Route<Model, Entity>,
-	CreateRestaurant = route.new(standard) :: Route<Model, Entity>,
+	CreateHouse = route.new(standard) :: Route<Model, Entity, types.BuildingRemoteParams>,
+	CreateApartment = route.new(standard) :: Route<Model, Entity, types.BuildingRemoteParams>,
+	CreateRestaurant = route.new(standard) :: Route<Model, Entity, types.BuildingRemoteParams>,
 	DeleteHouse = route.new(standard) :: Route<Entity>,
 	DeleteApartment = route.new(standard) :: Route<Entity>,
 	DeleteRestaurant = route.new(standard) :: Route<Entity>,
 
-	SetupResidence = route.new(standard) :: Route<Model, Entity>,
+	IWantToTeleportInOrOut = route.new(standard) :: Route<Model>,
 }

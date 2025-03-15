@@ -14,27 +14,44 @@ local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
+--//TODO: remove this
 local noob = workspace:FindFirstChild("Noob") :: Model
 local noob_id = ref(noob)
 
-local function setup_the_house_req(model: Model, serverid: types.Entity)
+local function setup_the_house_req(
+	model: Model,
+	serverid: types.Entity,
+	params: types.BuildingRemoteParams
+)
 	local e, cleanup = ref(model)
 	world:set(e, c.Cleanup, cleanup)
 	world:set(e, c.EntityId, serverid)
 
-	create_house(model)
+	print(`house = `, params)
+
+	create_house(model, params)
 end
 
-local function setup_the_restaurant_req(model: Model, serverid: types.Entity)
+local function setup_the_restaurant_req(
+	model: Model,
+	serverid: types.Entity,
+	params: types.BuildingRemoteParams
+)
 	local e, cleanup = ref(model)
 	world:set(e, c.Cleanup, cleanup)
 	world:set(e, c.EntityId, serverid)
+	print(`restaurant = `, params)
 
-	create_restaurant(model)
+	create_restaurant(model, params)
 	basic_order(noob, model)
 end
 
-local function setup_the_apartment_req(model: Model, serverid: types.Entity) end
+local function setup_the_apartment_req(
+	model: Model,
+	serverid: types.Entity,
+	params: types.BuildingRemoteParams
+)
+end
 
 local function system()
 	--[[
@@ -43,21 +60,24 @@ local function system()
 		The reason we use this approach is because there might be an order of how an item should be created as we
 		might assume some components/data may exist
 	]]
-	for _, models, server_ids in events.BulkCreateApartments:query():client():iter() do
+	for _, models, server_ids, params in events.BulkCreateApartments:query():client():iter() do
 		for k = 1, #server_ids do
-			setup_the_apartment_req(models[k], server_ids[k])
+			setup_the_apartment_req(models[k], server_ids[k], params[k])
 		end
 		events.IFinishedSettingUpAptsInitiially:send()
 	end
-	for _, models, server_ids in events.BulkCreateHouses:query():client():iter() do
+	for _, models, server_ids, params in events.BulkCreateHouses:query():client():iter() do
+		print(`in bulk create house `, params)
 		for k = 1, #server_ids do
-			setup_the_house_req(models[k], server_ids[k])
+			setup_the_house_req(models[k], server_ids[k], params[k])
 		end
 		events.IFinishedSettingUpHousesInitiially:send()
 	end
-	for _, models, server_ids in events.BulkCreateRestaurants:query():client():iter() do
+	for _, models, server_ids, params in events.BulkCreateRestaurants:query():client():iter() do
+		print(`in bulk create restuarantd `, params)
+
 		for k = 1, #server_ids do
-			setup_the_restaurant_req(models[k], server_ids[k])
+			setup_the_restaurant_req(models[k], server_ids[k], params[k])
 		end
 		events.IFinishedSettingUpRestaurantInitiially:send()
 	end
@@ -65,13 +85,13 @@ local function system()
 	--[[
 		These are the regular setups for buildings
 	]]
-	for _, model, serverid in events.CreateApartment:query():client():iter() do
+	for _, model, serverid, params in events.CreateApartment:query():client():iter() do
 	end
-	for _, model, serverid in events.CreateHouse:query():client():iter() do
-		setup_the_house_req(model, serverid)
+	for _, model, serverid, params in events.CreateHouse:query():client():iter() do
+		setup_the_house_req(model, serverid, params)
 	end
-	for _, model, serverid in events.CreateRestaurant:query():client():iter() do
-		setup_the_restaurant_req(model, serverid)
+	for _, model, serverid, params in events.CreateRestaurant:query():client():iter() do
+		setup_the_restaurant_req(model, serverid, params)
 	end
 end
 

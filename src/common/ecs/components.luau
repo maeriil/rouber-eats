@@ -7,10 +7,13 @@ local world = require(script.Parent.world)
 local t = require(ReplicatedStorage.types)
 type Poll<T = unknown> = future.Poll<T>
 
+-- If components are almost always queried together, we should look to turn them into a table
+-- Theres no point in introducing more fragmentation if they are alwyas together
 local components = {
 	Name = jecs.Name,
 	Client = world:component() :: t.Entity<Player>,
 	Model = world:component() :: t.Entity<Model>,
+	BasePart = world:component() :: t.Entity<BasePart>,
 	PrimaryPart = world:component() :: t.Entity<BasePart>,
 	AgentParams = world:component() :: t.Entity<{
 		radius: number,
@@ -23,13 +26,15 @@ local components = {
 	Path = world:component() :: t.Entity<Path>,
 	PathWaypoints = world:component() :: t.Entity<{ PathWaypoint }>,
 	PathFuture = world:component() :: t.Entity<future.FutureLike<string, { PathWaypoint }>>,
-	DoorMat = world:component() :: t.Entity<Part>,
+
 	RayParams = world:component() :: t.Entity<RaycastParams>,
 	OverParams = world:component() :: t.Entity<OverlapParams>,
 	TweenParams = world:component() :: t.Entity<TweenInfo>,
 	Tween = world:component() :: t.Entity<Tween>,
 
 	Lifetime = world:component() :: t.Entity<number>,
+	-- Typically should be used for component only I would say
+	Cooldown = world:component() :: t.Entity<number>,
 
 	Coins = world:component() :: t.Entity<number>,
 	Gems = world:component() :: t.Entity<number>,
@@ -49,8 +54,10 @@ local components = {
 	WorkingAt = world:entity(),
 
 	-- whether player is on job duty or on break
+	-- Probably don't need this tbh if we are using WorkingAt
 	IsWorking = world:entity(),
 
+	EventRequest = world:entity() :: t.Entity<number>,
 	Timestamp = world:component() :: t.Entity<number>,
 	Start = world:entity(),
 	End = world:entity(),
@@ -76,10 +83,16 @@ local components = {
 	AptUnitOf = world:entity() :: t.Entity,
 	Mansion = world:entity() :: t.Entity,
 
+	TeleportZone = world:entity() :: t.Entity,
+	DoormatZone = world:entity() :: t.Entity,
 	Door = world:entity() :: t.Entity,
 	Radius = world:component() :: t.Entity<number>, -- How close player has to be to open it
 	CannotOpen = world:entity() :: t.Entity,
-	OpenStatus = world:component() :: t.Entity<"open" | "close">,
+	CannotTeleport = world:entity() :: t.Entity,
+
+	DoorStatus = world:component() :: t.Entity<boolean>,
+	CastStatus = world:component() :: t.Entity<boolean>,
+	TweenStatus = world:component() :: t.Entity<boolean>, -- True-> Start tween, false -> dont
 
 	-- In future, player can own a restaurant too, not our problem right now though
 	Restaurant = world:entity() :: t.Entity,
@@ -118,6 +131,10 @@ local components = {
 
 	DoNotReconcile = world:entity() :: t.Entity,
 	DoNotDelete = world:entity() :: t.Entity,
+
+	NPC = world:entity() :: t.Entity,
+
+	IsCutscenePlaying = world:entity() :: t.Entity,
 }
 do
 	-- Because luau is ass
@@ -147,6 +164,14 @@ end)
 
 world:set(components.PrimaryPart, jecs.OnRemove, function(entity: t.Entity)
 	local basepart = world:get(entity, components.PrimaryPart)
+
+	if basepart and not world:has(entity, components.DoNotDelete) then
+		basepart:Destroy()
+	end
+end)
+
+world:set(components.BasePart, jecs.OnRemove, function(entity: t.Entity)
+	local basepart = world:get(entity, components.BasePart)
 
 	if basepart and not world:has(entity, components.DoNotDelete) then
 		basepart:Destroy()

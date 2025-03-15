@@ -11,22 +11,22 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local function system()
-	for i, doormat, params in world:query(c.DoorMat, c.OverParams):iter() do
-		local hits = workspace:GetPartsInPart(doormat, params)
-		local status = "close"
+	-- for i, doormat, params in world:query(c.DoorMat, c.OverParams):iter() do
+	-- local hits = workspace:GetPartsInPart(doormat, params)
+	-- local status = "close"
 
-		for i, basepart in hits do
-			local model = basepart:FindFirstAncestorOfClass("Model")
-			if not model then
-				continue
-			end
-			if Players:GetPlayerFromCharacter(model) then
-				status = "open"
-			end
-		end
+	-- for i, basepart in hits do
+	-- 	local model = basepart:FindFirstAncestorOfClass("Model")
+	-- 	if not model then
+	-- 		continue
+	-- 	end
+	-- 	if Players:GetPlayerFromCharacter(model) then
+	-- 		status = "open"
+	-- 	end
+	-- end
 
-		world:set(i, c.OpenStatus, status)
-	end
+	-- world:set(i, c.OpenStatus, status)
+	-- end
 end
 
 return {

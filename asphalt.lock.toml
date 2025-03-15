@@ -1,6 +1,34 @@
+[entries."assets/images/ActiveStar.svg"]
+hash = "04b79783513f7056f11549d16b04dd3ce41a80fa9944b7a8cdb115f6a6528629"
+asset_id = 99303162879991
+
 [entries."assets/images/CardEffect_test.svg"]
 hash = "524bdcf0aa2e842a08df8aba118e94f48ba9f835d750b1d2e42970fcbeed40d2"
 asset_id = 124434407722310
+
+[entries."assets/images/Dialogue.svg"]
+hash = "2f1fda2a7c296da31c886b69686d7127b52377028bccf97aa98e8b8b4463da12"
+asset_id = 134267041295470
+
+[entries."assets/images/DialogueBubbleIndicator.svg"]
+hash = "c87dcb931501662b6efc99e47284efc4f7206414e1abc25fc76de1990a6705ac"
+asset_id = 78259420024750
+
+[entries."assets/images/DialogueFlipped.svg"]
+hash = "788459def42836f57cb27b9fd472467b8f7031b6cb23f471c419c209c0c8baa2"
+asset_id = 71252644122890
+
+[entries."assets/images/DialogueProfile.svg"]
+hash = "4decaa833b0fa968bd6c2d42c2e7ba0acf3c3290270352cf43f49f39ef2b86fd"
+asset_id = 70661544405103
+
+[entries."assets/images/DialogueUsername.svg"]
+hash = "30f8c1b327f35788d09152a3cd3c7bda0b8774937e6f2d9e3ae666395821803e"
+asset_id = 127370511454991
+
+[entries."assets/images/ExclamationIcon.svg"]
+hash = "a5e69a434f658ebe12a835b9077899aa4e41e00088383ca3e78a5f8bff3581a1"
+asset_id = 139734034364282
 
 [entries."assets/images/ExitButton.svg"]
 hash = "06789e56aefb5bba0c984be018cd8103fa20e4d0952f2256b4aacab61987f521"
@@ -18,6 +46,18 @@ asset_id = 126126494446320
 hash = "ad78233fc3cca027b642f0f0de35245589a50a725a9c6d5db2a90cf207d0f46d"
 asset_id = 70502070150372
 
+[entries."assets/images/PhoneDesign1.svg"]
+hash = "d6966b723bfaab79ab023f9a810257fe009cac8fc60d17e4b3aa0ae5e7b3dc1e"
+asset_id = 126615497961611
+
+[entries."assets/images/PhoneIconFrame.svg"]
+hash = "594e52a008c4c3d9ed23dbe54a5f893b2bddeba2b1b0156b3a4ec2c288433bf6"
+asset_id = 137856131398050
+
+[entries."assets/images/SidebarFrame.svg"]
+hash = "7632e245dcec5ebafe12bd18bf79684fe8acd0790d403b4dc95704efb4599a0b"
+asset_id = 117386399087386
+
 [entries."assets/images/Sidebar_Main.png"]
 hash = "7e7cbf3e596a155621119b1e685d2cf4c859ddb15282f58cb0ba2656b6f2726f"
 asset_id = 116974007477757
@@ -33,6 +73,14 @@ asset_id = 128045156855763
 [entries."assets/images/SiderbarPatternInverted.png"]
 hash = "4aba424ee0dfaaeca24c5d283f859a9fca26b3adebbf1cfae65732c5cf0c8901"
 asset_id = 90188759870952
+
+[entries."assets/images/SpeechBubbleInverted.svg"]
+hash = "d1f820386be86a4b48c78c53cf4fb2bd8177cb1e19f2cb4b29c25402c97e84be"
+asset_id = 105510096014087
+
+[entries."assets/images/TaxiAppIcon.svg"]
+hash = "ee842273c56c140dc9d778d4a826f1139f8c14bd43938c3943bbf164c9ec35dd"
+asset_id = 88237947006716
 
 [entries."assets/images/Title_Back.png"]
 hash = "a6647388c0f4288134322a967531f35ce95a69365589781a2ae702756587a19a"

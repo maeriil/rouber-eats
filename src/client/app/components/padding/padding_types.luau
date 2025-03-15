@@ -26,4 +26,10 @@ return {
 	px32 = function(do_not_use_px: boolean?)
 		return UDim.new(0, get_value(32, do_not_use_px))
 	end,
+	px36 = function(do_not_use_px: boolean?)
+		return UDim.new(0, get_value(36, do_not_use_px))
+	end,
+	px48 = function(do_not_use_px: boolean?)
+		return UDim.new(0, get_value(48, do_not_use_px))
+	end,
 }

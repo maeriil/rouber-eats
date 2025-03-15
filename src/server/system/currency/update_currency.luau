@@ -7,24 +7,15 @@ local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local ref = require(ReplicatedStorage.common.ecs.ref)
-local pair = jecs.pair
 local events = require(ReplicatedStorage.common.events)
+local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
-local yetanothernet = require(ReplicatedStorage.pkg.yetanothernet)
 local __ = jecs.Wildcard
-
-local function wrapper<T...>(route: yetanothernet.Route<T...>)
-	return function(client: Player | { Player }, ...: T...)
-		route:send():to(client)
-	end
-end
-
-local x = wrapper(events.IncreaseCoinCount)
 
 local function system()
 	for i, client, add_amount, curr_amount in
-		world:query(c.Client, pair(c.Coins, c.Increase), c.Coins):iter()
+		world:query(c.Client, pairs.IncreaseCoins, c.Coins):iter()
 	do
 		local player_id = ref(client)
 		local new_amount = curr_amount + add_amount
@@ -33,12 +24,10 @@ local function system()
 
 		-- Fire remote event to client letting it know our coins increased by X amount
 		events.IncreaseCoinCount:send(add_amount):to(client)
-		world:remove(i, pair(c.Coins, c.Increase))
+		world:remove(i, pairs.IncreaseCoins)
 	end
 
-	for i, client, add_amount, curr_amount in
-		world:query(c.Client, pair(c.Gems, c.Increase), c.Gems):iter()
-	do
+	for i, client, add_amount, curr_amount in world:query(c.Client, pairs.IncreaseGems, c.Gems):iter() do
 		local player_id = ref(client)
 		local new_amount = curr_amount + add_amount
 
@@ -46,11 +35,11 @@ local function system()
 
 		-- Fire remote event to client letting it know our coins increased by X amount
 		events.IncreaseGemCount:send(add_amount):to(client)
-		world:remove(i, pair(c.Gems, c.Increase))
+		world:remove(i, pairs.IncreaseGems)
 	end
 
 	for i, client, remove_amount, curr_amount in
-		world:query(c.Client, pair(c.Coins, c.Decrease), c.Coins):iter()
+		world:query(c.Client, pairs.DecreaseCoins, c.Coins):iter()
 	do
 		local player_id = ref(client)
 		local new_amount = curr_amount - remove_amount
@@ -59,11 +48,11 @@ local function system()
 
 		-- Fire remote event to client letting it know our coins increased by X amount
 		events.DecreaseGemCount:send(remove_amount):to(client)
-		world:remove(i, pair(c.Coins, c.Decrease))
+		world:remove(i, pairs.DecreaseCoins)
 	end
 
 	for i, client, remove_amount, curr_amount in
-		world:query(c.Client, pair(c.Gems, c.Decrease), c.Gems):iter()
+		world:query(c.Client, pairs.DecreaseGems, c.Gems):iter()
 	do
 		local player_id = ref(client)
 		local new_amount = curr_amount - remove_amount
@@ -72,7 +61,7 @@ local function system()
 
 		-- Fire remote event to client letting it know our coins increased by X amount
 		events.DecreaseGemCount:send(remove_amount):to(client)
-		world:remove(i, pair(c.Gems, c.Decrease))
+		world:remove(i, pairs.DecreaseGems)
 	end
 end
 

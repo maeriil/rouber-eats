@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local eventqueue = require(ReplicatedStorage.client.app.ui_store.eventqueue)
+local eventqueue = require(ReplicatedStorage.client.app.uistore.eventqueue)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local types = require(ReplicatedStorage.types)
