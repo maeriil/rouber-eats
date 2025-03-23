@@ -4,6 +4,7 @@ local events = require(ReplicatedStorage.common.events)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local job_configs = require(ReplicatedStorage.common.configs.job_configs)
 local last_fired = require(ReplicatedStorage.common.utility.last_fired)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
@@ -61,14 +62,10 @@ end
 local SwitchJobEvent = events.IWantToSwitchJobs
 local function system()
 	for i, player, job in SwitchJobEvent:query():server():iter() do
-		print("CHANGE JOB EVENT IN THE SERVER!!!")
-
 		if not can_request(player) then
-			print("player is on cooldown")
 			continue
 		end
 
-		print("handing job change event")
 		event_handle(player, job)
 	end
 end
@@ -77,5 +74,5 @@ return {
 	system = system,
 	runConditions = {},
 	name = script.Name,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Update,
 }

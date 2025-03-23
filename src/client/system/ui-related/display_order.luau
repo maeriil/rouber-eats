@@ -6,6 +6,7 @@ local uistore = require(ReplicatedStorage.client.app.uistore)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local create_delivery_order = require(ReplicatedStorage.common.ecs.prefabs.create_delivery_order)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local pair = jecs.pair
 local events = require(ReplicatedStorage.common.events)
@@ -42,6 +43,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.First,
 	runConditions = {},
 }

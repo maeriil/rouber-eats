@@ -1,13 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local create_dialogue =
-	require(ReplicatedStorage.common.utility.create_dialogue)
+local create_dialogue = require(ReplicatedStorage.common.utility.create_dialogue)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local pair = jecs.pair
-local ChildOf = jecs.ChildOf
 
 local DIALOGUE = create_dialogue.DIALOGUE
 local CHOICE = create_dialogue.CHOICE

@@ -1,36 +1,51 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
+local events = require(ReplicatedStorage.common.events)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
-local pair = jecs.pair
-local events = require(ReplicatedStorage.common.events)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local cast_query = world:query(c.CastStatus):with(c.TeleportZone):without(pairs.TPCooldown):cached()
+-- local cast_query =
+-- 	world:query(c.CastStatus):with(c.TeleportZone):without(pairs.TPCooldown):cached()
+
+local door_interaction_query = world
+	:query(c.BasePart)
+	:with(c.DoormatZone, c.Interacted)
+	:without(pairs.InteractedCooldown)
+	:cached()
 
 local function system()
-	for i, is_player_on_part in cast_query:iter() do
-		local parent = world:parent(i) :: t.Entity
-		local parentbuilding = world:get(parent, c.Model)
-		assert(parentbuilding, `Parent building must exist at runtime`)
+	for i in door_interaction_query:iter() do
+		local parent = world:parent(i)
+		assert(
+			parent ~= nil and world:contains(parent),
+			`Parent entity for the door does not exist. This is a bug, investigate`
+		)
+		local serverid = world:get(parent, c.EntityId)
+		assert(serverid, `The Server entity id does not exist for the building in client...`)
 
-		if not is_player_on_part then
-			continue
-		end
+		--[[
+			Since the doormat belongs to the building in exterior world, its telling server
+			that it want ts to go to interior
 
-		events.IWantToTeleportInOrOut:send(parentbuilding)
-		world:set(i, c.CastStatus, false)
-		world:set(i, pairs.TPCooldown, 1)
+			true = going to interior
+			false = (player is in interior, going to exterior)
+
+		]]
+		local to_interior = world:has(parent, c.Exterior)
+
+		events.IWantToTeleportInOrOut:send(serverid, to_interior)
+		world:set(i, pairs.InteractedCooldown, 2) -- So clients dont just spam request
+		world:set(c.Client, pairs.InteractedCooldown, 0.25)
 	end
 end
 
 return {
 	name = script.Name,
 	system = system,
-	phase = phases.Phases.SteppedPhases.WorldCast,
+	phase = phases.Update,
 	runConditions = {},
 }

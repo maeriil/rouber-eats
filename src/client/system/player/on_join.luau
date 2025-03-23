@@ -5,7 +5,9 @@ local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local pair = jecs.pair
+local events = require(ReplicatedStorage.common.events)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -45,7 +47,7 @@ local function system()
 		world:set(c.Client, c.OverParams, overparams)
 		world:set(c.Client, c.Radius, overparam_radius)
 
-		warn(`Finished setting up the c.Client entity in client...`)
+		-- warn(`Finished setting up the c.Client entity in client...`)
 
 		character_added[i] = nil
 	end
@@ -64,11 +66,18 @@ local function system()
 
 		character_removed[i] = nil
 	end
+
+	for _, server_id in events.PlayerLoadIn:query():client():iter() do
+		warn(`Player has loaded in. After 2 seconds, we will setup their house`)
+		-- task.delay(2, function()
+		events.IHaveLoadedIn:send()
+		-- end)
+	end
 end
 
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.First,
 	runConditions = {},
 }

@@ -1,0 +1,61 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local jecs = require(ReplicatedStorage.pkg.jecs)
+local t = require(ReplicatedStorage.types)
+
+local c = require(ReplicatedStorage.common.ecs.components)
+local events = require(ReplicatedStorage.common.events)
+local get_client_owner_id_from_serverid =
+	require(ReplicatedStorage.common.utility.get_client_owner_id_from_serverid)
+local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local phases = require(ReplicatedStorage.common.ecs.phases)
+local world = require(ReplicatedStorage.common.ecs.world)
+local __ = jecs.Wildcard
+
+local function cleanup_buildings(house_id: t.Entity)
+	local interior_id, exterior_id =
+		world:get(house_id, pairs.BuildingInteriorId, pairs.BuildingExteriorId)
+
+	if not interior_id or not exterior_id then
+		error(`Could not find a valid interior and exterior id for the buidlings. This is a bug!`)
+	end
+
+	local interior_cleanup = world:get(interior_id, c.Cleanup)
+	local exterior_cleanup = world:get(exterior_id, c.Cleanup)
+	assert(interior_cleanup and exterior_cleanup, `Both interior and exterior cleanup must exist`)
+
+	interior_cleanup()
+	exterior_cleanup()
+
+	print(`Deleting exterior_id`)
+	world:delete(interior_id)
+	world:delete(exterior_id)
+	world:delete(house_id)
+end
+
+local function cleanup_house_owner(server_owner_id: t.Entity)
+	local client_owner_id = get_client_owner_id_from_serverid(server_owner_id)
+	local house_id = world:get(client_owner_id, c.Residence)
+	assert(house_id, `Could not find an appropriate house_id for the client owner. This is a bug`)
+
+	cleanup_buildings(house_id)
+
+	-- local house_owner_cleanup = world:get(client_owner_id, c.Cleanup)
+	-- assert(house_owner_cleanup, `Cleanup function must exist for the house owner`)
+
+	-- house_owner_cleanup()
+	world:delete(client_owner_id)
+end
+
+local function system()
+	for _, server_owner_id in events.DeleteHouseOwner:query():client():iter() do
+		warn(`Received request to clean up a house owner`)
+		cleanup_house_owner(server_owner_id)
+	end
+end
+
+return {
+	name = script.Name,
+	system = system,
+	phase = phases.Client.GeneralSetups.Cleanup,
+	runConditions = {},
+}

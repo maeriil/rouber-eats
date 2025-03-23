@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local c = require(ReplicatedStorage.common.ecs.components)
 local jecs = require(ReplicatedStorage.pkg.jecs)
+local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
 local pair = jecs.pair
-local ChildOf = jecs.ChildOf
 local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
@@ -39,7 +39,7 @@ function setup_choice(
 
 	local choice = world:entity() :: Entity
 	world:add(parent, pair(COMPONENT, choice))
-	world:add(choice, pair(ChildOf, parent))
+	world:add(choice, pairs.childof(parent))
 	world:add(choice, COMPONENT)
 	world:set(choice, c.DialogueDetails, {
 		response = props.response,
@@ -122,7 +122,7 @@ local function DIALOGUE(props: {
 	local parent = ref(props.npc)
 
 	world:add(parent, pair(c.DialogueOf, e))
-	world:add(e, pair(ChildOf, parent))
+	world:add(e, pairs.childof(parent))
 	world:set(e, c.Dialogue, {
 		author = author,
 		initial_text = props.initial_text,

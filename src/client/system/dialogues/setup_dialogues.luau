@@ -8,6 +8,7 @@ local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local pair = jecs.pair
 local planck = require(ReplicatedStorage.pkg.planck)
@@ -33,7 +34,7 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Client.GeneralSetups.Setup,
 	runConditions = {
 		planck.runOnce(),
 	},

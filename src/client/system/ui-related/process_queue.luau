@@ -6,8 +6,10 @@ local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
+local handle_proximity_interaction =
+	require(ReplicatedStorage.common.utility.handle_proximity_interaction)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
-local pair = jecs.pair
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -34,6 +36,10 @@ local map: {
 		end
 		world:add(start_dialog_id, c.Start)
 	end,
+
+	["ProximityClicked"] = function(payload: () -> types.ActiveProximity)
+		handle_proximity_interaction(payload())
+	end,
 }
 
 local function system()
@@ -55,6 +61,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.First,
 	runConditions = {},
 }

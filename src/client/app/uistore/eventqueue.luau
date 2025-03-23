@@ -5,7 +5,12 @@ local vide = require(ReplicatedStorage.pkg.vide)
 
 type queue<T> = queue.Queue<T>
 type Entity = types.Entity
-export type qevent_types = "UIOpen" | "UIClose" | "DialogueChoiceSelected" | "DialoguePromptStarted"
+export type qevent_types =
+	"UIOpen"
+	| "UIClose"
+	| "DialogueChoiceSelected"
+	| "DialoguePromptStarted"
+	| "ProximityClicked"
 export type qevent = {
 	type: qevent_types,
 	payload: (() -> any)?,
@@ -57,9 +62,21 @@ local function add_ui_openclose_event(page: string)
 	end)
 end
 
+local function dispatch_proximity_clicked(activeproximity: types.ActiveProximity)
+	local payload = function()
+		return activeproximity
+	end
+
+	event_queue:add({
+		type = "ProximityClicked",
+		payload = payload,
+	})
+end
+
 return {
 	queue = event_queue,
 	add_dialogue_event_choice = add_dialogue_event_choice,
 	add_ui_openclose_event = add_ui_openclose_event,
 	add_dialogue_started = add_dialogue_started,
+	dispatch_proximity_clicked = dispatch_proximity_clicked,
 }

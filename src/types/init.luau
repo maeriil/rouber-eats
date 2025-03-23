@@ -38,7 +38,33 @@ export type DialogueType = {
 	id: Entity,
 }
 
+export type ActiveProximity = Entity?
+
+export type DoorProximityDetails = {
+	adornee: BasePart,
+	proximity_text: string,
+	exterior: boolean, -- Whether a door is used in exterior vs interior
+
+	-- The id contains the entity id of the proximity prompt it belongs to
+	-- we only display the full proximity if it equals to whatever is the ActiveProximtiy
+	-- at that moment
+	promptid: Entity,
+}
+
 -- We might want to return the greentea here
 -- Or create a table of predefined runtimes and return that, whichever we want ot do later on?
+
+--[[
+	A Scene is just an array of entites. Where each entities represent some action
+]]
+export type SceneType = { Entity }
+
+--[[
+	A cutscene is therefore just an array of Scenes
+]]
+export type CutsceneType = { SceneType }
+
+-- Uhhh i should use keyof but it doesn;t exist so doing this manually lmfao
+export type BuildingsType = "House_BasicHouse"
 
 return greentea

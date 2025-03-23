@@ -3,6 +3,7 @@ _G.__JECS_DEBUG = true
 local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local debug_scheduler_order = require(script.Parent.debug_scheduler_order)
 local jabby = require(ReplicatedStorage.pkg.jabby)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local rewire = require(ReplicatedStorage.pkg.rewire)
@@ -53,6 +54,9 @@ local function start(folders: { Folder })
 			end
 		end)
 	end
+
+	-- printOrder(scheduler, true)
+	-- debug_scheduler_order(scheduler, true)
 
 	if RunService:IsClient() then
 		local client = jabby.obtain_client()

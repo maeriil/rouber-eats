@@ -1,41 +1,51 @@
-local function is_action(v: any)
-	return type(v) == "table" and v._action
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local components = require(ReplicatedStorage.common.ecs.components)
+local t = require(ReplicatedStorage.types)
+local world = require(ReplicatedStorage.common.ecs.world)
+
+local function is_scene(v: any)
+	return type(v) == "table" and v._scene
 end
 
-type Action = {}
-type TABLE = { [any]: any }
+type TABLE = { { t.Entity } }
 
-type cutscene_props = {
+local function CUTSCENE(props: TABLE)
+	local scene_list = {}
 
-	[number]: { Action },
-}
+	for i, scene in ipairs(props) do
+		if not is_scene(scene) then
+			error(`Passed an unknown datatype to the Cutscene, {scene}`)
+		end
 
-local function CUTSCENE(props: cutscene_props)
-	local array = {}
+		local action_list = {} :: { t.Entity }
+		for _, action in ipairs(scene) do
+			table.insert(action_list, action)
+		end
 
-	for i, v in ipairs(props) do
+		table.insert(scene_list, action_list)
 	end
+
+	local cutscene = world:entity()
+	world:set(cutscene, components.Cutscene, {
+		cutscene = scene_list,
+		curr_scene_id = 0,
+		is_scene_complete = true,
+	})
 end
 
-local function ACTION(props: TABLE)
+local function SCENE(props: { [number]: t.Entity })
 	return {
-		_action = true,
+		_scene = true,
 		props = props,
 	}
 end
 
+local function action<T...>(callback: (T...) -> t.Entity, ...: T...)
+	return callback(...)
+end
+
 return {
 	CUTSCENE = CUTSCENE,
-	ACTION = ACTION,
+	SCENE = SCENE,
+	action = action,
 }
-
---[[
-  ACTION {
-    name = "describe what the action is doing"
-    who = localplayer
-    what = components.Position
-    goal = doormat.Position
-
-  }
-
-]]

@@ -1,14 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
-local playerstore = require(ServerScriptService.server.store.playerstore)
 local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local events = require(ReplicatedStorage.common.events)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
@@ -68,6 +67,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Update,
 	runConditions = {},
 }

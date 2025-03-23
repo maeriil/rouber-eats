@@ -53,11 +53,11 @@ local function system()
 	local result = workspace:GetPartBoundsInRadius(current_pos, radius, params)
 	local set = {}
 
-	gizmo.sphere.drawWithStyle({
-		alwaysOnTop = true,
-		color = Color3.fromRGB(255, 0, 0),
-		transparency = 0.5,
-	}, current_pos, radius)
+	-- gizmo.sphere.drawWithStyle({
+	-- 	alwaysOnTop = true,
+	-- 	color = Color3.fromRGB(255, 0, 0),
+	-- 	transparency = 0.5,
+	-- }, current_pos, radius)
 
 	for _, instance in result do
 		if set[instance] then
@@ -73,6 +73,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = phases.Phases.SteppedPhases.PlayerCast,
+	phase = phases.PreUpdate,
 	runConditions = {},
 }

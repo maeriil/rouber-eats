@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- local DoorProximity = require(script.features.Proximity.Attaching.DoorProximity)
+local DoorProximity = require(script.features.Proximity.DoorProximity)
 local HudScreen = require(script.pages.HudScreen)
 local PhoneScreen = require(script.pages.PhoneScreen)
 local RouberScreen = require(script.pages.RouberScreen)
@@ -10,8 +12,7 @@ local vide = require(ReplicatedStorage.pkg.vide)
 
 local create = vide.create
 local switch = vide.switch
--- local switch = vide.switch
--- local indexes = vide.indexes
+local indexes = vide.indexes
 
 -- local function FatalScreen(props)
 -- 	return frame {
@@ -72,14 +73,28 @@ local function root(): { any }
 	local phone: types.GamePages = "PhoneScreen"
 	local rouber: types.GamePages = "RouberScreen"
 
+	local alldoors = uistore.DoorProximity
+
 	return {
 		-- attach_billboard_to_npc {},
+
 		create "ScreenGui" {
 			use_px.use_px(),
 			IgnoreGuiInset = true,
 			ResetOnSpawn = false,
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 			ScreenInsets = Enum.ScreenInsets.None,
+			-- indexes(alldoors, function(details: () -> types.DoorProximityDetails, a1: number)
+			-- 	return DoorProximity {
+			-- 		details = details,
+			-- 	}
+			-- end),
+
+			indexes(alldoors, function(details: () -> types.DoorProximityDetails, a1: number)
+				return DoorProximity {
+					details = details,
+				}
+			end),
 
 			switch(page) {
 				[""] = function()

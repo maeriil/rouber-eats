@@ -8,69 +8,69 @@ type Entity = types.Entity
 
 local buildings = require(ReplicatedStorage.common.store.buildings)
 local c = require(ReplicatedStorage.common.ecs.components)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
 local pair = jecs.pair
-local ChildOf = jecs.ChildOf
 local __ = jecs.Wildcard
 
 type BaseBuildingType = buildings.BaseBuildingType
 
-local function for_all(e: Entity, model: Model)
-	-- For all kinds of residence, these are the things we must add/always have
-	-- Primary part is used to identify where to teleport the player if they need to step inside the house
-	local root = model.PrimaryPart
-	if root == nil then
-		error(
-			`The building {model.Name} does not have a primary part. A primary part must exist for all building`
-		)
-		return
-	end
+-- local function for_all(e: Entity, model: Model)
+-- 	-- For all kinds of residence, these are the things we must add/always have
+-- 	-- Primary part is used to identify where to teleport the player if they need to step inside the house
+-- 	local root = model.PrimaryPart
+-- 	if root == nil then
+-- 		error(
+-- 			`The building {model.Name} does not have a primary part. A primary part must exist for all building`
+-- 		)
+-- 		return
+-- 	end
 
-	world:set(e, c.PrimaryPart, root)
-	world:set(e, c.Position, root.Position :: any)
+-- 	world:set(e, c.PrimaryPart, root)
+-- 	world:set(e, c.Position, root.Position :: any)
 
-	local entry = {} :: BaseBuildingType
+-- 	local entry = {} :: BaseBuildingType
 
-	-- The doormat is used for teleporting the player when they leave the residence
-	local door_mat = model:FindFirstChild("DoorMat") :: Part?
-	if door_mat == nil then
-		error(
-			`The bulding {model.Name} does not contain a doormat. A doormat must exist for all building`
-		)
-	end
+-- 	-- The doormat is used for teleporting the player when they leave the residence
+-- 	local door_mat = model:FindFirstChild("DoorMat") :: Part?
+-- 	if door_mat == nil then
+-- 		error(
+-- 			`The bulding {model.Name} does not contain a doormat. A doormat must exist for all building`
+-- 		)
+-- 	end
 
-	local door_mat_e = world:entity() :: Entity
-	local door_mat_params = OverlapParams.new()
-	door_mat_params:AddToFilter({ door_mat } :: { any })
-	world:set(door_mat_e, c.DoorMat, door_mat)
-	world:set(door_mat_e, c.Position, door_mat.Position :: any)
-	world:add(door_mat_e, pair(ChildOf, e))
-	world:set(door_mat_e, c.OverParams, door_mat_params)
-	entry.DoorMat = door_mat_e
+-- 	local door_mat_e = world:entity() :: Entity
+-- 	local door_mat_params = OverlapParams.new()
+-- 	door_mat_params:AddToFilter({ door_mat } :: { any })
+-- 	world:set(door_mat_e, c.DoorMat, door_mat)
+-- 	world:set(door_mat_e, c.Position, door_mat.Position :: any)
+-- 	world:add(door_mat_e, pair(ChildOf, e))
+-- 	world:set(door_mat_e, c.OverParams, door_mat_params)
+-- 	entry.DoorMat = door_mat_e
 
-	local door = model:FindFirstChild("Door") :: Model?
-	if door == nil then
-		error(
-			`The building {model.Name} does not contain a door. Every building must contain at least one door even if we can't go inside`
-		)
-	end
-	local door_root = door.PrimaryPart
-	if door_root == nil then
-		error(
-			`{model.Name}'s door does not have primary part. Every door must contain a primary part, and everything else must be attached to it`
-		)
-	end
+-- 	local door = model:FindFirstChild("Door") :: Model?
+-- 	if door == nil then
+-- 		error(
+-- 			`The building {model.Name} does not contain a door. Every building must contain at least one door even if we can't go inside`
+-- 		)
+-- 	end
+-- 	local door_root = door.PrimaryPart
+-- 	if door_root == nil then
+-- 		error(
+-- 			`{model.Name}'s door does not have primary part. Every door must contain a primary part, and everything else must be attached to it`
+-- 		)
+-- 	end
 
-	local door_e = world:entity() :: Entity
-	world:add(door_e, c.Door)
-	world:set(door_e, c.Model, model)
-	world:set(door_e, c.PrimaryPart, door_root)
-	world:set(door_e, c.Position, door_root.Position :: any)
-	entry.Door = door_e
+-- 	local door_e = world:entity() :: Entity
+-- 	world:add(door_e, c.Door)
+-- 	world:set(door_e, c.Model, model)
+-- 	world:set(door_e, c.PrimaryPart, door_root)
+-- 	world:set(door_e, c.Position, door_root.Position :: any)
+-- 	entry.Door = door_e
 
-	buildings[e] = entry
-end
+-- 	buildings[e] = entry
+-- end
 
 -- local function system()
 -- 	-- initially I want to query for all houses and place them in world
@@ -147,7 +147,7 @@ local function system() end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Update,
 	runConditions = {
 		planck.runOnce(),
 	},

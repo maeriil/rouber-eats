@@ -6,12 +6,12 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local for_each_target = require(ReplicatedStorage.common.utility.for_each_target)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
-local previous = require(ReplicatedStorage.common.utility.previous)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local cast_query = world:query(c.CastStatus, c.BasePart, c.OverParams):with(c.DoormatZone):cached()
-local door_query = world:query(c.DoorStatus, previous(c.DoorStatus)):without(c.CannotOpen):cached()
+local door_query =
+	world:query(c.DoorStatus, pairs.previous(c.DoorStatus)):without(c.CannotOpen):cached()
 local doortween_query =
 	world:query(pairs.TweenStart, pairs.TweenEnd, c.DoorStatus, c.TweenStatus):with(c.Door):cached()
 
@@ -55,7 +55,7 @@ local function system()
 			world:set(target, c.TweenStatus, true)
 		end)
 
-		world:set(i, previous(c.DoorStatus), doorstatus)
+		world:set(i, pairs.previous(c.DoorStatus), doorstatus)
 	end
 
 	for i, starttween, endtween, doorstatus, tweenstatus in doortween_query:iter() do
@@ -76,6 +76,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = phases.Phases.SteppedPhases.WorldCast,
+	phase = phases.PreUpdate,
 	runConditions = {},
 }

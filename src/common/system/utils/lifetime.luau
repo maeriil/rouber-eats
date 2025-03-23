@@ -5,6 +5,7 @@ local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local scheduler = require(ReplicatedStorage.common.ecs.scheduler)
 local pair = jecs.pair
 local world = require(ReplicatedStorage.common.ecs.world)
@@ -45,6 +46,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Update,
 	runConditions = {},
 }

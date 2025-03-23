@@ -1,3 +1,5 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local types = require(ReplicatedStorage.types)
 --[[
     The template for how we save players data in the data store.
 
@@ -8,6 +10,7 @@
 local template = {
 	coins = 0,
 	gems = 0,
+	housetype = "House_BasicHouse" :: types.BuildingsType,
 }
 export type template = typeof(template)
 

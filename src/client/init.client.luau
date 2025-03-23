@@ -10,6 +10,7 @@ do
 
 	-- Here are the modules that needs to be required at least once before we startup
 	-- our system. Modules get cached so we can access them in system after as normal
+	require(ReplicatedStorage.common.configs.buildings.buildings_map)
 	require(ReplicatedStorage.common.configs.job_configs)
 	require(ReplicatedStorage.common.events)
 	require(ReplicatedStorage.common.store.buildings)

@@ -15,6 +15,9 @@ local components = {
 	Model = world:component() :: t.Entity<Model>,
 	BasePart = world:component() :: t.Entity<BasePart>,
 	PrimaryPart = world:component() :: t.Entity<BasePart>,
+	Humanoid = world:component() :: t.Entity<Humanoid>,
+	Animator = world:component() :: t.Entity<Animator>,
+	AnimationTrack = world:component() :: t.Entity<AnimationTrack>,
 	AgentParams = world:component() :: t.Entity<{
 		radius: number,
 		height: number,
@@ -26,11 +29,18 @@ local components = {
 	Path = world:component() :: t.Entity<Path>,
 	PathWaypoints = world:component() :: t.Entity<{ PathWaypoint }>,
 	PathFuture = world:component() :: t.Entity<future.FutureLike<string, { PathWaypoint }>>,
+	WalkToFuture = world:component() :: t.Entity<future.FutureLike<string, boolean>>,
 
 	RayParams = world:component() :: t.Entity<RaycastParams>,
 	OverParams = world:component() :: t.Entity<OverlapParams>,
 	TweenParams = world:component() :: t.Entity<TweenInfo>,
 	Tween = world:component() :: t.Entity<Tween>,
+
+	-- Generic tag, which can be used to start
+	-- Tweens
+	-- Animations using Animator
+	-- Springs
+	StartAnimation = world:entity() :: t.Entity,
 
 	Lifetime = world:component() :: t.Entity<number>,
 	-- Typically should be used for component only I would say
@@ -40,6 +50,7 @@ local components = {
 	Gems = world:component() :: t.Entity<number>,
 
 	Position = world:component() :: t.Entity<vector>,
+	Size = world:component() :: t.Entity<vector>,
 	Transform = world:component() :: t.Entity<CFrame>,
 
 	DeliveryOrderStatus = world:component() :: t.Entity<t.DeliveryOrderStatus>,
@@ -70,18 +81,27 @@ local components = {
 	OffDuty = world:entity() :: t.Entity,
 	Job = world:component() :: t.Entity<t.Entity>,
 
-	OwnerOf = world:entity() :: t.Entity,
+	OwnsBuilding = world:entity() :: t.Entity,
 	OwnedBy = world:entity() :: t.Entity,
+
+	-- Deprecate the usage of OwnerOf, as its too generic. The entities are on thing that
+	-- makes more sense that their aren't generic because they are super cheap to create
+	OwnerOf = world:entity() :: t.Entity,
 	Claim = world:entity() :: t.Entity,
 
 	-- Residence is basically any place a player can claim as their own living space
 	-- Player should be able to own multiple. They will start off with a basic apartment
 	Residence = world:component() :: t.Entity<t.Entity>,
-	House = world:entity() :: t.Entity,
+	Vacant = world:entity() :: t.Entity,
+	House = world:component() :: t.Entity<string>,
 	Apartment = world:entity() :: t.Entity,
 	ApartmentUnit = world:entity() :: t.Entity,
 	AptUnitOf = world:entity() :: t.Entity,
 	Mansion = world:entity() :: t.Entity,
+	LandPlot = world:entity() :: t.Entity,
+	OccupiedByPlayer = world:component() :: t.Entity<t.Entity>,
+	OccupiedByNPC = world:component() :: t.Entity<t.Entity>,
+	HouseOwner = world:entity() :: t.Entity,
 
 	TeleportZone = world:entity() :: t.Entity,
 	DoormatZone = world:entity() :: t.Entity,
@@ -133,8 +153,33 @@ local components = {
 	DoNotDelete = world:entity() :: t.Entity,
 
 	NPC = world:entity() :: t.Entity,
+	-- House NPC are kind of NPC that must always have a residence
+	-- If they dont have residence, then we must delete them and recycle
+	HouseNPC = world:entity() :: t.Entity,
 
 	IsCutscenePlaying = world:entity() :: t.Entity,
+	Cutscene = world:component() :: t.Entity<{
+		cutscene: t.CutsceneType,
+		is_scene_complete: boolean,
+		curr_scene_id: number,
+	}>,
+	CutsceneAction = world:entity() :: t.Entity,
+
+	AnimationFuture = world:component() :: t.Entity<future.FutureLike<string, boolean>>,
+	SoundFuture = world:component() :: t.Entity<future.FutureLike<string, boolean>>,
+	Sound = world:component() :: t.Entity<Sound>,
+
+	Camera = world:entity() :: t.Entity,
+	CameraProperties = world:component() :: t.Entity<{
+		type: Enum.CameraType,
+		fov: number,
+	}>,
+
+	Parent = world:component() :: t.Entity<t.Entity>,
+	Map = world:component() :: t.Entity<Folder>,
+
+	Interacted = world:entity() :: t.Entity,
+	InteractedCooldown = world:entity() :: t.Entity,
 }
 do
 	-- Because luau is ass
@@ -158,6 +203,7 @@ world:set(components.Model, jecs.OnRemove, function(entity: t.Entity)
 	local model = world:get(entity, components.Model)
 
 	if model and not world:has(entity, components.DoNotDelete) then
+		print(` AN ENTITY WITH MODEL {model.Name}`)
 		model:Destroy()
 	end
 end)
@@ -177,5 +223,7 @@ world:set(components.BasePart, jecs.OnRemove, function(entity: t.Entity)
 		basepart:Destroy()
 	end
 end)
+
+world:add(components.Parent, jecs.pair(jecs.OnDeleteTarget, jecs.Delete))
 
 return components

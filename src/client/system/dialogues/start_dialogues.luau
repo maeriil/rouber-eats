@@ -6,6 +6,7 @@ local uistore = require(ReplicatedStorage.client.app.uistore)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local queue = require(ReplicatedStorage.common.utility.queue)
 local world = require(ReplicatedStorage.common.ecs.world)
 local future = require(ReplicatedStorage.pkg.future).Future
@@ -145,6 +146,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Update,
 	runConditions = {},
 }

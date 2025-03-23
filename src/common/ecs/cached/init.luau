@@ -8,4 +8,6 @@ return {
 
 	-- For deleteing instances from server
 	iterate_cleanup = world:query(c.EntityId, c.Cleanup):cached(),
+
+	all_client = world:query(c.Client):cached(),
 }

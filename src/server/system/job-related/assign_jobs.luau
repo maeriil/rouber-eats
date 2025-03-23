@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local c = require(ReplicatedStorage.common.ecs.components)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local job_configs = require(ReplicatedStorage.common.configs.job_configs)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local world = require(ReplicatedStorage.common.ecs.world)
 local pair = jecs.pair
@@ -9,7 +10,6 @@ local __ = jecs.Wildcard
 
 local function assign_job()
 	for e, player, job in world:query(c.Client, pair(c.Job, c.Assign)):iter() do
-		print("changing players team")
 		world:remove(e, pair(c.Job, c.Assign))
 
 		local previous_job = world:target(e, c.Job)
@@ -37,7 +37,7 @@ end
 
 return {
 	runConditions = {},
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Update,
 	system = system,
 	name = script.Name,
 }

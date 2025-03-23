@@ -1,18 +1,24 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local childof = require(script.Parent.childof)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local setup_door = require(script.Parent.setup_door)
+local setup_door = require(ReplicatedStorage.common.configs.buildings.setup_door)
 local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
+local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local pair = jecs.pair
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local function setup_exteriorinterior_house(model: Model, params: types.BuildingRemoteParams)
+--[[
+	@DEPRECATED
+]]
+local function setup_exteriorinterior_house(
+	model: Model,
+	params: types.BuildingRemoteParams
+)
 	-- If it is a exterior/interior building, then it most likely is a building player can go in. Exterior is the outside
 	-- look and interior is the inside part of the building
 	-- Typically, the interior of the building is somewhere else far away
@@ -33,14 +39,14 @@ local function setup_exteriorinterior_house(model: Model, params: types.Building
 	-- local interior_door = interior:FindFirstChild("Door") :: Model
 	-- local interior_doormat = interior_door.PrimaryPart :: Part
 	world:add(interior_e, c.Interior)
-	world:add(interior_e, childof(parent))
+	world:add(interior_e, pairs.childof(parent))
 	world:set(interior_e, c.Model, interior)
 	world:set(interior_e, c.PrimaryPart, interior_root)
 
 	local exterior_root = exterior.PrimaryPart :: Part
 	local exterior_door = exterior:FindFirstChild("DoorCore") :: Model
 	local exterior_doormat = exterior_door.PrimaryPart :: Part
-	world:add(exterior_e, childof(parent))
+	world:add(exterior_e, pairs.childof(parent))
 	world:add(exterior_e, c.Exterior)
 	world:set(exterior_e, c.Model, exterior)
 	world:set(exterior_e, c.PrimaryPart, exterior_root)

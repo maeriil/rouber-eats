@@ -1,3 +1,11 @@
+[entries."assets/images/ActionBubble.svg"]
+hash = "316f7ed2ec66f18a16a83205068a9aad4ee17ddeca213a1345639e97b30f56ab"
+asset_id = 129504285891746
+
+[entries."assets/images/ActionBubbleInverted.svg"]
+hash = "3fc2f0dbefa763a24c461c1d5881060760aea7021ec5063354e1696cf362f4fe"
+asset_id = 116680509777131
+
 [entries."assets/images/ActiveStar.svg"]
 hash = "04b79783513f7056f11549d16b04dd3ce41a80fa9944b7a8cdb115f6a6528629"
 asset_id = 99303162879991
@@ -38,6 +46,18 @@ asset_id = 101224825839546
 hash = "2a6f5c31c32e313616e42e641090fc319b15ad0aed91c1f00124fefc2cb40f53"
 asset_id = 135155603345133
 
+[entries."assets/images/Hexagon.svg"]
+hash = "eea1229fc05a6bf1b28a7b682448891ee0ed4da222bac66025a2efcb1fe78e7d"
+asset_id = 113821992656466
+
+[entries."assets/images/Label.svg"]
+hash = "ada8d6d3e89a9d5bf151dfd0eb1a08011a53d26e836fccf980df4e331f83c389"
+asset_id = 129893366688406
+
+[entries."assets/images/LabelInverted.svg"]
+hash = "ebf5ba72595ba45a8b9b075e4ae3b0bae8e0678ecf4f1c40bbe75501a2546d14"
+asset_id = 124291415335756
+
 [entries."assets/images/Order_List_Back.png"]
 hash = "d0ef92a634169896fb3f9b5a3714f2df060870e0e5f28b7808df682d250bbcc6"
 asset_id = 126126494446320
@@ -45,6 +65,14 @@ asset_id = 126126494446320
 [entries."assets/images/Order_List_Front.png"]
 hash = "ad78233fc3cca027b642f0f0de35245589a50a725a9c6d5db2a90cf207d0f46d"
 asset_id = 70502070150372
+
+[entries."assets/images/ParallelogramLeft.svg"]
+hash = "52dbdd43f8b8a48c7f3ac50f3e5913d0ad1b441fe4e3d47b367b1272edc95d50"
+asset_id = 117697437558772
+
+[entries."assets/images/ParallelogramRight.svg"]
+hash = "48f07f382e347c7843a61cb9bfcaa7ad0c26855bc63dcbb0e0a2c7657e9627e0"
+asset_id = 105891122572510
 
 [entries."assets/images/PhoneDesign1.svg"]
 hash = "d6966b723bfaab79ab023f9a810257fe009cac8fc60d17e4b3aa0ae5e7b3dc1e"

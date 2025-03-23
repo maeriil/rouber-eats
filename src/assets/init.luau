@@ -1,5 +1,7 @@
 return {
 	images = {
+		["ActionBubble.svg"] = "rbxassetid://129504285891746",
+		["ActionBubbleInverted.svg"] = "rbxassetid://116680509777131",
 		["ActiveStar.svg"] = "rbxassetid://99303162879991",
 		["CardEffect_test.svg"] = "rbxassetid://124434407722310",
 		["Dialogue.svg"] = "rbxassetid://134267041295470",
@@ -10,8 +12,13 @@ return {
 		["ExclamationIcon.svg"] = "rbxassetid://139734034364282",
 		["ExitButton.svg"] = "rbxassetid://101224825839546",
 		["ExitButtonInverted.svg"] = "rbxassetid://135155603345133",
+		["Hexagon.svg"] = "rbxassetid://113821992656466",
+		["Label.svg"] = "rbxassetid://129893366688406",
+		["LabelInverted.svg"] = "rbxassetid://124291415335756",
 		["Order_List_Back.png"] = "rbxassetid://126126494446320",
 		["Order_List_Front.png"] = "rbxassetid://70502070150372",
+		["ParallelogramLeft.svg"] = "rbxassetid://117697437558772",
+		["ParallelogramRight.svg"] = "rbxassetid://105891122572510",
 		["PhoneDesign1.svg"] = "rbxassetid://126615497961611",
 		["PhoneIconFrame.svg"] = "rbxassetid://137856131398050",
 		["SidebarFrame.svg"] = "rbxassetid://117386399087386",

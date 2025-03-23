@@ -5,6 +5,7 @@ local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 
 type Entity<T = nil> = jecs.Entity<T>
 local c = require(ReplicatedStorage.common.ecs.components)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local pair = jecs.pair
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
@@ -34,6 +35,6 @@ end
 return {
 	name = script.Name,
 	system = system,
-	phase = planckrunservice.Phases.Update,
+	phase = phases.Update,
 	runConditions = {},
 }

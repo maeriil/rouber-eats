@@ -10,8 +10,11 @@ do
 	-- our system. Modules get cached so we can access them in system after as normal
 
 	require(ReplicatedStorage.common.events)
+	require(ReplicatedStorage.common.configs.buildings.buildings_map)
 	require(script.store.playerstore)
 	require(script.store.playerdatastore)
+	-- require(script.store.serverstore)
+	require(script.store.playersetupconfig)
 	require(ReplicatedStorage.common.configs.job_configs)
 	require(ReplicatedStorage.common.store.buildings)
 end
