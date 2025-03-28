@@ -7,15 +7,13 @@ local ProximityText = require(script.Parent.ProximityText)
 local frame = require(ReplicatedStorage.client.app.components.pane.frame)
 local letter_effect_list = require(ReplicatedStorage.common.utility.letter_effect_list)
 local padding = require(ReplicatedStorage.client.app.components.padding)
-local padding_types =
-	require(ReplicatedStorage.client.app.components.padding.padding_types)
+local padding_types = require(ReplicatedStorage.client.app.components.padding.padding_types)
 local scale = require(ReplicatedStorage.client.app.components.scale.scale)
 local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local vide = require(ReplicatedStorage.pkg.vide)
 local vlayout = require(ReplicatedStorage.client.app.components.layouts.vlayout)
 
 local mount = vide.mount
-local px = use_px.px
 
 local effects = letter_effect_list
 
@@ -23,18 +21,6 @@ local effects = letter_effect_list
 
 local function story()
 	use_px.use_px()
-
-	-- local res, translator = pcall(function()
-	-- 	return LocalizationService:GetTranslatorForLocaleAsync("es")
-	-- end)
-
-	-- if res then
-	-- 	-- Use Translate function, providing object context and string
-	-- 	local sourceTranslation = translator:Translate(game, "Screen!")
-	-- 	print(sourceTranslation) -- Expected Output: "Pantalla"
-	-- else
-	-- 	print("GetTranslatorForPlayerAsync failed: " .. translator)
-	-- end
 
 	return frame {
 		size = UDim2.new(1, 0, 1, 0),

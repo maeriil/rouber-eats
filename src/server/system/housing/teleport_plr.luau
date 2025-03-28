@@ -1,29 +1,29 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
+local serverevents = require(ServerScriptService.server.serverevents)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local p = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
+local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local teleport =
-	world:query(c.Model, c.TeleportTo, c.PrimaryPart):without(pairs.TPCooldown):cached()
+local teleport = world:query(c.Model, c.TeleportTo, c.PrimaryPart):without(p.TPCooldown):cached()
+local teleport_event = serverevents.Building.IWantToTeleportInOrOut
 local function system()
-	for _, player, building_id, going_interior in
-		events.IWantToTeleportInOrOut:query():server():iter()
-	do
+	for _, player, _building_id, curr_building in teleport_event.iter() do
+		local building_id = (_building_id :: never) :: types.Entity
 		if not building_id or not world:contains(building_id) then
-			warn(`That building id does not exist!`)
-			warn(`building id = {building_id}`)
+			warn(`The specified building id = {building_id} does not exist. Aborting request`)
 			continue
 		end
 
 		local e = ref(player)
-		local interior_id = world:get(building_id, pairs.BuildingInteriorId)
-		local exterior_id = world:get(building_id, pairs.BuildingExteriorId)
+		local interior_id = world:get(building_id, p.BuildingInteriorId)
+		local exterior_id = world:get(building_id, p.BuildingExteriorId)
 
 		-- For that, we need to know whether a player is outside or inside
 		-- We also need to store the exterior position of the building in our server, which we don't right now
@@ -33,6 +33,7 @@ local function system()
 
 		assert(interior_id ~= nil, `Interior id must exist for the building`)
 		assert(exterior_id ~= nil, `Exterior id must exist for the building`)
+		local going_interior = curr_building == "exterior"
 
 		if going_interior then
 			local destination = world:get(interior_id, c.Transform) :: CFrame
@@ -46,7 +47,7 @@ local function system()
 	for i, model, cf, hrp in teleport:iter() do
 		model:PivotTo(cf + Vector3.new(0, hrp.Size.Y / 2, 0))
 		world:remove(i, c.TeleportTo)
-		world:set(i, pairs.TPCooldown, 1)
+		world:set(i, p.TPCooldown, 1)
 	end
 end
 

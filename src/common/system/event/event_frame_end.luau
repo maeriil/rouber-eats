@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local events = require(ReplicatedStorage.common.events.setup)
+-- local events = require(ReplicatedStorage.common.events.setup)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 
 local function sys()
-	events.after_event()
+	-- events.after_event()
 end
 
 return {

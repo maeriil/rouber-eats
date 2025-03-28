@@ -1,4 +1,4 @@
-_G.__JECS_DEBUG = true
+_G.__JECS_DEBUG = false
 
 local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -55,7 +55,6 @@ local function start(folders: { Folder })
 		end)
 	end
 
-	-- printOrder(scheduler, true)
 	-- debug_scheduler_order(scheduler, true)
 
 	if RunService:IsClient() then

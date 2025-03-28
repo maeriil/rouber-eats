@@ -1,22 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
+local p = require(ReplicatedStorage.common.ecs.pairs)
+local phases = require(ReplicatedStorage.common.ecs.phases)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local phases = require(ReplicatedStorage.common.ecs.phases)
 local pair = jecs.pair
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
+-- local housing = clientevents.Housing
 local function system()
-	local it = world:query(c.Dialogue):iter()
-	local e, dialogue = it()
-	if not e then
-		return
-	end
-
-	-- continue with our dialogue now
+	-- for _, id_list, model_list in housing.BulkCreateHousePlayerOwners.iter() do
+	-- end
 end
 
 return {

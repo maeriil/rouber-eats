@@ -3,10 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local playersetupconfig = require(ServerScriptService.server.store.playersetupconfig)
+local serverevents = require(ServerScriptService.server.serverevents)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)
@@ -59,6 +59,7 @@ local cleanup_house_npc_query = world
 	:query(c.Parent, c.OccupiedByNPC, pairs.BuildingInteriorId, pairs.BuildingExteriorId)
 	:with(c.Cleanup, c.House)
 	:cached()
+local request_delete_house = serverevents.Building.delete_house_owner
 local function cleanup_npc_landplot()
 	local players_who_have_completed_setup = get_players_who_has_setup_houses()
 
@@ -68,10 +69,10 @@ local function cleanup_npc_landplot()
 		-- server will filter out the players to send to. The housing setup runs after this phase
 		-- so we are guaranteed that this list contains players who has setup this npc
 
-		print("Cleaning up the existing npc landplot and sending it to the following users")
-		print(players_who_have_completed_setup)
-
-		events.DeleteHouseOwner:send(npc_owner_id):to(players_who_have_completed_setup)
+		print(
+			`Cleaning up the existing npc landplot and sending it to the following users {players_who_have_completed_setup}`
+		)
+		request_delete_house.fire_list(players_who_have_completed_setup, npc_owner_id :: never)
 		cleanup_the_landplot(house_id, parent, interior_id, exterior_id)
 
 		world:remove(parent, c.OccupiedByNPC)

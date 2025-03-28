@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local EnterAction =
-	require(ReplicatedStorage.client.app.features.Graffiti.Presets.EnterAction)
+local EnterAction = require(ReplicatedStorage.client.app.features.Graffiti.Presets.EnterAction)
 local ProximityKey = require(script.Parent.ProximityKey)
 local ProximityPresenceIcon = require(script.Parent.ProximityPresenceIcon)
 local ProximityText = require(script.Parent.ProximityText)
@@ -96,11 +95,18 @@ local function DoorProximity(props: props)
 		return details().promptid == uistore.ActiveProximity()
 	end
 
+	local function adjust_offset()
+		return if proximity_type_display() then vector.create(0, 1, 3) else vector.create(0, 5, 0)
+	end
+
 	return billboard {
 		max_distance = 75,
+		offset = adjust_offset,
 		adornee = adornee,
 		size = function()
-			if proximity_type_display() then return UDim2.new(10, 0, 5, 0) end
+			if proximity_type_display() then
+				return UDim2.new(10, 0, 5, 0)
+			end
 			return UDim2.new(4, 0, 4, 0)
 		end,
 

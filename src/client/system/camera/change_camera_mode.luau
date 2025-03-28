@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local c = require(ReplicatedStorage.common.ecs.components)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 

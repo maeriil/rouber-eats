@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
 local get_client_owner_id_from_serverid =
 	require(ReplicatedStorage.common.utility.get_client_owner_id_from_serverid)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
@@ -26,7 +26,7 @@ local function cleanup_buildings(house_id: t.Entity)
 	interior_cleanup()
 	exterior_cleanup()
 
-	print(`Deleting exterior_id`)
+	warn(`Deleting exterior_id={exterior_id}, interior_id={exterior_id}, and house_id={house_id}`)
 	world:delete(interior_id)
 	world:delete(exterior_id)
 	world:delete(house_id)
@@ -46,10 +46,11 @@ local function cleanup_house_owner(server_owner_id: t.Entity)
 	world:delete(client_owner_id)
 end
 
+local request_delete_house_owner = clientevents.Building.delete_house_owner
 local function system()
-	for _, server_owner_id in events.DeleteHouseOwner:query():client():iter() do
+	for _, server_owner_id in request_delete_house_owner.iter() do
 		warn(`Received request to clean up a house owner`)
-		cleanup_house_owner(server_owner_id)
+		cleanup_house_owner(server_owner_id :: never)
 	end
 end
 

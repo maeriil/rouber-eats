@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local assets = require(ReplicatedStorage.assets)
 local basebutton = require(ReplicatedStorage.client.app.components.button.basebutton)
-local frame = require(ReplicatedStorage.client.app.components.pane.frame)
 local padding = require(ReplicatedStorage.client.app.components.padding)
 local padding_types = require(ReplicatedStorage.client.app.components.padding.padding_types)
 local pane = require(ReplicatedStorage.client.app.components.pane.pane)
 local par = require(ReplicatedStorage.client.app.components.label.par)
+local ratio = require(ReplicatedStorage.client.app.components.ratio)
 local text_sizes = require(ReplicatedStorage.client.app.utility.text_sizes)
 local types = require(ReplicatedStorage.types)
 local use_motion = require(ReplicatedStorage.client.app.utility.use_motion)
@@ -56,10 +56,10 @@ local function ChoiceBubble(props: props)
 			motion:tween(default_scale)
 		end
 	end)
-
 	return pane {
 		size = function()
-			return UDim2.new(0, px(440), 0, px(95))
+			-- return UDim2.new(0, px(440), 0, px(95))
+			return UDim2.new(1, 0, 1, 0)
 		end,
 		order = props.order,
 		basebutton {
@@ -71,8 +71,11 @@ local function ChoiceBubble(props: props)
 				hovering(false)
 			end,
 		},
+		ratio {
+			ratio = 440 / 95,
+		},
 		create "ImageLabel" {
-			Size = UDim2.new(0, px(440), 0, px(95)),
+			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.fromRGB(255, 0, 0),
 			BorderSizePixel = 0,
@@ -108,6 +111,7 @@ local function ChoiceBubble(props: props)
 			end,
 			anchor = Vector2.new(0.5, 0.5),
 			pos = UDim2.fromScale(0.5, 0.5),
+			rotation = props.rotation,
 			create "UIScale" {
 				Scale = default_scale,
 			},
@@ -118,7 +122,7 @@ local function ChoiceBubble(props: props)
 				end,
 				color = textcolor,
 				size = function()
-					return px(text_sizes.heading.h4)
+					return px(text_sizes.heading.h3)
 				end,
 				wrap = true,
 				xalign = Enum.TextXAlignment.Center,

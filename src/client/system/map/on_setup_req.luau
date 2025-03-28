@@ -2,6 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local assets = require(ReplicatedStorage.assets)
+local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local setup_building_exterior =
@@ -12,7 +13,6 @@ local uistore = require(ReplicatedStorage.client.app.uistore)
 local c = require(ReplicatedStorage.common.ecs.components)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local pair = jecs.pair
-local events = require(ReplicatedStorage.common.events)
 local get_true_ancestor = require(ReplicatedStorage.common.utility.get_true_ancestor)
 local tags = require(ReplicatedStorage.types.tags)
 local types = require(ReplicatedStorage.types)
@@ -20,8 +20,10 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local gamemap = workspace.GameMap
+local request_setup_map = clientevents.PlayerEvents.setup_map_on_join
+local response_setup_map = clientevents.PlayerEvents.i_have_setup_map
 local function system()
-	for _ in events.SetupMapOnJoin:query():client():iter() do
+	for _ in request_setup_map.iter() do
 		task.spawn(function()
 			warn(`SETTING UP THE MAP...`)
 			local me = Players.LocalPlayer
@@ -57,7 +59,7 @@ local function system()
 			-- 	world:set(restaurantid, c.Name, exterior_name)
 			-- end
 
-			events.IHaveSetupMapToWorkspace:send()
+			response_setup_map.fire()
 			warn(`FINISHED SETTING UP THE MAP...`)
 		end)
 	end

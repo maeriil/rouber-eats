@@ -1,16 +1,12 @@
 -- NOT DELETING THIS BECAUSE I SPENT 13 HOURS ON THIS :(
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local assets = require(ReplicatedStorage.assets)
 local flexfill = require(ReplicatedStorage.client.app.components.flex.flexfill)
 local frame = require(ReplicatedStorage.client.app.components.pane.frame)
 local hlayout = require(ReplicatedStorage.client.app.components.layouts.hlayout)
 local next_order = require(ReplicatedStorage.common.utility.next_order)
 local pane = require(ReplicatedStorage.client.app.components.pane.pane)
-local phonebase = require(script.phonebase)
-local phonesidebar = require(script.phonesidebar)
-local ripple = require(ReplicatedStorage.pkg.ripple)
 local showdelay = require(ReplicatedStorage.client.app.components.showdelay)
 local uistore = require(ReplicatedStorage.client.app.uistore)
 local use_motion = require(ReplicatedStorage.client.app.utility.use_motion)
@@ -19,7 +15,6 @@ local vide = require(ReplicatedStorage.pkg.vide)
 
 local effect = vide.effect
 local source = vide.source
-local cleanup = vide.cleanup
 local create = vide.create
 local px = use_px.px
 local show = vide.show
@@ -35,11 +30,6 @@ local function phone(props)
 	local mainframemove, mainframemove_motion = use_motion(2)
 	local titlemove, titlemove_motion = use_motion(-1)
 	local total_time = 50
-
-	-- cleanup(RunService.Heartbeat:Connect(function(dt: number)
-	-- 	currdt(dt * speed + currdt())
-	-- 	print(currdt())
-	-- end))
 
 	local tilemovement, tilemovement_motion = use_motion(0)
 	local tilemovement_secondary, tilemovementsecondary_motion = use_motion(-1000)

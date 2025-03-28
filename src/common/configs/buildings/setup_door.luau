@@ -18,7 +18,6 @@ local function setup_doormatzone(doormat: Part, parent: t.Entity, params: Overla
 	world:set(e, c.OverParams, params)
 	world:set(e, c.CastStatus, false)
 	world:set(e, c.BasePart, doormat)
-
 	basepartmap[doormat] = e
 
 	return e
@@ -39,10 +38,7 @@ local function setup_teleportzone(teleport: Part, parent: t.Entity, params: Over
 end
 
 local function setup_door(door: Model, parent: t.Entity, open_cf_mul: CFrame)
-	assert(
-		door.PrimaryPart,
-		`Primary part must exist for the door under the building {parent}`
-	)
+	assert(door.PrimaryPart, `Primary part must exist for the door under the building {parent}`)
 
 	local e = world:entity()
 	world:add(parent, pair(c.Door, e))

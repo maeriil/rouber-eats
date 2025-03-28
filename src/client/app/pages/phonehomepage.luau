@@ -170,7 +170,6 @@ local function phone_homepage(props: {
 		indexes(
 			owned_buttons,
 			function(p: () -> { desc: string, name: string, page_name: string }, order: number)
-				print(p)
 				return create_icon(p(), props.page, order, icon_size)
 			end
 		),

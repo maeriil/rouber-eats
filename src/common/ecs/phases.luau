@@ -5,10 +5,12 @@ local planck = require(ReplicatedStorage.pkg.planck)
   Server related phases. Refer to the figma diagram to know how exactly the phases are ordered
 ]]
 export type ServerInitialize = {
+	DataSetup: planck.Phase,
 	BuildingSetup: planck.Phase,
 	MapSetup: planck.Phase,
 }
 local ServerInitialize = {} :: ServerInitialize
+ServerInitialize.DataSetup = planck.Phase.new("DataSetup")
 ServerInitialize.BuildingSetup = planck.Phase.new("BuildingSetup")
 ServerInitialize.MapSetup = planck.Phase.new("MapSetup")
 
@@ -89,6 +91,7 @@ return {
 		_pipelines = {
 			ServerInitializePipeline = planck.Pipeline
 				.new("ServerInitialize")
+				:insert(ServerInitialize.DataSetup)
 				:insert(ServerInitialize.BuildingSetup)
 				:insert(ServerInitialize.MapSetup),
 			PlayerAddedRemoved = planck.Pipeline

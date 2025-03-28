@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)
@@ -17,6 +17,7 @@ local door_interaction_query = world
 	:without(pairs.InteractedCooldown)
 	:cached()
 
+local request_to_teleport = clientevents.Building.IWantToTeleportInOrOut
 local function system()
 	for i in door_interaction_query:iter() do
 		local parent = world:parent(i)
@@ -35,9 +36,9 @@ local function system()
 			false = (player is in interior, going to exterior)
 
 		]]
-		local to_interior = world:has(parent, c.Exterior)
+		local to_interior = world:has(parent, c.Exterior) and "exterior" or "interior"
+		request_to_teleport.fire(serverid, to_interior :: never)
 
-		events.IWantToTeleportInOrOut:send(serverid, to_interior)
 		world:set(i, pairs.InteractedCooldown, 2) -- So clients dont just spam request
 		world:set(c.Client, pairs.InteractedCooldown, 0.25)
 	end

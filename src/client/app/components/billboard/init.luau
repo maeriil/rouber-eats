@@ -12,6 +12,7 @@ type props = {
 	max_distance: types.Can<number>?,
 	size: types.Can<UDim2>?,
 	active: types.Can<boolean>?,
+	offset: types.Can<vector>?,
 
 	[number]: any,
 }
@@ -41,7 +42,7 @@ local function BillboardGui(props: props)
 		-- DistanceUpperLimit = function()
 		-- 	return -1
 		-- end,
-		StudsOffsetWorldSpace = vector.create(0, 5, 0),
+		StudsOffsetWorldSpace = props.offset or vector.create(0, 5, 0),
 		MaxDistance = max_distance,
 		-- ExtentsOffset = vector.create() -- the offset vector from our part relative to camera
 		-- StudsOffset = vector.create() -- im ngl this feels same as above, we should figure out what diff it has

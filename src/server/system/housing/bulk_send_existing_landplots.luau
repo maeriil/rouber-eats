@@ -4,10 +4,11 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local playerdatastore = require(ServerScriptService.server.store.playerdatastore)
 local playersetupconfig = require(ServerScriptService.server.store.playersetupconfig)
+local serverevents = require(ServerScriptService.server.serverevents)
 local t = require(ReplicatedStorage.types)
 
+local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)
@@ -51,22 +52,27 @@ end
 ]]
 local house_owner_details_query =
 	world:query(c.Model, c.PrimaryPart, c.Residence):with(c.HouseOwner):cached()
-
+local request_bulk_create_house_owners = serverevents.Building.bulk_create_house_owners
 local function bulk_send_house_owners_with_residence_to_new_players(players: { Player })
-	local owner_id_list = {} :: { t.Entity }
-	local owner_name_list = {} :: { string }
+	local owner_id_list = {} :: { number }
+	local owner_name_list = {} :: { Model }
 	local is_npc_list = {} :: { boolean }
 
 	for owner_id, char, primarypart, residence_id in house_owner_details_query:iter() do
 		local is_npc = world:has(owner_id, c.OccupiedByNPC)
 		assert(char.PrimaryPart ~= nil, `Primary parpt must be valid`)
 
-		table.insert(owner_id_list, owner_id)
-		table.insert(owner_name_list, char.Name)
+		table.insert(owner_id_list, blink_conv.from_entity(owner_id))
+		table.insert(owner_name_list, char)
 		table.insert(is_npc_list, is_npc)
 	end
 
-	events.BulkCreateHouseOwners:send(owner_id_list, owner_name_list, is_npc_list):to(players)
+	request_bulk_create_house_owners.fire_list(
+		players,
+		owner_id_list,
+		owner_name_list :: never,
+		is_npc_list
+	)
 end
 
 --[[
@@ -80,6 +86,7 @@ local npc_house_details_query = world
 local client_house_details_query = world
 	:query(c.House, pairs.BuildingExteriorId, pairs.BuildingInteriorId, c.Parent, c.OccupiedByPlayer)
 	:cached()
+local request_bulk_create_houses = serverevents.Building.bulk_create_house
 local function bulk_send_house_details_to_new_players(players: { Player })
 	local house_serverid_list = {} :: { t.Entity }
 	local house_exteriordoormat_list = {} :: { CFrame }
@@ -127,15 +134,23 @@ local function bulk_send_house_details_to_new_players(players: { Player })
 	end
 
 	for i, player in players do
-		events.BulkCreateHouses
-			:send(
-				house_serverid_list,
-				house_exteriordoormat_list,
-				house_interiormodel_list,
-				house_type_list,
-				house_owner_id_list
-			)
-			:to(player)
+		-- events.BulkCreateHouses
+		-- 	:send(
+		-- 		house_serverid_list,
+		-- 		house_exteriordoormat_list,
+		-- 		house_interiormodel_list,
+		-- 		house_type_list,
+		-- 		house_owner_id_list
+		-- 	)
+		-- 	:to(player)
+		request_bulk_create_houses.fire(
+			player,
+			house_serverid_list :: never,
+			house_exteriordoormat_list,
+			house_interiormodel_list,
+			house_type_list,
+			house_owner_id_list
+		)
 	end
 end
 

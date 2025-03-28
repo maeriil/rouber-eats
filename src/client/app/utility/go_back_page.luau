@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local uistore = require(ReplicatedStorage.client.app.uistore)
 
 local function go_back_page()
-	print("going back to old page")
 	local currpage = uistore.page
 	local lastpage = uistore.lastpage
 

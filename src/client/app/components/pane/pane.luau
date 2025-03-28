@@ -4,7 +4,7 @@ local vide = require(ReplicatedStorage.pkg.vide)
 local create = vide.create
 type can<T> = T | () -> T
 
-type props = {
+export type props = {
 	name: can<string>?,
 	size: can<UDim2>,
 	pos: can<UDim2>?,

@@ -136,11 +136,11 @@ local function terminate_dialogue()
 end
 
 local function system()
-	start_dialogue()
-	process_active_dialogue()
-	condition_poll_system()
-	render_dialog_choices()
-	terminate_dialogue()
+	-- start_dialogue()
+	-- process_active_dialogue()
+	-- condition_poll_system()
+	-- render_dialog_choices()
+	-- terminate_dialogue()
 end
 
 return {
@@ -149,3 +149,48 @@ return {
 	phase = phases.Update,
 	runConditions = {},
 }
+
+--[[
+
+
+Root {
+  id = 'dialogue_id',
+
+  response {
+    key="one"
+    choice {
+			text = ""
+      response {
+			text = ""
+        response {
+          response {
+            callback(func_here) {
+              goto {
+                key="one"
+              }
+            }
+
+          }
+        }
+      }
+    }
+    choice {}
+    choice {
+      condition(func_here) {
+        success = {
+          response {}
+        }
+        failure = {
+          callback(func_here) {
+            choice {}
+            choice {}
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+]]

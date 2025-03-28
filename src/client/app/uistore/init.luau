@@ -12,6 +12,7 @@ local sources = {
 	-- The server most likely will update this as well
 	IsWorking = source(false),
 	ShowPhone = source(false),
+	MyModel = source(workspace:FindFirstChild("Maeriil")),
 
 	page = source("HudScreen" :: types.GamePages) :: source<types.GamePages>,
 	lastpage = source("HudScreen" :: types.GamePages) :: source<types.GamePages>,
@@ -19,15 +20,19 @@ local sources = {
 	-- Dialogue related sources
 	DialogueAuthor = source(""),
 	DialogueResponse = source(""),
+	-- idk if we need responseid
 	DialogueResponseId = source((0 :: unknown) :: Entity),
 	DialogueChoices = source({} :: {
-		id: Entity,
-		text: string,
+		{
+			id: Entity,
+			text: string,
+		}
 	}),
 
 	NPCToAttachDialogues = source({} :: { Model }),
 	IsTalkingWithNPC = source(false),
-	DeliveryOrderList = source({} :: { types.DeliveryOrderType }),
+	DeliveryOrderList = source({} :: { [string]: types.DeliveryOrderType }),
+	MyDialogueId = source(nil) :: types.Source<types.ActiveProximity?>,
 
 	--[[
 		For all proximity in the game, we only want to render it when it is close to the player
@@ -36,7 +41,15 @@ local sources = {
 	]]
 
 	DoorProximity = source({} :: { types.DoorProximityDetails }),
+	-- For all of our actions, we can create a source like so
+	-- InvestigateProximity = source({}),
+	DialogueProximity = source({} :: { types.DialogueProximityDetails }),
+
+	-- Active proximity is generic, so it will show every kind,
+	-- We also need to make it so that... we provide "left" or "right" side
 	ActiveProximity = source() :: types.Source<types.ActiveProximity?>,
+	ActiveDialogueProximity = source() :: types.Source<types.ActiveProximity?>,
+	ActiveDialgoueModel = source(nil) :: types.Source<Model?>,
 
 	--[[
 
@@ -77,6 +90,29 @@ local sources = {
 				send_details_to_server()
 				add_cooldown
 			}
+
+	algorithm for displaying proximity
+
+	do raycast
+	filter out all the valid ones only
+	hold reference to part with min distance
+
+	dialogue_function
+		for all filtered part with dialogue entity
+		if this part is ref part with min distance and its convo_distance is met
+			mark this id as ActiveDialogueProximity
+
+		Add the part's details to DialogueProximity, such as the initial message and other stuf
+		that are needed for this function
+
+	door_action_function
+			for all filtered parts with door entity
+				determine if we are entering or leaving
+				add it to our proximity
+
+
+
+
 
 	]]
 }

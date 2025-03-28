@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local t = require(ReplicatedStorage.types)
@@ -7,7 +8,6 @@ local t = require(ReplicatedStorage.types)
 local c = require(ReplicatedStorage.common.ecs.components)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local pair = jecs.pair
-local events = require(ReplicatedStorage.common.events)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -39,6 +39,9 @@ local function system()
 		overparams:AddToFilter({ character } :: never)
 		local overparam_radius = 5
 
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		assert(humanoid ~= nil, `Humanoid must exist in the character model at this point`)
+
 		-- Since we clear c.Client on cleanup, we must ensure we add it back?
 		world:add(c.Client, c.Client)
 		world:set(c.Client, c.Model, character)
@@ -46,6 +49,7 @@ local function system()
 		world:set(c.Client, c.RayParams, rayparams)
 		world:set(c.Client, c.OverParams, overparams)
 		world:set(c.Client, c.Radius, overparam_radius)
+		world:set(c.Client, c.Humanoid, humanoid)
 
 		-- warn(`Finished setting up the c.Client entity in client...`)
 
@@ -67,10 +71,12 @@ local function system()
 		character_removed[i] = nil
 	end
 
-	for _, server_id in events.PlayerLoadIn:query():client():iter() do
+	for _, server_id in clientevents.PlayerEvents.player_loaded_in.iter() do
+		-- for _, server_id in events.PlayerLoadIn:query():client():iter() do
 		warn(`Player has loaded in. After 2 seconds, we will setup their house`)
 		-- task.delay(2, function()
-		events.IHaveLoadedIn:send()
+		-- events.IHaveLoadedIn:send()
+		clientevents.PlayerEvents.i_have_loaded_in.fire()
 		-- end)
 	end
 end

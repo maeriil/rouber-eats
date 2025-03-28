@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local types = require(ReplicatedStorage.types)
 local yetanothernet = require(ReplicatedStorage.pkg.yetanothernet)
-type Entity<T = unknown> = types.Entity<T>
+type Entity<T = nil> = types.Entity<T>
 type Config = yetanothernet.Configuration
 type Route<U...> = yetanothernet.Route<U...>
 

@@ -33,8 +33,6 @@ return function(model: Model, restaurant: Model)
 		local connection = yetanothernet.createConnection(
 			events.OrderVerificationStatus,
 			function(response, by, received_status)
-				print("INSIDE CONNECTION WE CREATED, WE FOUND SOMETHING")
-				print(response, by, received_status)
 				status = received_status
 				local success, err = coroutine.resume(thread)
 				if not success then

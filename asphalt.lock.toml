@@ -10,6 +10,14 @@ asset_id = 116680509777131
 hash = "04b79783513f7056f11549d16b04dd3ce41a80fa9944b7a8cdb115f6a6528629"
 asset_id = 99303162879991
 
+[entries."assets/images/ArtStripe1.svg"]
+hash = "a542e9d6d73cc769a954929c3944f6658be859bd5a14b69d3cbeae197b767167"
+asset_id = 92260793178212
+
+[entries."assets/images/ArtStripe2.svg"]
+hash = "5d7dc135db6c5251ebc45c9037290b34982fbc1415cedf05731f7cf26f928bdd"
+asset_id = 128556395418164
+
 [entries."assets/images/CardEffect_test.svg"]
 hash = "524bdcf0aa2e842a08df8aba118e94f48ba9f835d750b1d2e42970fcbeed40d2"
 asset_id = 124434407722310

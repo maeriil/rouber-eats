@@ -2,16 +2,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local playersetupconfig = require(ServerScriptService.server.store.playersetupconfig)
+local serverevents = require(ServerScriptService.server.serverevents)
 
+local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local function system()
-	--system
+local request_player_load_in = serverevents.PlayerEvents.player_loaded_in
+local response_player_load_in = serverevents.PlayerEvents.i_have_loaded_in
 
+local function system()
 	for client_id, client in world:query(c.Client):iter() do
 		local configstore = playersetupconfig[client]
 		if not configstore then
@@ -23,13 +25,12 @@ local function system()
 		end
 
 		configstore.loaded_in.server_sent = true
-		events.PlayerLoadIn:send(client_id):to(client)
+		request_player_load_in.fire(client, blink_conv.from_entity(client_id))
 	end
 
-	for _, player in events.IHaveLoadedIn:query():server():iter() do
+	for _, player in response_player_load_in.iter() do
 		local configstore = playersetupconfig[player]
 		configstore.loaded_in.client_completed = true
-		warn(`player ={player.Name} has confirmed they have loaded in`)
 	end
 end
 

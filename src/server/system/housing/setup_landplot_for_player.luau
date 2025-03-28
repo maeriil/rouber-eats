@@ -3,9 +3,10 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local buildings_map = require(ReplicatedStorage.common.configs.buildings.buildings_map)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local playerdatastore = require(ServerScriptService.server.store.playerdatastore)
+local serverevents = require(ServerScriptService.server.serverevents)
 
+local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
 local next_order = require(ReplicatedStorage.common.utility.next_order)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
@@ -44,6 +45,8 @@ local empty_land = world
 	:query(pairs.PlayerExteriorTPTransform, pairs.DoormatTransform, pairs.ClaimedBy)
 	:with(c.Vacant)
 	:cached()
+local request_create_house_owner = serverevents.Building.create_house_owner
+local request_create_house = serverevents.Building.create_house
 local function system()
 	for plot_id, player_tp_cf, exterior_doormat_cf, client_id in empty_land:iter() do
 		local player = world:get(client_id, c.Client) :: Player
@@ -99,10 +102,14 @@ local function system()
 		-- When we first setup the client in the server, we should send the mapped client's server id
 		-- So that on the client side, player can lookup the EntityId to determine that they are local
 		-- player
-		events.CreateHouseOwner:send(client_id, character.Name, is_npc)
-		print(`When we setup landplot, we are sending {house_id}`)
-		events.CreateHouse:send(house_id, exterior_doormat_cf, interior_model, house_type, client_id)
-
+		request_create_house_owner.fire_all(blink_conv.from_entity(client_id), character, is_npc)
+		request_create_house.fire_all(
+			blink_conv.from_entity(house_id),
+			exterior_doormat_cf,
+			interior_model,
+			house_type,
+			blink_conv.from_entity(client_id)
+		)
 		-- It is no longer vacant, mark it as such
 		world:set(plot_id, c.OccupiedByPlayer, client_id)
 		world:set(plot_id, c.Residence, house_id)
@@ -110,6 +117,8 @@ local function system()
 		world:remove(plot_id, c.Vacant)
 	end
 end
+
+-- local function system() end
 
 return {
 	name = script.Name,

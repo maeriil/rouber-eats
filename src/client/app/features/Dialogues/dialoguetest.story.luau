@@ -4,10 +4,12 @@ local DialogueAvatar = require(script.Parent.DialogueAvatar)
 local ResponseDialogue = require(script.Parent.ResponseDialogue)
 local SpeechBubble = require(script.Parent.SpeechBubble)
 local frame = require(ReplicatedStorage.client.app.components.pane.frame)
+local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local vide = require(ReplicatedStorage.pkg.vide)
 local vlayout = require(ReplicatedStorage.client.app.components.layouts.vlayout)
 
 local source = vide.source
+local px = use_px.px
 
 local noob = workspace:FindFirstChild("Noob")
 
@@ -41,6 +43,7 @@ local function DialogueTest()
 
 		DialogueAvatar {
 			model = noob,
+			size = UDim2.new(0, px(250), 0, px(175)),
 		},
 
 		ChoiceBubble {

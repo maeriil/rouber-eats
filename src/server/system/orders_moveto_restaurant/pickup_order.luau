@@ -7,7 +7,7 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local pair = jecs.pair
-local events = require(ReplicatedStorage.common.events)
+-- local events = require(ReplicatedStorage.common.events)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 

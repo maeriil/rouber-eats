@@ -14,7 +14,6 @@ local function story()
 
 	return UserChoices {
 		choices = choices,
-		order = 1,
 	}
 end
 

@@ -26,9 +26,7 @@ local function TestContent(props)
 			y = padding_types.px32,
 		},
 		RouberOrderCard {
-			click = function()
-				print("activated")
-			end,
+			click = function() end,
 			deliverykindimg = assets.images["food.png"],
 			extradetails = "Half and Half Chicken",
 			height = function()
@@ -39,9 +37,7 @@ local function TestContent(props)
 			reward = 100,
 		},
 		RouberOrderCard {
-			click = function()
-				print("activated")
-			end,
+			click = function() end,
 			deliverykindimg = assets.images["food.png"],
 			extradetails = "Half and Half Chicken",
 			height = function()

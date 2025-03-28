@@ -10,6 +10,7 @@ export type qevent_types =
 	| "UIClose"
 	| "DialogueChoiceSelected"
 	| "DialoguePromptStarted"
+	| "DialogueNextResponse"
 	| "ProximityClicked"
 export type qevent = {
 	type: qevent_types,
@@ -38,6 +39,17 @@ local function add_dialogue_started(npc: Model)
 
 	event_queue:add({
 		type = "DialoguePromptStarted",
+		payload = payload,
+	})
+end
+
+local function dispatch_next_dialogue(id: Entity)
+	local payload = function()
+		return id
+	end
+
+	event_queue:add({
+		type = "DialogueNextResponse",
 		payload = payload,
 	})
 end
@@ -78,5 +90,6 @@ return {
 	add_dialogue_event_choice = add_dialogue_event_choice,
 	add_ui_openclose_event = add_ui_openclose_event,
 	add_dialogue_started = add_dialogue_started,
+	dispatch_next_dialogue = dispatch_next_dialogue,
 	dispatch_proximity_clicked = dispatch_proximity_clicked,
 }

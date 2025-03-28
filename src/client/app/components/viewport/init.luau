@@ -6,11 +6,13 @@ local source = vide.source
 local cleanup = vide.cleanup
 local action = vide.action
 local create = vide.create
+local effect = vide.effect
+local read = vide.read
 
 type props = {
 	model: Model,
-	transform: CFrame?,
-	camera_position: CFrame?,
+	transform: types.Can<CFrame>?,
+	camera_position: types.Can<CFrame>?,
 	size: types.Can<UDim2>?,
 	pos: types.Can<UDim2>?,
 	anchor: types.Can<Vector2>?,
@@ -26,7 +28,9 @@ local function viewport(props: props)
 	local camcf = props.camera_position or CFrame.new()
 
 	return create "ViewportFrame" {
+		unpack(props),
 		BackgroundTransparency = 1,
+		BackgroundColor3 = Color3.fromRGB(0, 0, 255),
 		CurrentCamera = camera,
 		Position = props.pos,
 		AnchorPoint = props.anchor,
@@ -36,15 +40,13 @@ local function viewport(props: props)
 		Rotation = props.rotation,
 		action(function(frame: Instance)
 			assert(frame:IsA("ViewportFrame"))
-			model:PivotTo(transform)
+			model:PivotTo(read(transform))
 			model.Parent = frame
 
 			return cleanup(model)
 		end),
 		create "Camera" {
-			CFrame = function()
-				return camcf
-			end,
+			CFrame = camcf,
 			action(function(c: Instance)
 				assert(c:IsA("Camera"))
 				camera(c :: never)

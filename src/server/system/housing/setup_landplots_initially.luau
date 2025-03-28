@@ -32,17 +32,8 @@ local function system()
 		world:set(land, pairs.DoormatTransform, doormat_location.CFrame)
 		world:set(land, pairs.PlayerExteriorTPTransform, player_tp_location.CFrame)
 
-		-- Destroy at the end
-		-- for _, basepart in landplot:GetChildren() do
-		-- 	if not basepart:IsA("BasePart") then continue end
-		-- 	basepart.Transparency = 1
-		-- 	basepart.CanCollide = false
-		-- 	basepart.Anchored = true
-		-- end
 		plot:Destroy()
 	end
-
-	print(`Completed setting up landplots to the world initially`)
 end
 
 return {

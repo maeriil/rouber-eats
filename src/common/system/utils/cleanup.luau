@@ -12,7 +12,7 @@ local function system()
 	-- warn(
 	-- 	`If something is breaking, then 99% of time, we are doing something we shouldn't be. File an issue`
 	-- )
-	world:cleanup()
+	-- world:cleanup()
 end
 
 return {

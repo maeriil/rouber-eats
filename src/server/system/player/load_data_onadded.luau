@@ -33,6 +33,14 @@ local function setup_config(player: Player)
 			server_sent = false,
 			client_completed = false,
 		},
+		map_setup = {
+			server_sent = false,
+			client_completed = false,
+		},
+		order_setup = {
+			server_sent = false,
+			client_completed = false,
+		},
 	}
 end
 

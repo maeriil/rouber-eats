@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local basepartmap = require(ReplicatedStorage.client.store.basepartmap)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local uistore = require(ReplicatedStorage.client.app.uistore)
 
 local c = require(ReplicatedStorage.common.ecs.components)
@@ -11,97 +10,158 @@ local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local function system()
-	local params, hrp, radius = world:get(c.Client, c.OverParams, c.PrimaryPart, c.Radius)
-	if not world:has(c.Client, c.Model) or params == nil or hrp == nil or radius == nil then
-		return
-	end
-	if world:has(c.Client, c.IsCutscenePlaying) then
-		return
-	end
+local function filter_hit_parts(hit_parts: { BasePart })
+	local set = {} :: { [BasePart]: true }
+	local filtered = {}
 
-	-- We want to make the propximity a little bit large
-	radius *= 5
-
-	local current_pos = hrp.Position
-	local result = workspace:GetPartBoundsInRadius(current_pos, radius, params)
-	local set = {}
-
-	-- gizmo.sphere.drawWithStyle({
-	-- 	alwaysOnTop = true,
-	-- 	color = Color3.fromRGB(255, 0, 0),
-	-- 	transparency = 0.5,
-	-- }, current_pos, radius)
-
-	-- Go through each proximity, and for each valid one, compute the distance and
-	-- store it in a seperate table, sort the table, and the one thats closest to us
-	-- we will verify if its less than ProximityThreshold, and if so, update the ActiveProximitysource
-	-- Then we just update out proximity index list
-
-	-- Doormat zone proximity tests, we might want to improve upon for other kinds
-
-	local door_proximity = {} :: { types.DoorProximityDetails }
-	local part_with_lowest_dist = nil
-	local curr_lowest_dist = math.huge
-
-	for _, part in result do
+	for _, part in hit_parts do
 		if set[part] then
 			continue
 		end
 		local id = basepartmap[part]
 
-		if id == nil or not world:contains(id) then
+		if not id then
 			continue
 		end
-		if world:has(id, c.DoormatZone) then
-			-- Its a doormat so now we store on set and sort by shortest ones
-			local distance = (current_pos - part.Position).Magnitude
 
-			if distance < curr_lowest_dist then
-				curr_lowest_dist = distance
-				part_with_lowest_dist = part
+		set[part] = true
+		table.insert(filtered, part)
+	end
+
+	return filtered
+end
+
+local function find_closest_part(curr_pos: vector, hit_parts: { BasePart })
+	-- It is guaranteed that min_part won't end up being nil. This is because if the hit_parts is
+	-- empty, we already terminate before we reach this point
+	local min_dist = math.huge
+	local min_part = nil
+
+	for i, part in hit_parts do
+		local dest_pos = part.Position :: never
+		local magnitude = vector.magnitude(curr_pos - dest_pos)
+
+		if magnitude < min_dist then
+			min_dist = magnitude
+			min_part = part
+		end
+	end
+
+	return min_part, min_dist
+end
+
+local function update_dialogue_proximity(
+	hit_parts: { BasePart },
+	min_part: BasePart,
+	min_dist: number
+)
+	local dialogue_proximity = {} :: { types.DialogueProximityDetails }
+	for _, part in hit_parts do
+		local id = basepartmap[part]
+		local dialogue_details = world:get(id, c.HasDialogue)
+
+		if not dialogue_details then
+			continue
+		end
+
+		local dialogue_initial_text = dialogue_details.initial_text
+		local dialogue_activate_dist = dialogue_details.trigger_distance
+		local dialogue_id_str = dialogue_details.dialogue_id
+		--TODO: WE should do a table lookup here of [string]: entity
+		local dialogue_id = dialogue_id_str :: never
+
+		-- if it isn't equal to the min_part, then we only display the generic one
+		local proximity_details: types.DialogueProximityDetails = {
+			adornee = part,
+			dialogue_id = id,
+			proximity_text = dialogue_initial_text,
+		}
+
+		-- If it is min_part, then we do additional activate check
+		if part == min_part then
+			if min_dist <= dialogue_activate_dist then
+				local parent = part:FindFirstAncestorOfClass("Model") :: Model
+				uistore.ActiveDialogueProximity(id)
+				uistore.ActiveDialgoueModel(parent)
+			else
+				uistore.ActiveDialogueProximity(nil)
+				uistore.ActiveDialgoueModel(nil)
 			end
+		end
 
-			table.insert(set, part)
+		table.insert(dialogue_proximity, proximity_details)
+	end
+
+	uistore.DialogueProximity(dialogue_proximity)
+end
+
+local function update_door_proximity(hit_parts: { BasePart }, min_part: BasePart, min_dist: number)
+	local door_proximity = {} :: { types.DoorProximityDetails }
+
+	for _, part in hit_parts do
+		local id = basepartmap[part]
+		local is_doormat_zone = world:has(id, c.DoormatZone)
+		if not is_doormat_zone then
+			continue
+		end
+
+		local parent = world:parent(id)
+		assert(parent ~= nil, "Parent must exist for all doormat zones")
+		local name = world:get(parent, c.Name)
+		assert(name, `Name is required for every building so we can use it for proximity text`)
+		local is_exterior = world:has(parent, c.Exterior)
+		local details: types.DoorProximityDetails = {
+			adornee = part,
+			exterior = is_exterior,
+			promptid = id,
+			proximity_text = name,
+		}
+		table.insert(door_proximity, details)
+
+		if part == min_part then
+			--//TODO: tbh, we could probably store the active radius somewhere in our components
+			-- but for now, im just using 8 cuz i thin our doormat is like 8x8? or supposed to at least LOL
+			if min_dist <= 8 then
+				uistore.ActiveProximity(id)
+			else
+				uistore.ActiveProximity(nil)
+			end
 		end
 	end
 
-	-- Now if the lowest dist is less than like 10, then we can display prompt cuz player is
-	-- most likely close enough
+	uistore.DoorProximity(door_proximity)
+end
 
-	if part_with_lowest_dist then
-		for _, part in set do
-			local id = basepartmap[part]
-			local parent = world:parent(id)
-			assert(parent ~= nil, "Every doormatzone must have a parent")
+local cached = world
+	:query(c.OverParams, c.PrimaryPart, c.Radius)
+	:with(c.Client)
+	:without(c.IsCutscenePlaying)
+	:cached()
+local function system()
+	local it = cached:iter()
+	local e, params, hrp, radius = it()
+	if not e then
+		return
+	end
 
-			local name = world:get(parent, c.Name) :: string
-			assert(name, `Name is required for every building so we can use it for proximity text`)
+	radius *= 5
+	local current_pos = (hrp.Position :: never) :: vector
+	local unfiltered_result = workspace:GetPartBoundsInRadius(current_pos, radius, params)
+	local filtered = filter_hit_parts(unfiltered_result)
 
-			local is_exterior = world:has(parent, c.Exterior)
-			local details: types.DoorProximityDetails = {
-				adornee = part,
-				exterior = is_exterior,
-				promptid = id,
-				proximity_text = name,
-			}
-			table.insert(door_proximity, details)
-		end
-
-		if curr_lowest_dist <= 10 then
-			uistore.ActiveProximity(basepartmap[part_with_lowest_dist])
-		else
-			uistore.ActiveProximity(nil)
-		end
-
-		uistore.DoorProximity(door_proximity)
-	else
-		-- We aren't near any proximity, so render both of them as nil
+	if #filtered == 0 then
+		uistore.ActiveDialogueProximity(nil)
 		uistore.ActiveProximity(nil)
+		uistore.ActiveDialgoueModel(nil)
 		uistore.DoorProximity({})
+		uistore.DialogueProximity({})
+		return
 	end
 
-	set = {}
+	local min_part, min_dist = find_closest_part(current_pos, filtered)
+
+	update_dialogue_proximity(filtered, min_part, min_dist)
+	update_door_proximity(filtered, min_part, min_dist)
 end
 
 return {

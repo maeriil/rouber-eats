@@ -18,9 +18,9 @@ local function setup_client()
 
 		local e = ref(player)
 		world:set(e, c.Client, player)
+		world:set(e, c.Name, player.Name)
 
 		print(`Player {player.Name} has joined the game`)
-
 		player_added[i] = nil
 	end
 end

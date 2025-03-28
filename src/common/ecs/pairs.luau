@@ -36,9 +36,9 @@ return {
 		return jecs.pair(jecs.ChildOf, entity)
 	end,
 
-	cooldown = function<T>(component: t.Entity<T>)
-		return jecs.pair(c.Cooldown, component)
-	end,
+	-- cooldown = function<T>(component: t.Entity<T>)
+	-- 	return jecs.pair(c.Cooldown, component)
+	-- end,
 
 	previous = function<T>(component: jecs.Id<T>)
 		return jecs.pair(component, jecs.Rest)

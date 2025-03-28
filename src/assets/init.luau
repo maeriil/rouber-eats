@@ -3,6 +3,8 @@ return {
 		["ActionBubble.svg"] = "rbxassetid://129504285891746",
 		["ActionBubbleInverted.svg"] = "rbxassetid://116680509777131",
 		["ActiveStar.svg"] = "rbxassetid://99303162879991",
+		["ArtStripe1.svg"] = "rbxassetid://92260793178212",
+		["ArtStripe2.svg"] = "rbxassetid://128556395418164",
 		["CardEffect_test.svg"] = "rbxassetid://124434407722310",
 		["Dialogue.svg"] = "rbxassetid://134267041295470",
 		["DialogueBubbleIndicator.svg"] = "rbxassetid://78259420024750",

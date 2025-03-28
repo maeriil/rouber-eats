@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- local DoorProximity = require(script.features.Proximity.Attaching.DoorProximity)
+local DialogueProximity = require(script.features.Proximity.DialogueProximity)
+local DialogueScene = require(script.pages.DialogueScene)
 local DoorProximity = require(script.features.Proximity.DoorProximity)
 local HudScreen = require(script.pages.HudScreen)
 local PhoneScreen = require(script.pages.PhoneScreen)
@@ -72,8 +74,10 @@ local function root(): { any }
 	local hud: types.GamePages = "HudScreen"
 	local phone: types.GamePages = "PhoneScreen"
 	local rouber: types.GamePages = "RouberScreen"
+	local dialoguescene: types.GamePages = "DialogueScene"
 
 	local alldoors = uistore.DoorProximity
+	local all_dialogues = uistore.DialogueProximity
 
 	return {
 		-- attach_billboard_to_npc {},
@@ -90,8 +94,13 @@ local function root(): { any }
 			-- 	}
 			-- end),
 
-			indexes(alldoors, function(details: () -> types.DoorProximityDetails, a1: number)
+			indexes(alldoors, function(details: () -> types.DoorProximityDetails, _: number)
 				return DoorProximity {
+					details = details,
+				}
+			end),
+			indexes(all_dialogues, function(details: () -> types.DialogueProximityDetails, n: number)
+				return DialogueProximity {
 					details = details,
 				}
 			end),
@@ -116,6 +125,9 @@ local function root(): { any }
 				end,
 				[rouber] = function()
 					return RouberScreen {}
+				end,
+				[dialoguescene] = function()
+					return DialogueScene {}
 				end,
 			},
 		},

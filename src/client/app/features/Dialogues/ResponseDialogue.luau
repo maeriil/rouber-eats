@@ -7,6 +7,7 @@ local padding = require(ReplicatedStorage.client.app.components.padding)
 local padding_types = require(ReplicatedStorage.client.app.components.padding.padding_types)
 local pane = require(ReplicatedStorage.client.app.components.pane.pane)
 local par = require(ReplicatedStorage.client.app.components.label.par)
+local ratio = require(ReplicatedStorage.client.app.components.ratio)
 local text_sizes = require(ReplicatedStorage.client.app.utility.text_sizes)
 local types = require(ReplicatedStorage.types)
 local use_motion = require(ReplicatedStorage.client.app.utility.use_motion)
@@ -27,6 +28,8 @@ type props = {
 	text: types.Can<string>,
 	animate: types.Source<boolean>,
 	author: types.Can<string>,
+	pos: types.Can<UDim2>?,
+	anchor: types.Can<Vector2>?,
 }
 
 local function ResponseDialogue(props: props)
@@ -67,8 +70,14 @@ local function ResponseDialogue(props: props)
 
 	return pane {
 		size = function()
-			return UDim2.new(0, px(711), 0, px(176))
+			-- return UDim2.new(0, px(711), 0, px(176))
+			return UDim2.new(1, 0, 1, 0)
 		end,
+		anchor = props.anchor or Vector2.new(0.5, 0.5),
+		pos = props.pos or UDim2.new(0.5, 0, 0.5, 0),
+		ratio {
+			ratio = 711 / 176,
+		},
 		order = props.order,
 		basebutton {
 			click = props.click,
@@ -77,12 +86,13 @@ local function ResponseDialogue(props: props)
 			end,
 		},
 		create "ImageLabel" {
-			Size = UDim2.new(0, px(711), 0, px(176)),
+			-- Size = UDim2.new(0, px(711), 0, px(176)),
+			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.fromRGB(255, 0, 0),
 			BorderSizePixel = 0,
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5),
+			Position = UDim2.new(0.5, -px(32), 0.5, 0),
 			Image = assets.images["Dialogue.svg"],
 			padding {
 				x = padding_types.px36,

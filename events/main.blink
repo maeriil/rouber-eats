@@ -1,0 +1,208 @@
+option Casing = Snake
+option TypesOutput = "../src/types/remotes.luau"
+option ServerOutput = "../src/server/serverevents.luau"
+option ClientOutput = "../src/common/clientevents.luau"
+option Typescript = false
+option FutureLibrary = "ReplicatedStorage.pkg.future"
+-- this is a comment
+
+option WriteValidations = false
+option SyncValidation = false
+
+type Entity = f64
+type Model = Instance(Model)?
+
+scope Building {
+  --[[
+    This event is used to let the server know that the client wants to teleport to either
+    the interior or the exterior of the house. If the Housetype that they sent is interior, it
+    means the player is currently in interior, and so the server should then send them to exterior
+    and vice versa
+    @params Entity the server entity id of the parent house that contains Interior/Exterior
+    @params HouseType the type of the current house they player is near at
+  ]]
+  enum HouseType = {interior, exterior}
+  event IWantToTeleportInOrOut {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity, HouseType)
+  }
+
+  --[[
+    This event is used to mark a house as having a cutscene, in particular, the doormat would have
+    the HasCutscene entity. We only fire this event to client after we have verified that client
+    has picked up the order from Restaurant. Then when they are near the house, we want to play
+    the cutscene. In future, users can configure what cutscene they want others to see so we would
+    pass this data to the client
+
+    @params Entity the server entity if of the house that will render the cutscene
+  ]]
+  event add_cutscene_to_house {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: Entity
+  }
+
+
+  --[[
+    TODO: The following events, we want to deprecate in future and instead opt to use Attributes
+    Attributes replicate from server -> client, so instead, what we will do is that InteriorModel
+    will contain some collectionservice tag. The client will listen to adding/removal of this tag
+    Every interior model is always paired up with its exterior model, and this is also just a one time
+    thing. So we can just store exterior model details in its attributes. Reading them, we can
+    construct the house from ground up
+
+    The tricky part is just ensuring how we handle the Instance Added and Removed. There are few options
+    one of them could be we would lonly delete houses when client tells them to do so, or we would
+    only construct house when client tells them to do so as well...
+  ]]
+  type IsNPC = boolean
+  type ExteriorHouseType = string
+  event bulk_create_house_owners {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity[0..50], Instance[0..50], IsNPC[0..50])
+  }
+
+  event bulk_create_house {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity[0..50], CFrame[0..50], Instance[0..50], ExteriorHouseType[0..50], Entity[0..50])
+  }
+
+  event create_house_owner {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity, Instance, IsNPC)
+  }
+
+  event create_house {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity, CFrame, Instance, ExteriorHouseType, Entity)
+  }
+
+  event delete_house_owner {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: Entity
+  }
+
+  event bulk_create_restaurants {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity[0..10], string[0..10], Instance[0..10])
+  }
+}
+
+scope PlayerEvents {
+  event player_loaded_in {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: Entity
+  }
+
+  event i_have_loaded_in {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+  }
+
+  event setup_map_on_join {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+  }
+
+  event i_have_setup_map {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+  }
+
+  --[[
+    TODO
+    idk if we need this but okay....
+  ]]
+
+  event i_have_setup_houses {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+  }
+
+  event i_have_setup_restaurants {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+  }
+
+  event i_have_bulk_created_orders_initially {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+  }
+}
+
+--[[
+  These are the events related to delivering, ordering, and etc.
+]]
+
+scope RouberOrders {
+  struct DeliveryType {
+      restaurant_id: Entity,
+      destination_id: Entity,
+      foods_list_id: Entity[1..10],
+      conditions_list_id: Entity[0..10]
+  }
+  event create_order {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity, DeliveryType)
+  }
+
+  event bulk_create_order {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity[0..100], DeliveryType[0..100])
+  }
+
+  --[[
+    Client sends the mapped server entity id to the server
+  ]]
+  event i_want_to_accept_order {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: Entity
+  }
+}

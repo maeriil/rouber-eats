@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
+-- local events = require(ReplicatedStorage.common.events)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local job_configs = require(ReplicatedStorage.common.configs.job_configs)
 local last_fired = require(ReplicatedStorage.common.utility.last_fired)
@@ -59,15 +59,15 @@ local function event_handle(player: Player, job: jecs.Entity<unknown>)
 	return end_event(player)
 end
 
-local SwitchJobEvent = events.IWantToSwitchJobs
+-- local SwitchJobEvent = events.IWantToSwitchJobs
 local function system()
-	for i, player, job in SwitchJobEvent:query():server():iter() do
-		if not can_request(player) then
-			continue
-		end
+	-- for i, player, job in SwitchJobEvent:query():server():iter() do
+	-- 	if not can_request(player) then
+	-- 		continue
+	-- 	end
 
-		event_handle(player, job)
-	end
+	-- 	event_handle(player, job)
+	-- end
 end
 
 return {

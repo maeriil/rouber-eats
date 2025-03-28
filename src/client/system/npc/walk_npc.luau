@@ -41,8 +41,6 @@ local function test_walk_npc_system()
 		local primarypart = world:get(parent, c.PrimaryPart) :: Part
 		local currpos = primarypart.Position
 		primarypart.CFrame = CFrame.lookAt(currpos, goal.Position)
-		print(goal)
-		print(`cur pos = {currpos}`)
 
 		local goals = { CFrame = goal }
 
@@ -62,7 +60,6 @@ end
 -- 			or tween.PlaybackState == Enum.PlaybackState.Cancelled
 -- 		then
 -- 			track:Stop()
--- 			print("Track is stopped")
 -- 		end
 -- 	end
 -- end

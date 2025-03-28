@@ -1,10 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local buildings_map = require(ReplicatedStorage.common.configs.buildings.buildings_map)
 local jecs = require(ReplicatedStorage.pkg.jecs)
+local serverevents = require(ServerScriptService.server.serverevents)
 local t = require(ReplicatedStorage.types)
 
+local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local c = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
 local next_order = require(ReplicatedStorage.common.utility.next_order)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
@@ -43,6 +45,8 @@ local function create_noob(next_order_value: number)
 	return npc
 end
 
+local request_create_house_owner = serverevents.Building.create_house_owner
+local request_create_house = serverevents.Building.create_house
 local function system()
 	for plot_id, exterior_doormat_cf, player_tp_cf in all_unoocupied_lands:iter() do
 		local next_order_value = order()
@@ -53,6 +57,7 @@ local function system()
 
 		local npc_id, cleanup_npc = ref(npc)
 		world:set(npc_id, c.Model, npc)
+		world:set(npc_id, c.Name, npc.Name)
 		world:set(npc_id, c.PrimaryPart, root)
 		world:set(npc_id, c.Cleanup, cleanup_npc)
 		world:add(npc_id, c.HouseNPC)
@@ -105,8 +110,14 @@ local function system()
 		world:set(exterior_id, c.Transform, player_tp_cf)
 		world:add(exterior_id, c.Exterior)
 
-		events.CreateHouseOwner:send(npc_id, npc.Name, is_npc)
-		events.CreateHouse:send(house_id, exterior_doormat_cf, interior_model, fallback_house, npc_id)
+		request_create_house_owner.fire_all(blink_conv.from_entity(npc_id), npc, is_npc)
+		request_create_house.fire_all(
+			blink_conv.from_entity(house_id),
+			exterior_doormat_cf,
+			interior_model,
+			fallback_house,
+			blink_conv.from_entity(npc_id)
+		)
 
 		-- It is no longer vacant, mark it as such
 		world:set(plot_id, c.OccupiedByNPC, npc_id)
@@ -114,9 +125,11 @@ local function system()
 		world:remove(plot_id, pairs.ClaimedBy)
 		world:remove(plot_id, c.Vacant)
 
-		warn("Completed in drawing out the interior landplot")
+		-- warn("Completed in drawing out the interior landplot")
 	end
 end
+
+-- local function system() end
 
 return {
 	name = script.Name,

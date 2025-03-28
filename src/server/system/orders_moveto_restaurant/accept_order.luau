@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local components = require(ReplicatedStorage.common.ecs.components)
-local events = require(ReplicatedStorage.common.events)
+-- local events = require(ReplicatedStorage.common.events)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)

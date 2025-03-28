@@ -26,13 +26,13 @@ end
 
 local without_jobs = world:query(c.Client):without(pair(c.Job, __)):cached()
 local function system() -- Query for all new players who wont have any jobs
-	for e, player in without_jobs:iter() do
-		-- Set them as OffDuty initially, then on client side, similar to PizzaPlace, we will
-		-- show them the possible occupations they can do? idk
-		world:set(e, pair(c.Job, c.Assign), c.OffDuty)
-	end
+	-- for e, player in without_jobs:iter() do
+	-- 	-- Set them as OffDuty initially, then on client side, similar to PizzaPlace, we will
+	-- 	-- show them the possible occupations they can do? idk
+	-- 	world:set(e, pair(c.Job, c.Assign), c.OffDuty)
+	-- end
 
-	assign_job()
+	-- assign_job()
 end
 
 return {

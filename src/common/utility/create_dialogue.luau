@@ -1,175 +1,225 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local c = require(ReplicatedStorage.common.ecs.components)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
-local ref = require(ReplicatedStorage.common.ecs.ref)
+local t = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local pair = jecs.pair
-local types = require(ReplicatedStorage.types)
-type Entity = types.Entity
 
 type TABLE = { [any]: any }
 
-local function is_choice(v: any)
-	return type(v) == "table" and v._choice
+-- local function is_choice(v: any)
+-- 	return type(v) == "table" and v._choice
+-- end
+local function is_response(v: any)
+	return type(v) == "table" and v._response
 end
-
 local function is_callback(v: any)
 	return type(v) == "table" and v._callback
 end
-
+local function is_if(v: any)
+	return type(v) == "table" and v._if
+end
 local function is_goto(v: any)
 	return type(v) == "table" and v._goto
 end
 
-local function is_condition(v: any)
-	return type(v) == "table" and v._condition
+local function RESPONSE(props: TABLE & {
+	text: string,
+})
+	return {
+		_response = true,
+		props = props,
+	}
 end
 
-function setup_choice(
-	props: {
-		usertext: string,
-		response: string,
-		key: string?,
-	} & TABLE,
-	parent: Entity,
-	fallback: boolean?
-)
-	local COMPONENT = if fallback then c.FallbackChoice else c.Choice
-
-	local choice = world:entity() :: Entity
-	world:add(parent, pair(COMPONENT, choice))
-	world:add(choice, pairs.childof(parent))
-	world:add(choice, COMPONENT)
-	world:set(choice, c.DialogueDetails, {
-		response = props.response,
-		usertext = props.usertext,
-	})
-	world:set(choice, c.DialogueId, props.key or "")
-
-	build_dialouge_tree(props, choice)
-end
-
-function setup_condition(
-	props: { cond: { () -> boolean }, Fallback: TABLE } & TABLE,
-	parent: Entity
-)
-	world:set(parent, c.DialogueCondition, props.check)
-
-	for i, v in ipairs(props.success) do
-		setup_choice(v.props, parent)
-	end
-	for i, v in ipairs(props.failure) do
-		setup_choice(v.props, parent, true)
-	end
-end
-
-function setup_callback(props: TABLE, parent: Entity)
-	local callbacks = {}
-
-	for i, v in ipairs(props) do
-		table.insert(callbacks, v :: () -> ())
-	end
-
-	world:set(parent, c.DialogueCallbacks, callbacks)
-end
-
-function setup_goto(
-	props: TABLE & {
-		key: string,
-	},
-	parent: Entity
-)
-	local target_key = props.key
-	local current = parent
-
-	while current do
-		local dialogue_id = world:get(current, c.DialogueId)
-		if dialogue_id == target_key then
-			world:set(parent, c.GoTo, current)
-			return
-		end
-		current = world:parent(current) :: Entity
-	end
-	error(`GoTo target {target_key} not found for {parent}`)
-end
-
-function build_dialouge_tree(props: TABLE, parent: Entity)
-	if #props == 0 then
-		return
-	end
-
-	for i, v in ipairs(props) do
-		if is_choice(v) then
-			setup_choice(v.props, parent)
-		elseif is_condition(v) then
-			setup_condition(v, parent)
-		elseif is_callback(v) then
-			setup_callback(v.props, parent)
-		elseif is_goto(v) then
-			setup_goto(v.props, parent)
-		end
-	end
-end
-
-local function DIALOGUE(props: {
-	npc: Model,
-	initial_text: string,
-	key: string?,
-} & TABLE)
-	local e = world:entity() :: Entity
-	local author = props.npc.Name
-	local parent = ref(props.npc)
-
-	world:add(parent, pair(c.DialogueOf, e))
-	world:add(e, pairs.childof(parent))
-	world:set(e, c.Dialogue, {
-		author = author,
-		initial_text = props.initial_text,
-		trigger_distance = 10,
-		conversation_distance = 10,
-	})
-	world:set(e, c.DialogueId, props.key or "")
-
-	build_dialouge_tree(props, e)
-end
-
-local function CHOICE(props: TABLE)
+local function CHOICE(props: TABLE & {
+	text: string,
+})
 	return {
 		_choice = true,
 		props = props,
 	}
 end
 
-local function CALLBACK(props: TABLE)
-	return {
-		_callback = true,
-		props = props,
-	}
+local function CALLBACK(callback: () -> ())
+	return function(props: TABLE)
+		return {
+			_callback = true,
+			func = callback,
+			props = props,
+		}
+	end
 end
 
-local function GOTO(props: TABLE)
+local function GOTO(props: TABLE & {
+	key: string,
+})
 	return {
 		_goto = true,
 		props = props,
 	}
 end
-
-local function CONDITION(check_func)
-	return function(props: { SUCCESS: TABLE, FAILURE: TABLE })
+local function IF(check_function)
+	return function(props: { success: TABLE, failure: TABLE })
 		return {
-			_condition = true,
-			check = check_func,
-			success = props.SUCCESS,
-			failure = props.FAILURE,
+			_if = true,
+			check = check_function,
+			success = props.success,
+			failure = props.failure,
+			props = props,
 		}
 	end
 end
 
+local build_dialogue_tree: (parent: t.Entity, node: TABLE) -> t.Entity
+local build_choices: (parent: t.Entity, node: TABLE) -> ()
+
+local function create_choicecontainer(parent)
+	local container_id = world:entity()
+	world:set(container_id, c.Parent, parent)
+	world:add(parent, pair(c.Next, container_id))
+	world:add(container_id, c.DialogueChoiceContainer)
+	return container_id
+end
+
+local function create_choice(parent, t)
+	local choice_id = world:entity()
+	world:set(choice_id, c.Parent, parent)
+	world:add(choice_id, c.DialogueChoice)
+	world:set(choice_id, c.DialogueText, t.props.text)
+	world:add(parent, pair(c.Next, choice_id))
+	return choice_id
+end
+
+local function create_response(parent: t.Entity, dialogue_text: string)
+	local response_id = world:entity()
+	world:add(parent, pair(c.Next, response_id))
+	world:add(response_id, c.DialogueResponse)
+	world:set(response_id, c.Parent, parent)
+	world:set(response_id, c.DialogueText, dialogue_text)
+
+	return response_id
+end
+
+local function create_if(parent, check_function, success, failure)
+	-- I think this one might have bugs
+	local if_id = world:entity()
+	world:add(parent, pair(c.Next, if_id))
+	world:set(if_id, c.Parent, parent)
+	world:set(if_id, c.DialogueIf, check_function)
+	world:set(if_id, c.DialogueText, "todo... add condition text")
+
+	local success_id = world:entity()
+	world:add(success_id, c.DialogueSuccess)
+	if #success > 1 then
+		build_choices(success_id, success)
+	else
+		local _, next_node = next(success)
+		build_dialogue_tree(success_id, next_node)
+	end
+	world:add(if_id, pair(c.DialogueSuccess, success_id))
+
+	local failure_id = world:entity()
+	world:add(failure_id, c.DialogueFailure)
+	if #failure > 1 then
+		build_choices(failure_id, failure)
+	else
+		local _, next_node = next(failure)
+		build_dialogue_tree(failure_id, next_node)
+	end
+	world:add(if_id, pair(c.DialogueFailure, failure_id))
+
+	return if_id
+end
+
+local function create_callback(parent: t.Entity, callback: () -> ())
+	local callback_id = world:entity()
+	world:set(callback_id, c.Parent, parent)
+	world:add(parent, pair(c.Next, callback_id))
+	world:set(callback_id, c.DialogueCallback, callback)
+
+	return callback_id
+end
+
+local function create_goto(parent, props)
+	warn(`todo, goto needs some work...`)
+	local goto_id = world:entity()
+	world:set(goto_id, c.Parent, parent)
+	world:set(goto_id, c.DialogueGoto, props.target)
+	world:add(parent, pair(c.Next, goto_id))
+	return goto_id
+end
+
+-- WE will need to create other things like create_response etc as well
+function build_choices(parent: t.Entity, props: TABLE)
+	local container_id = create_choicecontainer(parent)
+	for _, choice in ipairs(props) do
+		local choice_id = create_choice(container_id, choice)
+		local num_of_children = #choice.props
+
+		if num_of_children > 1 then
+			build_choices(choice_id, choice.props)
+		else
+			local _, choice_nextnode = next(choice.props)
+			build_dialogue_tree(choice_id, choice_nextnode)
+		end
+	end
+
+	return
+end
+
+function build_dialogue_tree(parent, node)
+	if not node.props then
+		return parent
+	end
+
+	local _, next_node = next(node.props)
+	if is_response(node) then
+		local response_id = create_response(parent, node.props.text)
+
+		local num_of_children = #node.props
+		if num_of_children > 1 then
+			build_choices(response_id, node.props)
+			warn(`completed creating choices... verify it first`)
+		else
+			return build_dialogue_tree(response_id, next_node)
+		end
+	elseif is_callback(node) then
+		local callbackid = create_callback(parent, node.func)
+		local num_of_children = #node.props
+		if num_of_children > 1 then
+			build_choices(callbackid, node.props)
+		else
+			return build_dialogue_tree(callbackid, next_node)
+		end
+	elseif is_if(node) then
+		warn(`IF Dialgoue is not created yet`)
+		return create_if(parent, node.check, node.success, node.failure)
+	elseif is_goto(node) then
+		error(`GOTO dialogue is not created yet`)
+		return create_goto(parent, node.props)
+	else
+		error(`SHouldn't reach here`)
+	end
+
+	return parent
+end
+
+local function DIALOGUE(props: TABLE & { key: string })
+	local root = world:entity()
+
+	-- Add some configuration here
+	local _, next_props = next(props)
+	local _ = build_dialogue_tree(root, next_props)
+
+	return root
+end
+
 return {
 	DIALOGUE = DIALOGUE,
-	CHOICE = CHOICE,
-	CALLBACK = CALLBACK,
 	GOTO = GOTO,
-	CONDITION = CONDITION,
+	CHOICE = CHOICE,
+	RESPONSE = RESPONSE,
+	CALLBACK = CALLBACK,
+	IF = IF,
 }

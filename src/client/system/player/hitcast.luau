@@ -42,9 +42,16 @@ local function on_teleport_check(part: BasePart)
 	return true
 end
 
+local cached = world
+	:query(c.OverParams, c.PrimaryPart, c.Radius)
+	:with(c.Client)
+	:without(c.IsCutscenePlaying)
+	:cached()
 local function system()
-	local params, hrp, radius = world:get(c.Client, c.OverParams, c.PrimaryPart, c.Radius)
-	if not world:has(c.Client, c.Model) or params == nil or hrp == nil or radius == nil then
+	-- local params, hrp, radius = world:get(c.Client, c.OverParams, c.PrimaryPart, c.Radius)
+	local it = cached:iter()
+	local e, params, hrp, radius = it()
+	if not e then
 		return
 	end
 
@@ -60,6 +67,16 @@ local function system()
 	-- }, current_pos, radius)
 
 	for _, instance in result do
+		local id = basepartmap[instance]
+		if id ~= nil and world:contains(id) and world:has(id, c.HasCutscene) then
+			-- warn(`found cutscene, we are now going to be playign the cutscene`)
+			world:add(c.Client, c.IsCutscenePlaying)
+			world:add(c.Client, c.Start)
+			world:set(c.Client, c.Cutscene, {
+				triggered_id = id,
+			})
+		end
+
 		if set[instance] then
 			continue
 		end
