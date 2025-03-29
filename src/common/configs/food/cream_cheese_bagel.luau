@@ -6,7 +6,7 @@ local food: types.FoodConfigType = {
 	id = world:entity() :: types.Entity,
 	string_id = script.Name,
 	display_name = "Cream Cheese Bagel",
-	display_image = "path to the image here",
+	display_image = "http://www.roblox.com/asset/?id=15897177899",
 	category = "Pastries",
 	nationality = "Any",
 

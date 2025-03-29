@@ -9,6 +9,7 @@ type props = {
 	linemode: can<Enum.LineJoinMode>?,
 	thickness: can<number>?,
 	transparency: can<number>?,
+	color: can<Color3>?,
 	[number]: Instance, -- We want to pass UIGradient instead of setting colour
 }
 
@@ -17,7 +18,7 @@ local px = use_px.px
 local function border(props: props)
 	return create "UIStroke" {
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-		Color = Color3.fromRGB(255, 255, 255),
+		Color = props.color or Color3.fromRGB(255, 255, 255),
 		LineJoinMode = props.linemode or Enum.LineJoinMode.Round,
 		Thickness = props.thickness or function()
 			return px(4)

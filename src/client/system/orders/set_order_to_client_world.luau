@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local clientevents = require(ReplicatedStorage.common.clientevents)
+local clientgamedata = require(ReplicatedStorage.client.store.clientgamedata)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
+local uistore = require(ReplicatedStorage.client.app.uistore)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
@@ -26,7 +28,7 @@ end
 local function find_valid_client_destination_id(server_id: t.Entity)
 	local id = server_id_map.residence_map[server_id]
 
-	assert(id ~= nil, `Residence ID must not be nil`)
+	assert(id ~= nil, `Residence server ID {server_id} must not be nil`)
 	assert(world:contains(id), `Residence Id must exist in the world`)
 
 	return id
@@ -91,16 +93,65 @@ local function display_orders_to_ui()
 	for client_id, details, server_id in vacant_orders_query:iter() do
 		local key = tostring(server_id)
 		local restaurant_id = details.restaurant_id
-		local house_id = details.destination_id
 		local food_list = details.foods_list_id
+		local house_id = details.destination_id
 		local conditions = details.conditions_list_id
 
-		orders_map[key] = {}
+		local foods_list_display_type = {} :: { t.DeliveryOrderFoodType }
+
+		for i, food_id in food_list do
+			local client_food_id = server_id_map.food_map[food_id]
+			assert(client_food_id, `Client food id does not exist for the server id of food {food_id}`)
+
+			local client_food_details = clientgamedata.food_map[client_food_id]
+			assert(
+				client_food_details,
+				`Client Food details does not exist for client id {client_food_id}`
+			)
+
+			local to_add: t.DeliveryOrderFoodType = {
+				image = client_food_details.display_image,
+				name = client_food_details.display_name,
+				rarity = client_food_details.rarity_value,
+			}
+
+			table.insert(foods_list_display_type, to_add)
+		end
+
+		local client_restuarant_id = server_id_map.restaurant_map[restaurant_id]
+		assert(
+			client_restuarant_id,
+			`Client restuarant id does not exist for server iD {restaurant_id}`
+		)
+		local client_restuarant_details = clientgamedata.restaurant_map[client_restuarant_id]
+		assert(
+			client_restuarant_details,
+			`Client restuarant details does not exist for id {client_restuarant_details}`
+		)
+
+		orders_map[key] = {
+			delivery_type = "TODO, does not exist yet",
+			-- we have not worked on this yet
+			has_mystery_box = false,
+			house_address = "W.I.P address",
+			house_name = "W.I.P name",
+			order_id = client_id :: t.Entity,
+			-- We have not worked on this yet
+			order_rating = 6,
+			restaurant_address = "W.I.P address",
+			restaurant_image = client_restuarant_details.display_image,
+			restaurant_name = client_restuarant_details.display_name,
+			reward_amount = 10000,
+			foods_list = foods_list_display_type,
+		}
 	end
+
+	uistore.DeliveryOrderList(orders_map)
 end
 
 local function system()
 	create_order_to_world()
+	display_orders_to_ui()
 end
 
 return {

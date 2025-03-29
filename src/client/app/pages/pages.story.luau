@@ -12,10 +12,8 @@ local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local vide = require(ReplicatedStorage.pkg.vide)
 
 local mount = vide.mount
-local source = vide.source
 local switch = vide.switch
 local create = vide.create
-local px = use_px.px
 
 local function story()
 	local page = uistore.page
@@ -25,7 +23,7 @@ local function story()
 	use_px.use_px()
 
 	change_page("RouberScreen")
-	uistore.DeliveryOrderList(Mock_Delivery_list)
+	uistore.DeliveryOrderList(Mock_Delivery_list :: never)
 
 	return switch(page) {
 		[""] = function()

@@ -58,6 +58,10 @@ asset_id = 135155603345133
 hash = "eea1229fc05a6bf1b28a7b682448891ee0ed4da222bac66025a2efcb1fe78e7d"
 asset_id = 113821992656466
 
+[entries."assets/images/HoverEffect1.svg"]
+hash = "e0de2864e4a2f7fbd876e58ee0c160de3fa19ca4e01f3866044de66d93c11ee2"
+asset_id = 92462709048961
+
 [entries."assets/images/Label.svg"]
 hash = "ada8d6d3e89a9d5bf151dfd0eb1a08011a53d26e836fccf980df4e331f83c389"
 asset_id = 129893366688406

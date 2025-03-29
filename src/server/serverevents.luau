@@ -525,6 +525,39 @@ local function RouberOrders_ReadEVENT_i_want_to_accept_order(): (number)
 	return Value
 end
 
+local function RouberOrders_WriteEVENT_bulk_setup_food(Value1: { number }, Value2: { string }): ()
+	-- Allocate BLOCK: 3 bytes
+	local BLOCK_START = Allocate(3)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 18)
+	-- START ARRAY
+	buffer.writeu8(SendBuffer, BLOCK_START + 1, #Value1)
+		-- Allocate BLOCK: 8 bytes
+	local ARRAY_START_1 = Allocate(8 * #Value1)
+	for Index = 1, #Value1 do
+		local Item_1 = Value1[Index]
+		-- Allocate 8
+		local OPERATION_OFFSET = ARRAY_START_1
+		ARRAY_START_1 += 8
+		buffer.writef64(SendBuffer, OPERATION_OFFSET, Item_1)
+	end
+	-- END ARRAY
+	-- START ARRAY
+	buffer.writeu8(SendBuffer, BLOCK_START + 2, #Value2)
+		-- Allocate BLOCK: 2 bytes
+	local ARRAY_START_1 = Allocate(2 * #Value2)
+	for Index = 1, #Value2 do
+		local Item_1 = Value2[Index]
+		local Length = #Item_1
+		-- Allocate 2
+		local OPERATION_OFFSET = ARRAY_START_1
+		ARRAY_START_1 += 2
+		buffer.writeu16(SendBuffer, OPERATION_OFFSET, Length)
+		Allocate(Length)
+		buffer.writestring(SendBuffer, SendOffset, Item_1, Length)
+	end
+	-- END ARRAY
+end
+
 if not RunService:IsRunning() then
 	local NOOP = function() end
 	local Returns = table.freeze({
@@ -626,6 +659,12 @@ if not RunService:IsRunning() then
 		i_want_to_accept_order = {
 			iter = NOOP,
 			next = NOOP
+		},
+		bulk_setup_food = {
+			fire = NOOP,
+			fire_all = NOOP,
+			fire_list = NOOP,
+			fire_except = NOOP
 		},
 	},
 	})
@@ -1418,6 +1457,52 @@ local Returns = table.freeze({
 					return 
 				end
 			end
+		},
+		bulk_setup_food = {
+			fire = function(Player: Player, Value1: { number }, Value2: { string }): ()
+				Load(PlayersMap[Player])
+				RouberOrders_WriteEVENT_bulk_setup_food(Value1, Value2)
+				PlayersMap[Player] = Save()
+			end,
+			fire_all = function(Value1: { number }, Value2: { string }): ()
+				Load()
+				RouberOrders_WriteEVENT_bulk_setup_food(Value1, Value2)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_list = function(List: {Player}, Value1: { number }, Value2: { string }): ()
+				Load()
+				RouberOrders_WriteEVENT_bulk_setup_food(Value1, Value2)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in List do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_except = function(Except: Player, Value1: { number }, Value2: { string }): ()
+				Load()
+				RouberOrders_WriteEVENT_bulk_setup_food(Value1, Value2)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					if Player == Except then
+						continue
+					end
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
 		},
 	},
 })

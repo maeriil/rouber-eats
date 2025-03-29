@@ -26,7 +26,7 @@ local __ = jecs.Wildcard
   What if we want to display some orders that are for everyone?
 ]]
 
-local _TEMPORARY_MAX_ORDER_IN_SERVER = 5
+local _TEMPORARY_MAX_ORDER_IN_SERVER = 2
 local vacant_orders_count = world:query(c.DeliveryOrderDetails):with(c.Vacant):cached()
 local function should_create_order()
 	--[[

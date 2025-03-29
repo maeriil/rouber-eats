@@ -13,6 +13,7 @@ local function HudScreen(props)
 		padding {
 			padding = padding_types.px48,
 		},
+
 		PhoneIconButton {
 			click = function()
 				change_page("PhoneScreen")

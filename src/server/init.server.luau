@@ -10,6 +10,7 @@ do
 	-- our system. Modules get cached so we can access them in system after as normal
 
 	require(ReplicatedStorage.common.configs.food)
+	require(ReplicatedStorage.common.configs.restaurant)
 	-- require(ReplicatedStorage.common.configs.restaurant)
 	require(ReplicatedStorage.common.configs.buildings.buildings_map)
 	require(script.store.playerstore)

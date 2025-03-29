@@ -10,7 +10,7 @@ local restaurant: types.RestaurantConfigType = {
 	id = world:entity() :: types.Entity,
 	string_id = script.Name,
 	display_name = "Tim Horton's",
-	display_image = "Timmies Logo here.",
+	display_image = "http://www.roblox.com/asset/?id=15602025849",
 
 	foods = {
 		tim_hortons_signature_coffee.id,

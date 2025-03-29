@@ -5,7 +5,7 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local food: types.FoodConfigType = {
 	id = world:entity() :: types.Entity,
 	string_id = script.Name,
-	display_name = "Hamburger",
+	display_name = "http://www.roblox.com/asset/?id=17227185044",
 	display_image = "path to the image here",
 	category = "Burgers",
 	nationality = "Any",

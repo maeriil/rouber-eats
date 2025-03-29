@@ -13,7 +13,8 @@ local remotes = require(ReplicatedStorage.types.remotes)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local vacant_order_details = world:query(c.DeliveryOrderDetails):with(c.Vacant):cached()
+local vacant_order_details =
+	world:query(c.DeliveryOrderDetails):with(c.Vacant):without(c.Invalid):cached()
 local function system()
 	for _, client in world:query(c.Client):iter() do
 		local config = playersetupconfig[client]

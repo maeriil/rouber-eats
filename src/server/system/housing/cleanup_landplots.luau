@@ -25,6 +25,21 @@ local function get_players_who_has_setup_houses()
 	return players_who_have_setup_house
 end
 
+local function mark_orders_as_invalid(house_id: t.Entity)
+	--[[
+		TODO: We will need to fire to client world so they can cleanup the order??
+		We still haven't deleted it btw.
+
+	]]
+	for order_id, details in world:query(c.DeliveryOrderDetails):iter() do
+		local residence_id = details.destination_id
+
+		if residence_id == house_id then
+			world:add(order_id, c.Invalid)
+		end
+	end
+end
+
 local function cleanup_the_landplot(
 	house_id: t.Entity,
 	parent: t.Entity,
@@ -35,6 +50,10 @@ local function cleanup_the_landplot(
 	assert(cleanup_interior_model, `We have used ref to create interior model. We need to cleanup`)
 
 	cleanup_interior_model()
+	mark_orders_as_invalid(house_id)
+	--//TODO: tbhm we have the parent id here, maybe we can just change the destination in order
+	--// once we know the new house id becomes?
+
 	world:remove(parent, c.Residence)
 	world:add(parent, c.Vacant)
 

@@ -1,10 +1,11 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local clientevents = require(ReplicatedStorage.common.clientevents)
+local clientgamedata = require(ReplicatedStorage.client.store.clientgamedata)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local p = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
-local restaurant = require(ReplicatedStorage.common.configs.restaurant)
+local restaurant_map = require(ReplicatedStorage.common.configs.restaurant)
 local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
 local setup_door = require(ReplicatedStorage.common.configs.buildings.setup_door)
 local t = require(ReplicatedStorage.types)
@@ -27,7 +28,9 @@ end)
 local function setup_restuarant_to_client(restaurant_name: string, interior: Model, exterior: Model)
 	local interior_primary = interior.PrimaryPart :: Part
 	local exterior_priamry = exterior.PrimaryPart :: Part
-	local restaurant_config = restaurant[restaurant_name]
+	print(`>> pritning restaurant...`)
+	print(restaurant_map)
+	local restaurant_config = restaurant_map[restaurant_name]
 	assert(
 		restaurant_config,
 		`Restaurant with name {restaurant_name} does not exist in config folder...`
@@ -76,11 +79,14 @@ local function setup_restuarant_to_client(restaurant_name: string, interior: Mod
 	setup_door(exterior, exterior_id)
 
 	server_id_map.restaurant_map[interior_server_mapped_id] = parent_id
+	clientgamedata.restaurant_map[parent_id] = restaurant_config
+	restaurant_map[restaurant_name] = nil
 end
 
-local initial = false
+local completed = false
 local function system()
-	for i = #instance_added, 1, -1 do
+	local n = #instance_added
+	for i = n, 1, -1 do
 		local folder = instance_added[i]
 		assert(
 			folder:IsA("Folder"),
@@ -132,10 +138,13 @@ local function system()
 		instance_added[i] = nil
 	end
 
-	initial = true
-
-	if initial then
+	if not completed and n > 0 then
+		print(restaurant_map)
 		clientevents.PlayerEvents.i_have_setup_restaurants.fire()
+		-- -- table.clear(restaurant_map)
+		-- print("setting it to nil....")
+		-- -- restaurant_map = nil :: never
+		completed = true
 	end
 end
 

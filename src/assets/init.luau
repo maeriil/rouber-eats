@@ -15,6 +15,7 @@ return {
 		["ExitButton.svg"] = "rbxassetid://101224825839546",
 		["ExitButtonInverted.svg"] = "rbxassetid://135155603345133",
 		["Hexagon.svg"] = "rbxassetid://113821992656466",
+		["HoverEffect1.svg"] = "rbxassetid://92462709048961",
 		["Label.svg"] = "rbxassetid://129893366688406",
 		["LabelInverted.svg"] = "rbxassetid://124291415335756",
 		["Order_List_Back.png"] = "rbxassetid://126126494446320",

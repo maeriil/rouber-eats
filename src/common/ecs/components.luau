@@ -209,6 +209,7 @@ local components = {
 
 	Food = world:entity() :: t.Entity,
 	Value = world:component() :: t.Id<number>,
+	Invalid = world:entity() :: t.Entity,
 }
 do
 	-- Because luau is ass

@@ -205,4 +205,15 @@ scope RouberOrders {
     Poll: true,
     Data: Entity
   }
+
+  --[[
+    Server just sends a server entity id and foodname so client can setup
+  ]]
+  event bulk_setup_food {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity[0..100], string[0..100])
+  }
 }

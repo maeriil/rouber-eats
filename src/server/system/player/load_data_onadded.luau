@@ -41,6 +41,10 @@ local function setup_config(player: Player)
 			server_sent = false,
 			client_completed = false,
 		},
+		food_setup = {
+			server_sent = false,
+			client_completed = false,
+		},
 	}
 end
 

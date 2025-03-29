@@ -6,7 +6,7 @@ local food: types.FoodConfigType = {
 	id = world:entity() :: types.Entity,
 	string_id = script.Name,
 	display_name = "Tim Horton's Dark Roast Double Double",
-	display_image = "path to the image here",
+	display_image = "http://www.roblox.com/asset/?id=13457330819",
 	category = "Coffees and Teas",
 	nationality = "Any",
 

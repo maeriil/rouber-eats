@@ -24,16 +24,42 @@ export type BuildingRemoteParams = {
 	can_enter: boolean,
 }
 
+export type DeliveryOrderFoodType = {
+	name: string,
+	image: string,
+	rarity: number,
+}
 export type DeliveryOrderType = {
-	clientid: Entity,
-	reward: number,
-	restaurant: {
-		name: string,
-		img: string,
-		location: string,
-	},
-	deliverytype: string,
-	distance: number,
+	--[[
+		I think this should be the client entity id. If it is client, then we need to dispatch
+		to ecs world, which will then grab the entity and then send remote event
+	]]
+	order_id: Entity,
+
+	--[[
+		Order rating is basically how valuable this order is. The server calculates it based on the values of
+		foods, restaurants, and the house to deliver. Furthermore, only higher level players are
+		able to get higher tier orders
+	]]
+	order_rating: number,
+	delivery_type: string, --//NOTE: we only have 1 type rn tbh
+	has_mystery_box: boolean,
+	reward_amount: number,
+
+	--[[
+		Array of food list, we will need to build them up before hand and then send it to client
+		so that the client doesn't need to do world:get calls
+	]]
+	foods_list: { DeliveryOrderFoodType },
+
+	restaurant_image: string,
+	restaurant_name: string,
+	house_name: string,
+	--[[
+		TODO: this requires us to actually create a proper map with street names and etc
+	]]
+	restaurant_address: string,
+	house_address: string,
 }
 
 export type DialogueType = {

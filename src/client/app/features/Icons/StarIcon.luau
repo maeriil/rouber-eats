@@ -17,6 +17,7 @@ type props = {
 	anchor: types.Can<Vector2>?,
 	pos: types.Can<UDim2>?,
 	size: types.Can<UDim2>?,
+	color: types.Can<Color3>?,
 }
 
 local function StarIcon(props: props)
@@ -42,7 +43,7 @@ local function StarIcon(props: props)
 		end,
 		baseicon {
 			img = image,
-			color = Color3.fromRGB(255, 255, 255),
+			color = props.color or Color3.fromRGB(255, 255, 255),
 		},
 	}
 end

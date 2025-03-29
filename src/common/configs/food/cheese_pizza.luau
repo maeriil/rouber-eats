@@ -6,7 +6,7 @@ local food: types.FoodConfigType = {
 	id = world:entity() :: types.Entity,
 	string_id = script.Name,
 	display_name = "Cheese Pizza",
-	display_image = "path to the image here",
+	display_image = "http://www.roblox.com/asset/?id=18650345459",
 	category = "Pizza",
 	nationality = "Any",
 
@@ -15,7 +15,7 @@ local food: types.FoodConfigType = {
 	rarity_value = 0.65,
 
 	-- Conditions
-	can_be_hot = false,
+	can_be_hot = true,
 }
 
 return food
