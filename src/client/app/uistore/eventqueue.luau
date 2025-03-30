@@ -12,6 +12,7 @@ export type qevent_types =
 	| "DialoguePromptStarted"
 	| "DialogueNextResponse"
 	| "ProximityClicked"
+	| "OrderAccept"
 export type qevent = {
 	type: qevent_types,
 	payload: (() -> any)?,
@@ -85,6 +86,17 @@ local function dispatch_proximity_clicked(activeproximity: types.ActiveProximity
 	})
 end
 
+local function dispatch_order_accept(client_order_id: types.Entity)
+	local payload = function()
+		return client_order_id
+	end
+
+	event_queue:add({
+		type = "OrderAccept",
+		payload = payload,
+	})
+end
+
 return {
 	queue = event_queue,
 	add_dialogue_event_choice = add_dialogue_event_choice,
@@ -92,4 +104,5 @@ return {
 	add_dialogue_started = add_dialogue_started,
 	dispatch_next_dialogue = dispatch_next_dialogue,
 	dispatch_proximity_clicked = dispatch_proximity_clicked,
+	dispatch_order_accept = dispatch_order_accept,
 }

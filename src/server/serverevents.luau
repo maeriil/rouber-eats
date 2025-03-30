@@ -159,12 +159,16 @@ Queue.Reliable[12] = CreateQueue()
 Queue.Reliable[13] = CreateQueue()
 Queue.Reliable[14] = CreateQueue()
 Queue.Reliable[17] = CreateQueue()
+Queue.Reliable[18] = CreateQueue()
+Queue.Reliable[20] = CreateQueue()
+Queue.Reliable[21] = CreateQueue()
 export type Entity = number
 export type Model = Model?
 export type Building_HouseType = ("interior" | "exterior")
 export type Building_IsNPC = boolean
 export type Building_ExteriorHouseType = string
 export type RouberOrders_DeliveryType = { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }
+export type RouberOrders_OrderChoices = ("Deliver" | "Steal" | "Tamper")
 local function Building_ReadEVENT_IWantToTeleportInOrOut(): (number, ("interior" | "exterior"))
 	-- Read BLOCK: 9 bytes
 	local BLOCK_START = Read(9)
@@ -525,10 +529,64 @@ local function RouberOrders_ReadEVENT_i_want_to_accept_order(): (number)
 	return Value
 end
 
+local function RouberOrders_ReadEVENT_i_want_to_pickup_order(): (number)
+	-- Read BLOCK: 8 bytes
+	local BLOCK_START = Read(8)
+	local Value = buffer.readf64(RecieveBuffer, BLOCK_START + 0)
+	return Value
+end
+
+local function RouberOrders_WriteEVENT_pickup_order_response(Value1: boolean, Value2: number?, Value3: string?): ()
+	-- Allocate BLOCK: 4 bytes
+	local BLOCK_START = Allocate(4)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 19)
+	buffer.writeu8(SendBuffer, BLOCK_START + 1, Value1 and 1 or 0)
+	buffer.writeu8(SendBuffer, BLOCK_START + 2, Value2 ~= nil and 1 or 0)
+	if Value2 ~= nil then
+		-- Allocate BLOCK: 8 bytes
+		local BLOCK_START = Allocate(8)
+		buffer.writef64(SendBuffer, BLOCK_START + 0, Value2)
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 3, Value3 ~= nil and 1 or 0)
+	if Value3 ~= nil then
+		-- Allocate BLOCK: 2 bytes
+		local BLOCK_START = Allocate(2)
+		local Length = #Value3
+		buffer.writeu16(SendBuffer, BLOCK_START + 0, Length)
+		Allocate(Length)
+		buffer.writestring(SendBuffer, SendOffset, Value3, Length)
+	end
+end
+
+local function RouberOrders_ReadEVENT_my_choice_for_this_order(): (number, ("Deliver" | "Steal" | "Tamper"))
+	-- Read BLOCK: 9 bytes
+	local BLOCK_START = Read(9)
+	local Value1 = buffer.readf64(RecieveBuffer, BLOCK_START + 0)
+	local Value2 = true :: any
+	local Index = buffer.readu8(RecieveBuffer, BLOCK_START + 8)
+	if Index == 0 then
+		Value2 = "Deliver"
+	elseif Index == 1 then
+		Value2 = "Steal"
+	elseif Index == 2 then
+		Value2 = "Tamper"
+	else
+		error(`Unexpected enum: {Index}`)
+	end
+	return Value1, Value2
+end
+
+local function RouberOrders_ReadEVENT_i_want_to_complete_order(): (number)
+	-- Read BLOCK: 8 bytes
+	local BLOCK_START = Read(8)
+	local Value = buffer.readf64(RecieveBuffer, BLOCK_START + 0)
+	return Value
+end
+
 local function RouberOrders_WriteEVENT_bulk_setup_food(Value1: { number }, Value2: { string }): ()
 	-- Allocate BLOCK: 3 bytes
 	local BLOCK_START = Allocate(3)
-	buffer.writeu8(SendBuffer, BLOCK_START + 0, 18)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 22)
 	-- START ARRAY
 	buffer.writeu8(SendBuffer, BLOCK_START + 1, #Value1)
 		-- Allocate BLOCK: 8 bytes
@@ -660,6 +718,24 @@ if not RunService:IsRunning() then
 			iter = NOOP,
 			next = NOOP
 		},
+		i_want_to_pickup_order = {
+			iter = NOOP,
+			next = NOOP
+		},
+		pickup_order_response = {
+			fire = NOOP,
+			fire_all = NOOP,
+			fire_list = NOOP,
+			fire_except = NOOP
+		},
+		my_choice_for_this_order = {
+			iter = NOOP,
+			next = NOOP
+		},
+		i_want_to_complete_order = {
+			iter = NOOP,
+			next = NOOP
+		},
 		bulk_setup_food = {
 			fire = NOOP,
 			fire_all = NOOP,
@@ -738,6 +814,12 @@ Reliable.OnServerEvent:Connect(function(Player: Player, Buffer: buffer, Instance
 			Push(Queue.Reliable[14], table.pack(Player, PlayerEvents_ReadEVENT_i_have_bulk_created_orders_initially()))
 		elseif Index == 17 then
 			Push(Queue.Reliable[17], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_accept_order()))
+		elseif Index == 18 then
+			Push(Queue.Reliable[18], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_pickup_order()))
+		elseif Index == 20 then
+			Push(Queue.Reliable[20], table.pack(Player, RouberOrders_ReadEVENT_my_choice_for_this_order()))
+		elseif Index == 21 then
+			Push(Queue.Reliable[21], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_complete_order()))
 		end
 	end
 end)
@@ -1448,6 +1530,133 @@ local Returns = table.freeze({
 			next = function(): () -> (number, Player, number)
 				local index = 0
 				local queue = Queue.Reliable[17]
+				return function (): (number, Player, number)
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end
+		},
+		i_want_to_pickup_order = {
+			iter = function(): () -> (number, Player, number)
+				local index = 0
+				local queue = Queue.Reliable[18]
+				return function (): (number, Player, number)
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end,
+			--- @deprecated v0.14.1 -- Use `Iter` instead.
+			next = function(): () -> (number, Player, number)
+				local index = 0
+				local queue = Queue.Reliable[18]
+				return function (): (number, Player, number)
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end
+		},
+		pickup_order_response = {
+			fire = function(Player: Player, Value1: boolean, Value2: number?, Value3: string?): ()
+				Load(PlayersMap[Player])
+				RouberOrders_WriteEVENT_pickup_order_response(Value1, Value2, Value3)
+				PlayersMap[Player] = Save()
+			end,
+			fire_all = function(Value1: boolean, Value2: number?, Value3: string?): ()
+				Load()
+				RouberOrders_WriteEVENT_pickup_order_response(Value1, Value2, Value3)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_list = function(List: {Player}, Value1: boolean, Value2: number?, Value3: string?): ()
+				Load()
+				RouberOrders_WriteEVENT_pickup_order_response(Value1, Value2, Value3)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in List do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_except = function(Except: Player, Value1: boolean, Value2: number?, Value3: string?): ()
+				Load()
+				RouberOrders_WriteEVENT_pickup_order_response(Value1, Value2, Value3)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					if Player == Except then
+						continue
+					end
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+		},
+		my_choice_for_this_order = {
+			iter = function(): () -> (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
+				local index = 0
+				local queue = Queue.Reliable[20]
+				return function (): (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end,
+			--- @deprecated v0.14.1 -- Use `Iter` instead.
+			next = function(): () -> (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
+				local index = 0
+				local queue = Queue.Reliable[20]
+				return function (): (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end
+		},
+		i_want_to_complete_order = {
+			iter = function(): () -> (number, Player, number)
+				local index = 0
+				local queue = Queue.Reliable[21]
+				return function (): (number, Player, number)
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end,
+			--- @deprecated v0.14.1 -- Use `Iter` instead.
+			next = function(): () -> (number, Player, number)
+				local index = 0
+				local queue = Queue.Reliable[21]
 				return function (): (number, Player, number)
 					index += 1
 					local arguments = Pop(queue)

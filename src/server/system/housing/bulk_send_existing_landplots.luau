@@ -60,7 +60,7 @@ local function bulk_send_house_owners_with_residence_to_new_players(players: { P
 
 	for owner_id, char, primarypart, residence_id in house_owner_details_query:iter() do
 		local is_npc = world:has(owner_id, c.OccupiedByNPC)
-		assert(char.PrimaryPart ~= nil, `Primary parpt must be valid`)
+		assert(char.PrimaryPart ~= nil, `Primary part must be valid`)
 
 		table.insert(owner_id_list, blink_conv.from_entity(owner_id))
 		table.insert(owner_name_list, char)

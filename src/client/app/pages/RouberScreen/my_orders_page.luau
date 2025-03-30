@@ -6,6 +6,7 @@ local Mock_Delivery_list =
 local OrderPanelView = require(ReplicatedStorage.client.app.features.RouberDashboard.OrderPanelView)
 local RouberOrderContainer =
 	require(ReplicatedStorage.client.app.features.RouberPanel.RouberOrderContainer)
+local eventqueue = require(ReplicatedStorage.client.app.uistore.eventqueue)
 local flexfill = require(ReplicatedStorage.client.app.components.flex.flexfill)
 local frame = require(ReplicatedStorage.client.app.components.pane.frame)
 local pane = require(ReplicatedStorage.client.app.components.pane.pane)
@@ -29,7 +30,12 @@ local function my_orders(props: {
 		panelcontent = {
 			OrderPanelView {
 				acceptclick = function()
+					local selected_key = selected()
 					print(`Accepting the order of key = {selected()}`)
+					local orders_list = orderlist()
+					local details = orders_list[selected_key]
+					-- warn(`dispatching the order id to event queue...`)
+					eventqueue.dispatch_order_accept(details.order_id)
 				end,
 				details = function()
 					local content = orderlist()[selected()]

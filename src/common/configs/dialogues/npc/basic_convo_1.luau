@@ -54,26 +54,6 @@ local function create_basic_conversation(props: props)
 			CHOICE {
 				text = `None of your damn business!`,
 			},
-
-			-- RESPONSE {
-			-- 	text = `YEEHAW!!! What's up {me}`,
-			-- 	RESPONSE {
-			-- 		text = `Ensure that multiple nested response works`,
-			-- 		RESPONSE {
-			-- 			text = `Finally, after this point, the dialogue is finished. Again here is where it should auto disappear`,
-			-- 		},
-			-- 	},
-			-- },
-
-			-- CHOICE {
-			-- 	text = `My name is Bob`,
-			-- },
-			-- CHOICE {
-			-- 	text = `My name is Henry`,
-			-- },
-			-- CHOICE {
-			-- 	text = `My name is {me}`,
-			-- },
 		},
 	}
 

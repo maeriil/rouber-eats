@@ -3,6 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local playerdatastore = require(ServerScriptService.server.store.playerdatastore)
 local playersetupconfiguration = require(ServerScriptService.server.store.playersetupconfig)
+local playerstore = require(ServerScriptService.server.store.playerstore)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local phases = require(ReplicatedStorage.common.ecs.phases)
@@ -45,6 +46,10 @@ local function setup_config(player: Player)
 			server_sent = false,
 			client_completed = false,
 		},
+	}
+
+	playerstore[player] = {
+		my_orders = {},
 	}
 end
 

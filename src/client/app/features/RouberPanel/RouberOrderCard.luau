@@ -176,7 +176,9 @@ local function RouberOrderCard(props: props)
 			return UDim2.new(1, 0, 0, px(180))
 		end,
 		basebutton {
-			click = props.click,
+			click = function()
+				props.click()
+			end,
 		},
 		show(on_active_src, function()
 			return frame {

@@ -6,9 +6,6 @@ local playersetupconfig = require(ServerScriptService.server.store.playersetupco
 local serverevents = require(ServerScriptService.server.serverevents)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local p = require(ReplicatedStorage.common.ecs.pairs)
-local t = require(ReplicatedStorage.types)
-local pair = jecs.pair
 local remotes = require(ReplicatedStorage.types.remotes)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard

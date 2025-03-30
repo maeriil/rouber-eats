@@ -196,9 +196,60 @@ scope RouberOrders {
   }
 
   --[[
-    Client sends the mapped server entity id to the server
+    Client sends the mapped server entity id to the server. TBH this might be better off
+    being a remote function too ngl...
   ]]
   event i_want_to_accept_order {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: Entity
+  }
+
+  --[[
+    Client is in a restaurant and they are trying to pick up an order. This will be
+    a remote function as we want the client to get back a success/failure response if
+    an order pickup was successful or not
+  ]]
+  event i_want_to_pickup_order {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: Entity
+  }
+
+  --[[
+    We should move the Entity to the next one but for now its ok here. This entity is the
+    house entity. We will then need to add cutsfcene component there so
+  ]]
+  event pickup_order_response {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: ( boolean, Entity?, string?)
+  }
+
+  --[[
+    Okay this is tricky, if we made a choice, how do we know if it is for a single order
+    vs all the orders in a restaurant??
+  ]]
+
+  enum OrderChoices = { Deliver, Steal, Tamper }
+  event my_choice_for_this_order {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity, OrderChoices)
+  }
+
+  --[[
+    Here, the entity should represent the house_entity id
+  ]]
+  event i_want_to_complete_order {
     From: Client,
     Type: Reliable,
     Call: SingleSync,

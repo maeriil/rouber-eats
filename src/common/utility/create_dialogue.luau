@@ -59,7 +59,7 @@ local function GOTO(props: TABLE & {
 		props = props,
 	}
 end
-local function IF(check_function)
+local function IF(check_function: () -> boolean)
 	return function(props: { success: TABLE, failure: TABLE })
 		return {
 			_if = true,
@@ -75,7 +75,7 @@ local build_dialogue_tree: (parent: t.Entity, node: TABLE) -> t.Entity
 local build_choices: (parent: t.Entity, node: TABLE) -> ()
 
 local function create_choicecontainer(parent)
-	local container_id = world:entity()
+	local container_id = world:entity() :: t.Entity
 	world:set(container_id, c.Parent, parent)
 	world:add(parent, pair(c.Next, container_id))
 	world:add(container_id, c.DialogueChoiceContainer)
@@ -83,7 +83,7 @@ local function create_choicecontainer(parent)
 end
 
 local function create_choice(parent, t)
-	local choice_id = world:entity()
+	local choice_id = world:entity() :: t.Entity
 	world:set(choice_id, c.Parent, parent)
 	world:add(choice_id, c.DialogueChoice)
 	world:set(choice_id, c.DialogueText, t.props.text)
@@ -92,7 +92,7 @@ local function create_choice(parent, t)
 end
 
 local function create_response(parent: t.Entity, dialogue_text: string)
-	local response_id = world:entity()
+	local response_id = world:entity() :: t.Entity
 	world:add(parent, pair(c.Next, response_id))
 	world:add(response_id, c.DialogueResponse)
 	world:set(response_id, c.Parent, parent)
@@ -103,13 +103,13 @@ end
 
 local function create_if(parent, check_function, success, failure)
 	-- I think this one might have bugs
-	local if_id = world:entity()
+	local if_id = world:entity() :: t.Entity
 	world:add(parent, pair(c.Next, if_id))
 	world:set(if_id, c.Parent, parent)
 	world:set(if_id, c.DialogueIf, check_function)
 	world:set(if_id, c.DialogueText, "todo... add condition text")
 
-	local success_id = world:entity()
+	local success_id = world:entity() :: t.Entity
 	world:add(success_id, c.DialogueSuccess)
 	if #success > 1 then
 		build_choices(success_id, success)
@@ -119,7 +119,7 @@ local function create_if(parent, check_function, success, failure)
 	end
 	world:add(if_id, pair(c.DialogueSuccess, success_id))
 
-	local failure_id = world:entity()
+	local failure_id = world:entity() :: t.Entity
 	world:add(failure_id, c.DialogueFailure)
 	if #failure > 1 then
 		build_choices(failure_id, failure)
@@ -133,7 +133,7 @@ local function create_if(parent, check_function, success, failure)
 end
 
 local function create_callback(parent: t.Entity, callback: () -> ())
-	local callback_id = world:entity()
+	local callback_id = world:entity() :: t.Entity
 	world:set(callback_id, c.Parent, parent)
 	world:add(parent, pair(c.Next, callback_id))
 	world:set(callback_id, c.DialogueCallback, callback)
@@ -143,7 +143,7 @@ end
 
 local function create_goto(parent, props)
 	warn(`todo, goto needs some work...`)
-	local goto_id = world:entity()
+	local goto_id = world:entity() :: t.Entity
 	world:set(goto_id, c.Parent, parent)
 	world:set(goto_id, c.DialogueGoto, props.target)
 	world:add(parent, pair(c.Next, goto_id))
@@ -206,7 +206,7 @@ function build_dialogue_tree(parent, node)
 end
 
 local function DIALOGUE(props: TABLE & { key: string })
-	local root = world:entity()
+	local root = world:entity() :: t.Entity
 
 	-- Add some configuration here
 	local _, next_props = next(props)

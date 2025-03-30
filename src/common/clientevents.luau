@@ -162,13 +162,15 @@ Queue.Reliable[8] = CreateQueue()
 Queue.Reliable[10] = CreateQueue()
 Queue.Reliable[15] = CreateQueue()
 Queue.Reliable[16] = CreateQueue()
-Queue.Reliable[18] = CreateQueue()
+Queue.Reliable[19] = CreateQueue()
+Queue.Reliable[22] = CreateQueue()
 export type Entity = number
 export type Model = Model?
 export type Building_HouseType = ("interior" | "exterior")
 export type Building_IsNPC = boolean
 export type Building_ExteriorHouseType = string
 export type RouberOrders_DeliveryType = { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }
+export type RouberOrders_OrderChoices = ("Deliver" | "Steal" | "Tamper")
 local function Building_WriteEVENT_IWantToTeleportInOrOut(Value1: number, Value2: ("interior" | "exterior")): ()
 	-- Allocate BLOCK: 10 bytes
 	local BLOCK_START = Allocate(10)
@@ -597,6 +599,56 @@ local function RouberOrders_WriteEVENT_i_want_to_accept_order(Value: number): ()
 	buffer.writef64(SendBuffer, BLOCK_START + 1, Value)
 end
 
+local function RouberOrders_WriteEVENT_i_want_to_pickup_order(Value: number): ()
+	-- Allocate BLOCK: 9 bytes
+	local BLOCK_START = Allocate(9)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 18)
+	buffer.writef64(SendBuffer, BLOCK_START + 1, Value)
+end
+
+local function RouberOrders_ReadEVENT_pickup_order_response(): (boolean, number?, string?)
+	-- Read BLOCK: 3 bytes
+	local BLOCK_START = Read(3)
+	local Value1 = (buffer.readu8(RecieveBuffer, BLOCK_START + 0) == 1)
+	local Value2
+	if buffer.readu8(RecieveBuffer, BLOCK_START + 1) == 1 then
+		-- Read BLOCK: 8 bytes
+		local BLOCK_START = Read(8)
+		Value2 = buffer.readf64(RecieveBuffer, BLOCK_START + 0)
+	end
+	local Value3
+	if buffer.readu8(RecieveBuffer, BLOCK_START + 2) == 1 then
+		-- Read BLOCK: 2 bytes
+		local BLOCK_START = Read(2)
+		local Length = buffer.readu16(RecieveBuffer, BLOCK_START + 0)
+		Value3 = buffer.readstring(RecieveBuffer, Read(Length), Length)
+	end
+	return Value1, Value2, Value3
+end
+
+local function RouberOrders_WriteEVENT_my_choice_for_this_order(Value1: number, Value2: ("Deliver" | "Steal" | "Tamper")): ()
+	-- Allocate BLOCK: 10 bytes
+	local BLOCK_START = Allocate(10)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 20)
+	buffer.writef64(SendBuffer, BLOCK_START + 1, Value1)
+	if Value2 == "Deliver" then
+		buffer.writeu8(SendBuffer, BLOCK_START + 9, 0)
+	elseif Value2 == "Steal" then
+		buffer.writeu8(SendBuffer, BLOCK_START + 9, 1)
+	elseif Value2 == "Tamper" then
+		buffer.writeu8(SendBuffer, BLOCK_START + 9, 2)
+	else
+		error(`Unexpected enum: {Value2}, expected one of "Deliver" or "Steal" or "Tamper".`)
+	end
+end
+
+local function RouberOrders_WriteEVENT_i_want_to_complete_order(Value: number): ()
+	-- Allocate BLOCK: 9 bytes
+	local BLOCK_START = Allocate(9)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 21)
+	buffer.writef64(SendBuffer, BLOCK_START + 1, Value)
+end
+
 local function RouberOrders_ReadEVENT_bulk_setup_food(): ({ number }, { string })
 	-- Read BLOCK: 2 bytes
 	local BLOCK_START = Read(2)
@@ -707,6 +759,19 @@ if not RunService:IsRunning() then
 		i_want_to_accept_order = {
 			fire = NOOP
 		},
+		i_want_to_pickup_order = {
+			fire = NOOP
+		},
+		pickup_order_response = {
+			iter = NOOP,
+			next = NOOP
+		},
+		my_choice_for_this_order = {
+			fire = NOOP
+		},
+		i_want_to_complete_order = {
+			fire = NOOP
+		},
 		bulk_setup_food = {
 			iter = NOOP,
 			next = NOOP
@@ -778,8 +843,10 @@ Reliable.OnClientEvent:Connect(function(Buffer: buffer, Instances: {Instance})
 			Push(Queue.Reliable[15], table.pack(RouberOrders_ReadEVENT_create_order()))
 		elseif Index == 16 then
 			Push(Queue.Reliable[16], table.pack(RouberOrders_ReadEVENT_bulk_create_order()))
-		elseif Index == 18 then
-			Push(Queue.Reliable[18], table.pack(RouberOrders_ReadEVENT_bulk_setup_food()))
+		elseif Index == 19 then
+			Push(Queue.Reliable[19], table.pack(RouberOrders_ReadEVENT_pickup_order_response()))
+		elseif Index == 22 then
+			Push(Queue.Reliable[22], table.pack(RouberOrders_ReadEVENT_bulk_setup_food()))
 		end
 	end
 end)
@@ -1137,10 +1204,52 @@ local Returns = table.freeze({
 				RouberOrders_WriteEVENT_i_want_to_accept_order(Value)
 			end
 		},
+		i_want_to_pickup_order = {
+			fire = function(Value: number): ()
+				RouberOrders_WriteEVENT_i_want_to_pickup_order(Value)
+			end
+		},
+		pickup_order_response = {
+			iter = function(): () -> (number, boolean, number?, string?)
+				local index = 0
+				local queue = Queue.Reliable[19]
+				return function (): (number, boolean, number?, string?)
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end,
+			--- @deprecated v0.14.1 -- Use `Iter` instead.
+			next = function(): () -> (number, boolean, number?, string?)
+				local index = 0
+				local queue = Queue.Reliable[19]
+				return function (): (number, boolean, number?, string?)
+					index += 1
+					local arguments = Pop(queue)
+					if arguments ~= nil then
+						return index, unpack(arguments, 1, arguments.n)
+					end
+					return 
+				end
+			end
+		},
+		my_choice_for_this_order = {
+			fire = function(Value1: number, Value2: ("Deliver" | "Steal" | "Tamper")): ()
+				RouberOrders_WriteEVENT_my_choice_for_this_order(Value1, Value2)
+			end
+		},
+		i_want_to_complete_order = {
+			fire = function(Value: number): ()
+				RouberOrders_WriteEVENT_i_want_to_complete_order(Value)
+			end
+		},
 		bulk_setup_food = {
 			iter = function(): () -> (number, { number }, { string })
 				local index = 0
-				local queue = Queue.Reliable[18]
+				local queue = Queue.Reliable[22]
 				return function (): (number, { number }, { string })
 					index += 1
 					local arguments = Pop(queue)
@@ -1153,7 +1262,7 @@ local Returns = table.freeze({
 			--- @deprecated v0.14.1 -- Use `Iter` instead.
 			next = function(): () -> (number, { number }, { string })
 				local index = 0
-				local queue = Queue.Reliable[18]
+				local queue = Queue.Reliable[22]
 				return function (): (number, { number }, { string })
 					index += 1
 					local arguments = Pop(queue)

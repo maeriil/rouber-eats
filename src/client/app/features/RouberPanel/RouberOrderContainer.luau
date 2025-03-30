@@ -12,7 +12,6 @@ local vide = require(ReplicatedStorage.pkg.vide)
 local vlayout = require(ReplicatedStorage.client.app.components.layouts.vlayout)
 
 local px = use_px.px
-local values = vide.values
 local indexes = vide.indexes
 
 type props = {

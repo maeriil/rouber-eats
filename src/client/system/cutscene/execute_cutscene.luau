@@ -159,6 +159,7 @@ local function delivery_cutscene(trigger_id: t.Entity)
 
 		ContextActionService:UnbindAction(FREEZE_ACTION)
 		world:remove(c.Client, c.IsCutscenePlaying)
+		world:remove(trigger_id, c.HasCutscene)
 	end)
 end
 

@@ -11,7 +11,7 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local pair = jecs.pair
 
 local function setup_doormatzone(doormat: Part, parent: t.Entity, params: OverlapParams)
-	local e = world:entity()
+	local e = world:entity() :: t.Entity
 	world:add(parent, pair(c.DoormatZone, e))
 	world:add(e, c.DoormatZone)
 	world:add(e, pairs.childof(parent))
@@ -24,7 +24,7 @@ local function setup_doormatzone(doormat: Part, parent: t.Entity, params: Overla
 end
 
 local function setup_teleportzone(teleport: Part, parent: t.Entity, params: OverlapParams)
-	local e = world:entity()
+	local e = world:entity() :: t.Entity
 	world:add(parent, pair(c.TeleportZone, e))
 	world:add(e, c.TeleportZone)
 	world:add(e, pairs.childof(parent))

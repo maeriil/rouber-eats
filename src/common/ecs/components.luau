@@ -29,6 +29,7 @@ local components = {
 	PathWaypoints = world:component() :: t.Id<{ PathWaypoint }>,
 	PathFuture = world:component() :: t.Id<future.FutureLike<string, { PathWaypoint }>>,
 	WalkToFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
+	BoolFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
 
 	--//TODO: merge the ray and over params together into a single {}
 	RayParams = world:component() :: t.Id<RaycastParams>,
@@ -166,7 +167,7 @@ local components = {
 	DialogueChoiceContainer = world:entity() :: t.Entity,
 	DialogueResponse = world:entity() :: t.Entity,
 	DialogueCallback = world:component() :: t.Id<() -> ()>,
-	DialogueIf = world:component() :: t.Id<() -> ()>,
+	DialogueIf = world:component() :: t.Id<() -> boolean>,
 	DialogueSuccess = world:entity() :: t.Entity,
 	DialogueFailure = world:entity() :: t.Entity,
 	DialogueGoto = world:component() :: t.Id,
@@ -174,6 +175,7 @@ local components = {
 	DialogueKey = world:component() :: t.Id<string>,
 	DialogueAuthor = world:component() :: t.Id<string>,
 	Next = world:entity() :: t.Entity,
+	NeedsChoice = world:entity() :: t.Entity,
 
 	DoNotReconcile = world:entity() :: t.Entity,
 	DoNotDelete = world:entity() :: t.Entity,
