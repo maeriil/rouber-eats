@@ -10,6 +10,10 @@ local sources = {
 	-- By default, the player is not initially working. When a player is not working and they
 	-- open their phone, we want to show an option to start working
 	-- The server most likely will update this as well
+
+	CashCurrency = source(0),
+	GemsCurrency = source(0),
+
 	IsWorking = source(false),
 	ShowPhone = source(false),
 	MyModel = source(workspace:FindFirstChild("Maeriil")),

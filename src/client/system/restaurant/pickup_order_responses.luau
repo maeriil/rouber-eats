@@ -31,6 +31,7 @@ local function add_cutscene_to_house(server_house_id: t.Entity)
 	assert(doormat_zone_id, `Doormat zone id must exist`)
 
 	world:add(doormat_zone_id, c.HasCutscene)
+	world:add(doormat_zone_id, c.HasOrderToBeDelivered)
 
 	-- local client_id_map = clientgamedata.residence_map[server_house_id]
 	-- If this assert fails, then we r pickign up orders for a deleted house

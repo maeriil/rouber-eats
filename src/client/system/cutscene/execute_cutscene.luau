@@ -9,6 +9,7 @@ local uistore = require(ReplicatedStorage.client.app.uistore)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local for_each_target = require(ReplicatedStorage.common.utility.for_each_target)
+local freeze_player_movement = require(ReplicatedStorage.common.utility.freeze_player_movement)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
@@ -31,10 +32,7 @@ local function delivery_cutscene(trigger_id: t.Entity)
 	local animator = humanoid:FindFirstChildOfClass("Animator")
 	assert(animator ~= nil, `Animator instance must be child of Humanoid`)
 	local hrp = _hrp :: Part
-	local FREEZE_ACTION = "freezeMovement"
-	ContextActionService:BindAction(FREEZE_ACTION, function()
-		return Enum.ContextActionResult.Sink
-	end, false, unpack(Enum.PlayerActions:GetEnumItems()))
+	freeze_player_movement.freeze()
 
 	local exterior_pos = world:get(exterior_house_id, c.Transform) :: CFrame
 	local global = sounds.global
@@ -157,7 +155,8 @@ local function delivery_cutscene(trigger_id: t.Entity)
 		temporary:Destroy()
 		cutsceneparts:Destroy()
 
-		ContextActionService:UnbindAction(FREEZE_ACTION)
+		freeze_player_movement.unfreeze()
+
 		world:remove(c.Client, c.IsCutscenePlaying)
 		world:remove(trigger_id, c.HasCutscene)
 	end)

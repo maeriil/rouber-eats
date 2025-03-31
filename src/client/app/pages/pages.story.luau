@@ -22,7 +22,7 @@ local function story()
 	local rouber: types.GamePages = "RouberScreen"
 	use_px.use_px()
 
-	change_page("RouberScreen")
+	change_page("HudScreen")
 	uistore.DeliveryOrderList(Mock_Delivery_list :: never)
 
 	return switch(page) {

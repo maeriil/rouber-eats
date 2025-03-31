@@ -14,19 +14,35 @@ local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
+--[[
+	This one below is for when player tries to accept an order in restuarant but the order fails
+	to be accepted. It could be for many reasons actually
+		1. Order is expired or doesn't exist anymore
+		2. Order is already claimed by someone else
+		3. Player has already accepted the same order
+]]
+local function end_accept_request_with_failure(player: Player, message: string)
+	warn(`The server failed, with message = {message}`)
+	return serverevents.RouberOrders.accept_order_response.fire(player, false, -1, message)
+end
+
 local function accept_order_request()
 	for _, player, _order_id in serverevents.RouberOrders.i_want_to_accept_order.iter() do
 		local player_id = ref(player)
 		local order_id = blink_conv.as_entity(_order_id)
 		if order_id == nil then
-			warn(
+			end_accept_request_with_failure(
+				player,
 				`Sent an undefined order_id to process. Request will be dropped. This should never happen however`
 			)
 			continue
 		end
 
 		if not world:contains(order_id) or not world:has(order_id, c.DeliveryOrderDetails) then
-			warn(`The delivery order {order_id} does not exist. It may have never existed or expired`)
+			end_accept_request_with_failure(
+				player,
+				`The delivery order {order_id} does not exist. It may have never existed or expired`
+			)
 			continue
 		end
 
@@ -40,12 +56,15 @@ local function accept_order_request()
 		-- 	world:get(order_id, c.DeliveryOrderDetails) :: typeof(c.DeliveryOrderDetails.__T)
 		local another_userid = world:get(order_id, pair(c.EntityId, c.Claim))
 		if another_userid ~= nil and another_userid ~= player_id then
-			warn(`Another user has already claimed this order. Aborting request`)
+			end_accept_request_with_failure(
+				player,
+				`Another user has already claimed this order. Aborting request`
+			)
 			continue
 		end
 
 		if another_userid == player_id then
-			warn(`You have already accepted the order!`)
+			end_accept_request_with_failure(player, `You have already accepted the order!`)
 			continue
 		end
 
@@ -69,6 +88,8 @@ local function accept_order_request()
 		local store = playerstore[player]
 		table.insert(store.my_orders, e)
 		warn(`completed acceptped the order... Player can go pickup from restaurant now`)
+
+		serverevents.RouberOrders.accept_order_response.fire_all(true, blink_conv.from_entity(order_id))
 	end
 end
 
@@ -79,7 +100,7 @@ end
 	we fire back a response saying we picked it up, if we didn't we need to send the failure status.
 	While this is happening the client needs to yield. How will they yield tho....?
 ]]
-local function end_with_failure(player: Player, message: string)
+local function end_pickup_request_with_failure(player: Player, message: string)
 	warn(`The server failed, with message = {message}`)
 	return serverevents.RouberOrders.pickup_order_response.fire(player, false, -1, message)
 end
@@ -92,12 +113,15 @@ local function pickup_order_request()
 		local restaurant_id = blink_conv.as_entity(_restaurant_id)
 
 		if not world:contains(restaurant_id) or not world:has(restaurant_id, c.Restaurant) then
-			end_with_failure(player, `Could not find a valid restaurant. Ignoring your request`)
+			end_pickup_request_with_failure(
+				player,
+				`Could not find a valid restaurant. Ignoring your request`
+			)
 			continue
 		end
 
 		if not world:has(player_id, c.IsWorking) then
-			end_with_failure(
+			end_pickup_request_with_failure(
 				player,
 				`You are curren't not working! There is no way you have accepted orders!`
 			)
@@ -114,10 +138,8 @@ local function pickup_order_request()
 
 		for _, my_order_id in store.my_orders do
 			local order_info_id = world:target(my_order_id, c.WorkingAt) :: t.Entity
-			local details =
-				world:get(order_info_id, c.DeliveryOrderDetails) :: typeof(c.DeliveryOrderDetails.__T)
-			local status =
-				world:get(my_order_id, c.DeliveryOrderStatus) :: typeof(c.DeliveryOrderStatus.__T)
+			local details = world:exists_get(order_info_id, c.DeliveryOrderDetails)
+			local status = world:exists_get(my_order_id, c.DeliveryOrderStatus)
 
 			if details.restaurant_id == restaurant_id and status == "NotPickedUp" then
 				world:set(my_order_id, c.DeliveryOrderStatus, "PickedUp")
@@ -128,7 +150,7 @@ local function pickup_order_request()
 		end
 
 		if not found_once then
-			end_with_failure(player, `You do not have any orders to pickup!`)
+			end_pickup_request_with_failure(player, `You do not have any orders to pickup!`)
 			continue
 		end
 
@@ -148,6 +170,7 @@ local function select_order_choice() end
 
 local function complete_order_request()
 	for _, player, _house_id in serverevents.RouberOrders.i_want_to_complete_order.iter() do
+		warn(`complete order request found...!`)
 		local player_id = ref(player)
 		local house_id = blink_conv.as_entity(_house_id)
 
@@ -162,17 +185,17 @@ local function complete_order_request()
 		end
 
 		local order_list = playerstore[player].my_orders
+		local reward_amount = 0
 		local valid_order_id = nil
 		for _, my_order_id in order_list do
 			local order_info_id = world:target(my_order_id, c.WorkingAt) :: t.Entity
-			local details =
-				world:get(order_info_id, c.DeliveryOrderDetails) :: typeof(c.DeliveryOrderDetails.__T)
-			local status =
-				world:get(my_order_id, c.DeliveryOrderStatus) :: typeof(c.DeliveryOrderStatus.__T)
+			local details, coins = world:exists_get(order_info_id, c.DeliveryOrderDetails, c.Coins)
+			local status = world:exists_get(my_order_id, c.DeliveryOrderStatus)
 
 			if details.destination_id == house_id and status == "PickedUp" then
 				--//TODO WE meed to add another check here confirming that we actually picked Deliver
 				valid_order_id = my_order_id
+				reward_amount = coins
 				break
 			end
 		end
@@ -186,8 +209,14 @@ local function complete_order_request()
 		--//TODO: award player with some currency now
 		--//TODO: Do we delete the order id? Or what do we do with it?
 
+		warn(`WE ARE MARKING IT AS DELIVERED!!!`)
 		world:set(valid_order_id, c.DeliveryOrderStatus, "Delivered")
 		serverevents.Building.add_cutscene_to_house.fire(player, _house_id)
+		warn(`increasing the coints!`)
+		world:set(player_id, p.IncreaseCoins, reward_amount)
+
+		--//TODO now, remove the order from the player
+		-- we should probaly just do this inside the if statemnet tbh
 	end
 end
 

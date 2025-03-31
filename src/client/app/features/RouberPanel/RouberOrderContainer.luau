@@ -13,6 +13,7 @@ local vlayout = require(ReplicatedStorage.client.app.components.layouts.vlayout)
 
 local px = use_px.px
 local indexes = vide.indexes
+local create = vide.create
 
 type props = {
 	orders: types.Source<{ [string]: types.DeliveryOrderType }>,
@@ -42,35 +43,17 @@ local function RouberOrderScrollingFrame(props: props)
 			},
 		},
 
-		frame {
-			size = UDim2.new(1, 0, 1, 0),
-			order = order(),
-			-- color = Color3.fromRGB(0, 0, 255),
+		create "ScrollingFrame" {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 255),
+			Size = UDim2.new(1, 0, 1, 0),
+			LayoutOrder = order(),
 			flexfill {},
-			-- frame {
-			-- 	size = UDim2.new(1, 0, 0, px(240)),
-			-- },
-
 			vlayout {
 				pad = padding_types.px32,
 			},
-			-- values(props.orders, function(content: types.DeliveryOrderType, key: () -> string)
-			-- 	return RouberOrderCard {
-			-- 		content = function()
-			-- 			return content
-			-- 		end,
-			-- 		active = function()
-			-- 			local curr_active_key = props.active_order()
-			-- 			local my_key = key()
-			-- 			return curr_active_key == my_key
-			-- 			-- return false
-			-- 		end,
-			-- 		click = function()
-			-- 			local my_key = key()
-			-- 			props.active_order(my_key)
-			-- 		end,
-			-- 	}
-			-- end),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+
 			indexes(props.orders, function(_content: () -> types.DeliveryOrderType, key: string)
 				local content = _content()
 				return RouberOrderCard {

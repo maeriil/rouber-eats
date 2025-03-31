@@ -1,30 +1,30 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
+local serverevents = require(ServerScriptService.server.serverevents)
 local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
 -- local events = require(ReplicatedStorage.common.events)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local p = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local function system()
-	-- for i, client, add_amount, curr_amount in
-	-- 	world:query(c.Client, pairs.IncreaseCoins, c.Coins):iter()
-	-- do
-	-- 	local player_id = ref(client)
-	-- 	local new_amount = curr_amount + add_amount
+	for i, client, add_amount, curr_amount in world:query(c.Client, p.IncreaseCoins, c.Coins):iter() do
+		local player_id = ref(client)
+		local new_amount = curr_amount + add_amount
+		warn(`Updated client's currency to {new_amount} from {curr_amount} by adding {add_amount}`)
 
-	-- 	world:set(player_id, c.Coins, new_amount)
+		world:set(player_id, c.Coins, new_amount)
 
-	-- 	-- Fire remote event to client letting it know our coins increased by X amount
-	-- 	events.IncreaseCoinCount:send(add_amount):to(client)
-	-- 	world:remove(i, pairs.IncreaseCoins)
-	-- end
+		-- Fire remote event to client letting it know our coins increased by X amount
+		serverevents.RouberCurrency.IncreaseCoins.fire(client, new_amount)
+		world:remove(i, p.IncreaseCoins)
+	end
 
 	-- for i, client, add_amount, curr_amount in world:query(c.Client, pairs.IncreaseGems, c.Gems):iter() do
 	-- 	local player_id = ref(client)

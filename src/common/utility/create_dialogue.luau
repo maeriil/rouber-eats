@@ -24,7 +24,7 @@ local function is_goto(v: any)
 end
 
 local function RESPONSE(props: TABLE & {
-	text: string,
+	text: string | (() -> string),
 })
 	return {
 		_response = true,
@@ -33,7 +33,7 @@ local function RESPONSE(props: TABLE & {
 end
 
 local function CHOICE(props: TABLE & {
-	text: string,
+	text: string | (() -> string),
 })
 	return {
 		_choice = true,
@@ -169,7 +169,7 @@ function build_choices(parent: t.Entity, props: TABLE)
 end
 
 function build_dialogue_tree(parent, node)
-	if not node.props then
+	if not node or typeof(node) == "function" or not node.props then
 		return parent
 	end
 

@@ -5,7 +5,7 @@
 -- This is the Irish Grover font
 
 -- stylua: ignore start
-local GraffitiFont = Font.fromId (
+local BaseFont = Font.fromId (
   12187374954,
   Enum.FontWeight.ExtraBold,
   Enum.FontStyle.Italic
@@ -17,7 +17,7 @@ local medium = 64
 local small = 32
 
 return {
-	font = GraffitiFont,
+	font = BaseFont,
 	sizes = {
 		large = large,
 		medium = medium,

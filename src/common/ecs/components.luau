@@ -65,6 +65,8 @@ local components = {
 		foods_list_id: { t.Entity },
 		conditions_list_id: { t.Entity },
 	}>,
+	HasOrderToBeDelivered = world:entity() :: t.Entity,
+	HasMysteryBox = world:entity() :: t.Entity,
 	-- DeliveryOrderDetails = world:component() :: t.Id<{
 	-- 	restaurant_name: t.Entity,
 	-- 	audience_name: t.Entity,
@@ -171,11 +173,10 @@ local components = {
 	DialogueSuccess = world:entity() :: t.Entity,
 	DialogueFailure = world:entity() :: t.Entity,
 	DialogueGoto = world:component() :: t.Id,
-	DialogueText = world:component() :: t.Id<string>,
+	DialogueText = world:component() :: t.Id<string | (() -> string)>,
 	DialogueKey = world:component() :: t.Id<string>,
 	DialogueAuthor = world:component() :: t.Id<string>,
 	Next = world:entity() :: t.Entity,
-	NeedsChoice = world:entity() :: t.Entity,
 
 	DoNotReconcile = world:entity() :: t.Entity,
 	DoNotDelete = world:entity() :: t.Entity,

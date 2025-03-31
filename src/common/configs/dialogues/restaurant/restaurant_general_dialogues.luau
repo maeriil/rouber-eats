@@ -80,7 +80,9 @@ local function dialogue(props: props)
 					IF(create_awaiting_server_verification(server_house_id)) {
 						success = {
 							RESPONSE {
-								text = `Yup, everything looks correc! Here is the order.`,
+								text = function()
+									return `Yup, everything looks correc! Here is the order!`
+								end,
 								CHOICE {
 									text = `Perfect. Going to deliver this right away!`,
 									RESPONSE {
@@ -125,7 +127,9 @@ local function dialogue(props: props)
 						},
 						failure = {
 							RESPONSE {
-								text = `You do not have a valid order! {error_msg_handling}`,
+								text = function()
+									return `You do not have a valid order! {error_msg_handling}`
+								end,
 							},
 						},
 					},

@@ -91,6 +91,10 @@ local function select_foods_from_restaurant(foods: { t.Entity })
 	return foods[index] :: t.Entity
 end
 
+local function should_create_mystery_box()
+	return false
+end
+
 local function create_order()
 	-- Depending on the tier of the order, both of these would be selected different
 	-- For now, assume all of them are weighted equally
@@ -111,7 +115,19 @@ local function create_order()
 			-- Conditions aren't created yet
 		},
 	}
+	local coins_reward = math.random(250, 1000)
+	local should_have_mystery_box = should_create_mystery_box()
+
 	world:set(order_id, c.DeliveryOrderDetails, delivery_details)
+	if should_have_mystery_box then
+		world:add(order_id, c.HasMysteryBox)
+	end
+	--[[
+		TODO: we need a better way to figure out how much coins should we recieve from order
+		We willalso never receive gems from it directly so
+	]]
+	world:set(order_id, c.Coins, coins_reward)
+	world:set(order_id, c.Gems, 0)
 	world:add(order_id, c.Vacant)
 	warn(`Created a delivery order...`)
 
@@ -134,7 +150,12 @@ local function create_order()
 	serverevents.RouberOrders.create_order.fire_list(
 		clients_with_completed_setup,
 		blink_conv.from_entity(order_id),
-		delivery_details :: never
+		delivery_details :: never,
+		{
+			coins = coins_reward,
+			gems = 0,
+			has_mystery_box = should_have_mystery_box,
+		}
 	)
 
 	-- Fire the event now

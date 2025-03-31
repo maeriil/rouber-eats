@@ -9,6 +9,7 @@ local uistore = require(ReplicatedStorage.client.app.uistore)
 local c = require(ReplicatedStorage.common.ecs.components)
 local pair = jecs.pair
 local for_each_target = require(ReplicatedStorage.common.utility.for_each_target)
+local freeze_player_movement = require(ReplicatedStorage.common.utility.freeze_player_movement)
 local future = require(ReplicatedStorage.pkg.future)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
@@ -28,6 +29,8 @@ local function on_dialogue_started()
 	assert(humanoid ~= nil, `Humanoid must exist on client's character`)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+
+	freeze_player_movement.freeze()
 
 	-- This is the tree, and it should contain things like the author name, and the intial
 	-- text that we populate in the uistore
@@ -60,6 +63,7 @@ local function on_dialogue_cleanup()
 
 	-- WE want to update the UI so we no longer show the dialogue pages
 	go_back_page()
+	freeze_player_movement.unfreeze()
 
 	uistore.DialogueResponse("")
 	uistore.DialogueResponseId(nil :: never)
@@ -111,7 +115,7 @@ local function queue_next_dialogue_options()
 
 	-- Now, it means completed is true, which means we want to iterate over the next
 	-- on the tree
-	local next_id = world:target(node, c.Next)
+	local next_id = world:target(node, c.Next) :: t.Entity
 
 	if next_id == nil then
 		-- If no next is found, this means we have reached the end of the dialogue.
@@ -200,9 +204,10 @@ local function display_response_to_ui()
 	end
 
 	local current_node = configs.current_position
-	local text = world:get(current_node, c.DialogueText) :: string
+	local text = world:exists_get(current_node, c.DialogueText)
+	local content = if typeof(text) == "function" then text() else text
 
-	uistore.DialogueResponse(text)
+	uistore.DialogueResponse(content)
 	uistore.DialogueResponseId(current_node)
 
 	-- Now, we just need to wait until the user clicks or does some action
@@ -224,11 +229,12 @@ local function display_choices_to_ui()
 
 	for_each_target(current_node, c.Next, function(id)
 		-- local choice_node = pair(c.Next, id)
-		local text = world:get(id, c.DialogueText) :: string
+		local text = world:exists_get(id, c.DialogueText)
+		local content = if typeof(text) == "function" then text() else text
 
 		table.insert(choices_list, {
-			id = id,
-			text = text,
+			id = id :: t.Entity,
+			text = content,
 		})
 	end)
 

@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local basepartmap = require(ReplicatedStorage.client.store.basepartmap)
+local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local c = require(ReplicatedStorage.common.ecs.components)
+local clientevents = require(ReplicatedStorage.common.clientevents)
 local gizmo = require(ReplicatedStorage.common.utility.gizmo)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
@@ -75,6 +77,19 @@ local function system()
 			world:set(c.Client, c.Cutscene, {
 				triggered_id = id,
 			})
+
+			if world:has(id, c.HasOrderToBeDelivered) then
+				local exterior_id = world:parent(id)
+				print(`exterior_id  = {exterior_id}`)
+				local parent_id = world:exists_get(exterior_id, c.Parent)
+				print(`parent_id  = {exterior_id}`)
+
+				local server_parent_id = world:exists_get(parent_id, c.EntityId)
+
+				clientevents.RouberOrders.i_want_to_complete_order.fire(
+					blink_conv.from_entity(server_parent_id)
+				)
+			end
 		end
 
 		if set[instance] then

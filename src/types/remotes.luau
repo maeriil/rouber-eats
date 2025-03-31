@@ -152,6 +152,7 @@ export type Building_HouseType = ("interior" | "exterior")
 export type Building_IsNPC = boolean
 export type Building_ExteriorHouseType = string
 export type RouberOrders_DeliveryType = { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }
+export type RouberOrders_DeliveryRewardType = { coins: number, gems: number, ["has_mystery_box"]: boolean }
 export type RouberOrders_OrderChoices = ("Deliver" | "Steal" | "Tamper")
 
 
@@ -162,6 +163,8 @@ return {
 	PlayerEvents = {
 	},
 	RouberOrders = {
+	},
+	RouberCurrency = {
 	},
 
 }

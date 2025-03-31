@@ -34,7 +34,11 @@ local function find_valid_client_destination_id(server_id: t.Entity)
 	return id
 end
 
-local function add_order_to_world(_server_id: number, _details: remotes.RouberOrders_DeliveryType)
+local function add_order_to_world(
+	_server_id: number,
+	_details: remotes.RouberOrders_DeliveryType,
+	_rewards: remotes.RouberOrders_DeliveryRewardType
+)
 	local server_id = blink_conv.as_entity(_server_id)
 	local restaurant_id = blink_conv.as_entity(_details.restaurant_id)
 	local destination_id = blink_conv.as_entity(_details.destination_id)
@@ -51,6 +55,10 @@ local function add_order_to_world(_server_id: number, _details: remotes.RouberOr
 	print(server_food_list)
 	print(server_cond_list)
 
+	local coins = _rewards.coins
+	local gems = _rewards.gems
+	local has_mystery_box = _rewards.has_mystery_box
+
 	local order_id = world:entity() :: t.Entity
 
 	--//TODO : we need to convert the food into [Server]: Client map too
@@ -62,35 +70,45 @@ local function add_order_to_world(_server_id: number, _details: remotes.RouberOr
 	}
 	world:set(order_id, c.EntityId, server_id)
 	world:set(order_id, c.DeliveryOrderDetails, delivery_details)
+	world:set(order_id, c.Gems, gems)
+	world:set(order_id, c.Coins, coins)
 	world:add(order_id, c.Vacant)
+
+	if has_mystery_box then
+		world:add(order_id, c.HasMysteryBox)
+	end
 
 	server_id_map.order_map[server_id] = order_id
 end
 
 local function create_order_to_world()
-	for _, server_id_list, details_list in clientevents.RouberOrders.bulk_create_order.iter() do
+	for _, server_id_list, details_list, reward_list in
+		clientevents.RouberOrders.bulk_create_order.iter()
+	do
 		local n = #server_id_list
 		warn(`Bulk creating {n} delivery orders in the client...`)
 		for i = 1, n do
 			local server_id = server_id_list[i]
 			local details = details_list[i]
+			local reward = reward_list[i]
 
-			add_order_to_world(server_id, details)
+			add_order_to_world(server_id, details, reward)
 		end
 
 		clientevents.PlayerEvents.i_have_bulk_created_orders_initially.fire()
 	end
 
-	for _, server_id, details in clientevents.RouberOrders.create_order.iter() do
-		add_order_to_world(server_id, details)
+	for _, server_id, details, reward in clientevents.RouberOrders.create_order.iter() do
+		add_order_to_world(server_id, details, reward)
 	end
 end
 
-local vacant_orders_query = world:query(c.DeliveryOrderDetails, c.EntityId):with(c.Vacant):cached()
+local vacant_orders_query =
+	world:query(c.DeliveryOrderDetails, c.EntityId, c.Coins, c.Gems):with(c.Vacant):cached()
 local function display_orders_to_ui()
 	local orders_map = {} :: { [string]: types.DeliveryOrderType }
 
-	for client_id, details, server_id in vacant_orders_query:iter() do
+	for client_id, details, server_id, coins, gems in vacant_orders_query:iter() do
 		local key = tostring(server_id)
 		local restaurant_id = details.restaurant_id
 		local food_list = details.foods_list_id
@@ -129,19 +147,21 @@ local function display_orders_to_ui()
 			`Client restuarant details does not exist for id {client_restuarant_details}`
 		)
 
+		local house_name = world:exists_get(house_id, c.Name)
+
 		orders_map[key] = {
 			delivery_type = "TODO, does not exist yet",
 			-- we have not worked on this yet
 			has_mystery_box = false,
-			house_address = "W.I.P address",
-			house_name = "W.I.P name",
+			house_address = house_name,
+			house_name = house_name,
 			order_id = client_id :: t.Entity,
 			-- We have not worked on this yet
 			order_rating = 6,
 			restaurant_address = "W.I.P address",
 			restaurant_image = client_restuarant_details.display_image,
 			restaurant_name = client_restuarant_details.display_name,
-			reward_amount = 10000,
+			reward_amount = coins,
 			foods_list = foods_list_display_type,
 		}
 	end
@@ -149,9 +169,28 @@ local function display_orders_to_ui()
 	uistore.DeliveryOrderList(orders_map)
 end
 
+local function mark_order_as_claimed()
+	for _, status, _order_id, str in clientevents.RouberOrders.accept_order_response.iter() do
+		-- go through all the orders and mark it as completed?
+		if status then
+			local order_id = blink_conv.as_entity(_order_id :: number)
+			local client_order_id = server_id_map.order_map[order_id]
+
+			if client_order_id == nil then
+				warn(`Could not find the client. Normally this would be a bug.. Aborting req`)
+				continue
+			end
+
+			warn(`MAKRING IT AS CLAIMED NOW SO WE REMOVED VACANT!!!`)
+			world:remove(client_order_id, c.Vacant)
+		end
+	end
+end
+
 local function system()
 	create_order_to_world()
 	display_orders_to_ui()
+	mark_order_as_claimed()
 end
 
 return {

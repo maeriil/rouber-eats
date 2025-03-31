@@ -22,7 +22,8 @@ local function system()
 		for exterior_id, mapped_server_id in all_exteriors:iter() do
 			if mapped_server_id == server_house_id then
 				local doormat_id = world:target(exterior_id, c.DoormatZone) :: t.Entity
-				world:set(doormat_id, c.HasCutscene)
+				world:add(doormat_id, c.HasCutscene)
+				world:add(doormat_id, c.HasOrderToBeDelivered)
 
 				found = true
 				break
