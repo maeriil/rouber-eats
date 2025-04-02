@@ -73,7 +73,8 @@ local function accept_order_request()
 			world:add(player_id, c.IsWorking)
 		end
 
-		world:set(order_id, pair(c.EntityId, c.Claim), player_id)
+		world:set(order_id, p.ClaimedBy, player_id)
+		world:remove(order_id, c.Vacant)
 
 		-- local destination_id = details.destination_id
 		-- local restaurant_id = details.restaurant_id
@@ -184,6 +185,10 @@ local function complete_order_request()
 			continue
 		end
 
+		--[[
+			TODO: Clean this up a bit and handle it directtly here tbh?
+		]]
+
 		local order_list = playerstore[player].my_orders
 		local reward_amount = 0
 		local valid_order_id = nil
@@ -212,11 +217,19 @@ local function complete_order_request()
 		warn(`WE ARE MARKING IT AS DELIVERED!!!`)
 		world:set(valid_order_id, c.DeliveryOrderStatus, "Delivered")
 		serverevents.Building.add_cutscene_to_house.fire(player, _house_id)
-		warn(`increasing the coints!`)
+		warn(`increasing the coins by {reward_amount}!`)
 		world:set(player_id, p.IncreaseCoins, reward_amount)
 
 		--//TODO now, remove the order from the player
 		-- we should probaly just do this inside the if statemnet tbh
+
+		world:delete(valid_order_id)
+
+		for i, v in order_list do
+			if v == valid_order_id then
+				table.remove(order_list, i)
+			end
+		end
 	end
 end
 

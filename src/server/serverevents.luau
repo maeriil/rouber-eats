@@ -158,10 +158,10 @@ Queue.Reliable[11] = CreateQueue()
 Queue.Reliable[12] = CreateQueue()
 Queue.Reliable[13] = CreateQueue()
 Queue.Reliable[14] = CreateQueue()
-Queue.Reliable[17] = CreateQueue()
 Queue.Reliable[19] = CreateQueue()
 Queue.Reliable[21] = CreateQueue()
-Queue.Reliable[22] = CreateQueue()
+Queue.Reliable[23] = CreateQueue()
+Queue.Reliable[24] = CreateQueue()
 export type Entity = number
 export type Model = Model?
 export type Building_HouseType = ("interior" | "exterior")
@@ -427,8 +427,8 @@ local function PlayerEvents_ReadEVENT_i_have_bulk_created_orders_initially(): (n
 end
 
 local function RouberOrders_WriteEVENT_create_order(Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
-	-- Allocate BLOCK: 30 bytes
-	local BLOCK_START = Allocate(30)
+	-- Allocate BLOCK: 44 bytes
+	local BLOCK_START = Allocate(44)
 	buffer.writeu8(SendBuffer, BLOCK_START + 0, 15)
 	buffer.writef64(SendBuffer, BLOCK_START + 1, Value1)
 	buffer.writef64(SendBuffer, BLOCK_START + 9, Value2["restaurant_id"])
@@ -457,9 +457,9 @@ local function RouberOrders_WriteEVENT_create_order(Value1: number, Value2: { ["
 		buffer.writef64(SendBuffer, OPERATION_OFFSET, Item_1)
 	end
 	-- END ARRAY
-	buffer.writeu8(SendBuffer, BLOCK_START + 27, Value3.coins)
-	buffer.writeu8(SendBuffer, BLOCK_START + 28, Value3.gems)
-	buffer.writeu8(SendBuffer, BLOCK_START + 29, Value3["has_mystery_box"] and 1 or 0)
+	buffer.writef64(SendBuffer, BLOCK_START + 27, Value3.coins)
+	buffer.writef64(SendBuffer, BLOCK_START + 35, Value3.gems)
+	buffer.writeu8(SendBuffer, BLOCK_START + 43, Value3["has_mystery_box"] and 1 or 0)
 end
 
 local function RouberOrders_WriteEVENT_bulk_create_order(Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
@@ -526,24 +526,39 @@ local function RouberOrders_WriteEVENT_bulk_create_order(Value1: { number }, Val
 	-- END ARRAY
 	-- START ARRAY
 	buffer.writeu8(SendBuffer, BLOCK_START + 3, #Value3)
-		-- Allocate BLOCK: 3 bytes
-	local ARRAY_START_1 = Allocate(3 * #Value3)
+		-- Allocate BLOCK: 17 bytes
+	local ARRAY_START_1 = Allocate(17 * #Value3)
 	for Index = 1, #Value3 do
 		local Item_1 = Value3[Index]
-		-- Allocate 1
+		-- Allocate 8
 		local OPERATION_OFFSET = ARRAY_START_1
-		ARRAY_START_1 += 1
-		buffer.writeu8(SendBuffer, OPERATION_OFFSET, Item_1.coins)
-		-- Allocate 1
+		ARRAY_START_1 += 8
+		buffer.writef64(SendBuffer, OPERATION_OFFSET, Item_1.coins)
+		-- Allocate 8
 		local OPERATION_OFFSET = ARRAY_START_1
-		ARRAY_START_1 += 1
-		buffer.writeu8(SendBuffer, OPERATION_OFFSET, Item_1.gems)
+		ARRAY_START_1 += 8
+		buffer.writef64(SendBuffer, OPERATION_OFFSET, Item_1.gems)
 		-- Allocate 1
 		local OPERATION_OFFSET = ARRAY_START_1
 		ARRAY_START_1 += 1
 		buffer.writeu8(SendBuffer, OPERATION_OFFSET, Item_1["has_mystery_box"] and 1 or 0)
 	end
 	-- END ARRAY
+end
+
+local function RouberOrders_WriteEVENT_delete_order(Value: number): ()
+	-- Allocate BLOCK: 9 bytes
+	local BLOCK_START = Allocate(9)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 17)
+	buffer.writef64(SendBuffer, BLOCK_START + 1, Value)
+end
+
+local function RouberOrders_WriteEVENT_update_order_address(Value1: number, Value2: number): ()
+	-- Allocate BLOCK: 17 bytes
+	local BLOCK_START = Allocate(17)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 18)
+	buffer.writef64(SendBuffer, BLOCK_START + 1, Value1)
+	buffer.writef64(SendBuffer, BLOCK_START + 9, Value2)
 end
 
 local function RouberOrders_ReadEVENT_i_want_to_accept_order(): (number)
@@ -556,7 +571,7 @@ end
 local function RouberOrders_WriteEVENT_accept_order_response(Value1: boolean, Value2: number?, Value3: string?): ()
 	-- Allocate BLOCK: 4 bytes
 	local BLOCK_START = Allocate(4)
-	buffer.writeu8(SendBuffer, BLOCK_START + 0, 18)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 20)
 	buffer.writeu8(SendBuffer, BLOCK_START + 1, Value1 and 1 or 0)
 	buffer.writeu8(SendBuffer, BLOCK_START + 2, Value2 ~= nil and 1 or 0)
 	if Value2 ~= nil then
@@ -585,7 +600,7 @@ end
 local function RouberOrders_WriteEVENT_pickup_order_response(Value1: boolean, Value2: number?, Value3: string?): ()
 	-- Allocate BLOCK: 4 bytes
 	local BLOCK_START = Allocate(4)
-	buffer.writeu8(SendBuffer, BLOCK_START + 0, 20)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 22)
 	buffer.writeu8(SendBuffer, BLOCK_START + 1, Value1 and 1 or 0)
 	buffer.writeu8(SendBuffer, BLOCK_START + 2, Value2 ~= nil and 1 or 0)
 	if Value2 ~= nil then
@@ -632,7 +647,7 @@ end
 local function RouberOrders_WriteEVENT_bulk_setup_food(Value1: { number }, Value2: { string }): ()
 	-- Allocate BLOCK: 3 bytes
 	local BLOCK_START = Allocate(3)
-	buffer.writeu8(SendBuffer, BLOCK_START + 0, 23)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 25)
 	-- START ARRAY
 	buffer.writeu8(SendBuffer, BLOCK_START + 1, #Value1)
 		-- Allocate BLOCK: 8 bytes
@@ -663,10 +678,10 @@ local function RouberOrders_WriteEVENT_bulk_setup_food(Value1: { number }, Value
 end
 
 local function RouberCurrency_WriteEVENT_IncreaseCoins(Value: number): ()
-	-- Allocate BLOCK: 2 bytes
-	local BLOCK_START = Allocate(2)
-	buffer.writeu8(SendBuffer, BLOCK_START + 0, 24)
-	buffer.writeu8(SendBuffer, BLOCK_START + 1, Value)
+	-- Allocate BLOCK: 9 bytes
+	local BLOCK_START = Allocate(9)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 26)
+	buffer.writef64(SendBuffer, BLOCK_START + 1, Value)
 end
 
 if not RunService:IsRunning() then
@@ -762,6 +777,18 @@ if not RunService:IsRunning() then
 			fire_except = NOOP
 		},
 		bulk_create_order = {
+			fire = NOOP,
+			fire_all = NOOP,
+			fire_list = NOOP,
+			fire_except = NOOP
+		},
+		delete_order = {
+			fire = NOOP,
+			fire_all = NOOP,
+			fire_list = NOOP,
+			fire_except = NOOP
+		},
+		update_order_address = {
 			fire = NOOP,
 			fire_all = NOOP,
 			fire_list = NOOP,
@@ -879,14 +906,14 @@ Reliable.OnServerEvent:Connect(function(Player: Player, Buffer: buffer, Instance
 			Push(Queue.Reliable[13], table.pack(Player, PlayerEvents_ReadEVENT_i_have_setup_restaurants()))
 		elseif Index == 14 then
 			Push(Queue.Reliable[14], table.pack(Player, PlayerEvents_ReadEVENT_i_have_bulk_created_orders_initially()))
-		elseif Index == 17 then
-			Push(Queue.Reliable[17], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_accept_order()))
 		elseif Index == 19 then
-			Push(Queue.Reliable[19], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_pickup_order()))
+			Push(Queue.Reliable[19], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_accept_order()))
 		elseif Index == 21 then
-			Push(Queue.Reliable[21], table.pack(Player, RouberOrders_ReadEVENT_my_choice_for_this_order()))
-		elseif Index == 22 then
-			Push(Queue.Reliable[22], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_complete_order()))
+			Push(Queue.Reliable[21], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_pickup_order()))
+		elseif Index == 23 then
+			Push(Queue.Reliable[23], table.pack(Player, RouberOrders_ReadEVENT_my_choice_for_this_order()))
+		elseif Index == 24 then
+			Push(Queue.Reliable[24], table.pack(Player, RouberOrders_ReadEVENT_i_want_to_complete_order()))
 		end
 	end
 end)
@@ -1580,10 +1607,102 @@ local Returns = table.freeze({
 				end
 			end,
 		},
+		delete_order = {
+			fire = function(Player: Player, Value: number): ()
+				Load(PlayersMap[Player])
+				RouberOrders_WriteEVENT_delete_order(Value)
+				PlayersMap[Player] = Save()
+			end,
+			fire_all = function(Value: number): ()
+				Load()
+				RouberOrders_WriteEVENT_delete_order(Value)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_list = function(List: {Player}, Value: number): ()
+				Load()
+				RouberOrders_WriteEVENT_delete_order(Value)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in List do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_except = function(Except: Player, Value: number): ()
+				Load()
+				RouberOrders_WriteEVENT_delete_order(Value)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					if Player == Except then
+						continue
+					end
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+		},
+		update_order_address = {
+			fire = function(Player: Player, Value1: number, Value2: number): ()
+				Load(PlayersMap[Player])
+				RouberOrders_WriteEVENT_update_order_address(Value1, Value2)
+				PlayersMap[Player] = Save()
+			end,
+			fire_all = function(Value1: number, Value2: number): ()
+				Load()
+				RouberOrders_WriteEVENT_update_order_address(Value1, Value2)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_list = function(List: {Player}, Value1: number, Value2: number): ()
+				Load()
+				RouberOrders_WriteEVENT_update_order_address(Value1, Value2)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in List do
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+			fire_except = function(Except: Player, Value1: number, Value2: number): ()
+				Load()
+				RouberOrders_WriteEVENT_update_order_address(Value1, Value2)
+				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+				for _, Player in Players:GetPlayers() do
+					if Player == Except then
+						continue
+					end
+					Load(PlayersMap[Player])
+					local Position = Allocate(Size)
+					buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+					table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+					PlayersMap[Player] = Save()
+				end
+			end,
+		},
 		i_want_to_accept_order = {
 			iter = function(): () -> (number, Player, number)
 				local index = 0
-				local queue = Queue.Reliable[17]
+				local queue = Queue.Reliable[19]
 				return function (): (number, Player, number)
 					index += 1
 					local arguments = Pop(queue)
@@ -1596,7 +1715,7 @@ local Returns = table.freeze({
 			--- @deprecated v0.14.1 -- Use `Iter` instead.
 			next = function(): () -> (number, Player, number)
 				local index = 0
-				local queue = Queue.Reliable[17]
+				local queue = Queue.Reliable[19]
 				return function (): (number, Player, number)
 					index += 1
 					local arguments = Pop(queue)
@@ -1656,7 +1775,7 @@ local Returns = table.freeze({
 		i_want_to_pickup_order = {
 			iter = function(): () -> (number, Player, number)
 				local index = 0
-				local queue = Queue.Reliable[19]
+				local queue = Queue.Reliable[21]
 				return function (): (number, Player, number)
 					index += 1
 					local arguments = Pop(queue)
@@ -1669,7 +1788,7 @@ local Returns = table.freeze({
 			--- @deprecated v0.14.1 -- Use `Iter` instead.
 			next = function(): () -> (number, Player, number)
 				local index = 0
-				local queue = Queue.Reliable[19]
+				local queue = Queue.Reliable[21]
 				return function (): (number, Player, number)
 					index += 1
 					local arguments = Pop(queue)
@@ -1729,7 +1848,7 @@ local Returns = table.freeze({
 		my_choice_for_this_order = {
 			iter = function(): () -> (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
 				local index = 0
-				local queue = Queue.Reliable[21]
+				local queue = Queue.Reliable[23]
 				return function (): (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
 					index += 1
 					local arguments = Pop(queue)
@@ -1742,7 +1861,7 @@ local Returns = table.freeze({
 			--- @deprecated v0.14.1 -- Use `Iter` instead.
 			next = function(): () -> (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
 				local index = 0
-				local queue = Queue.Reliable[21]
+				local queue = Queue.Reliable[23]
 				return function (): (number, Player, number, ("Deliver" | "Steal" | "Tamper"))
 					index += 1
 					local arguments = Pop(queue)
@@ -1756,7 +1875,7 @@ local Returns = table.freeze({
 		i_want_to_complete_order = {
 			iter = function(): () -> (number, Player, number)
 				local index = 0
-				local queue = Queue.Reliable[22]
+				local queue = Queue.Reliable[24]
 				return function (): (number, Player, number)
 					index += 1
 					local arguments = Pop(queue)
@@ -1769,7 +1888,7 @@ local Returns = table.freeze({
 			--- @deprecated v0.14.1 -- Use `Iter` instead.
 			next = function(): () -> (number, Player, number)
 				local index = 0
-				local queue = Queue.Reliable[22]
+				local queue = Queue.Reliable[24]
 				return function (): (number, Player, number)
 					index += 1
 					local arguments = Pop(queue)

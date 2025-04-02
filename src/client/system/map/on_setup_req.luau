@@ -29,18 +29,19 @@ local function system()
 			local me = Players.LocalPlayer
 			local playergui = me.PlayerGui
 
-			local map = playergui.MAP:WaitForChild("Map") :: Folder
-			map.Parent = gamemap
+			local map = playergui.MAP:WaitForChild("map") :: Folder
+			map.Parent = workspace
 
 			-- For each map, we want to go through the restaurants and set them up in the client
 			-- We also want to go through each of the roads / paths and create two different pathfinding costs
 
-			local footpaths_list = map:FindFirstChild("Footpaths") :: Folder?
-			local roads_list = map:FindFirstChild("Road") :: Folder?
-			local restaurant_list = map:FindFirstChild("Restaurant") :: Folder?
+			--//TODO; we will need to setup the roads and sidewalks too
+			-- local footpaths_list = map:FindFirstChild("Footpaths") :: Folder?
+			-- local roads_list = map:FindFirstChild("Road") :: Folder?
+			local restaurant_list = map:FindFirstChild("restaurants") :: Folder?
 
-			assert(footpaths_list ~= nil, `There does not exist a folder named Footpaths in Map folder`)
-			assert(roads_list ~= nil, `There does not exist a folder named roads in Map folder`)
+			-- assert(footpaths_list ~= nil, `There does not exist a folder named Footpaths in Map folder`)
+			-- assert(roads_list ~= nil, `There does not exist a folder named roads in Map folder`)
 			assert(
 				restaurant_list ~= nil,
 				`There does not exist a folder named restaurants in Map folder`

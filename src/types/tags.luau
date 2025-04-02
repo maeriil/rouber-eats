@@ -1,6 +1,7 @@
 return {
 	Door = "DoorRelated",
 	SlidingDoor = "SlidingDoor",
+	DoubleDoor = "DoubleDoor",
 	DoorMat = "DoorMat",
 	Teleport = "TeleportZone",
 	Restaurant = "Restaurant",

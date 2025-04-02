@@ -1,11 +1,16 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
+local playersetupconfig = require(ServerScriptService.server.store.playersetupconfig)
+local serverevents = require(ServerScriptService.server.serverevents)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
 local t = require(ReplicatedStorage.types)
 local pair = jecs.pair
+local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
+local for_each_target = require(ReplicatedStorage.common.utility.for_each_target)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -17,23 +22,70 @@ local __ = jecs.Wildcard
   For some reason house A is deleted (either a player joins, or player leaves)
   Now the order is pointing towards an invalid House.
 
-  We have two options.
-    1. Delete the order
-    2. Change the order such that it points to the new house on that landplot
 
-  If we did one, then its relatively straight forward, we just delete it and move on
-    we do also need to however, tell the client that we should delete that order
-  If we did two, then we would need to tell the client to update the details to a new house id
-    We would need to find the parent of the house, but thats hard because entity is invalid now...
-
-  Honestly, it might be better to mark an order as deleted WHEN a house is being deleted
-  and in here, we can do stuff with it once we find out its invalid...
 ]]
 
-local function system()
-	for order_id, details in world:query(c.DeliveryOrderDetails):iter() do
-		local residence_id = details.destination_id
+local invalid_vacant_query = world:query(c.DeliveryOrderDetails):with(c.Vacant, c.Invalid):cached()
+local function delete_invalid_vacant_orders()
+	local players_who_completed_req = {}
+
+	for client_id, client in world:query(c.Client):iter() do
+		local config = playersetupconfig[client]
+
+		if config and config.order_setup.client_completed then
+			table.insert(players_who_completed_req, client)
+		end
 	end
+
+	for order_id in invalid_vacant_query:iter() do
+		warn(`Found an invalid order that is vacant. We will swiftly remove it from the world`)
+		warn(`!!!=== sending it to `, players_who_completed_req)
+		serverevents.RouberOrders.delete_order.fire_list(
+			players_who_completed_req,
+			blink_conv.from_entity(order_id)
+		)
+
+		world:delete(order_id)
+	end
+end
+
+local invalid_nonvacant_query = world
+	:query(c.Residence)
+	:with(c.LandPlot, pair(c.HasOrderToBeDelivered, __))
+	:without(c.Vacant)
+	:cached()
+
+local function update_nonvacant_invalid_orders()
+	-- We should mark it with something here...?
+	for land_id, residence_id in invalid_nonvacant_query:iter() do
+		warn(`Found an invalid order that was pointing to existing house`)
+		warn(`Since someone has accepted it, we should update their details`)
+		warn(`!!!==========================================`)
+		for_each_target(land_id, c.HasOrderToBeDelivered, function(order_id)
+			local order_details = world:exists_get(order_id, c.DeliveryOrderDetails)
+			local claimed_by = world:get(order_id, pair(c.EntityId, c.Claim))
+
+			if claimed_by == nil then
+				warn(`We found that the order is somehow claimed by no one anymore....`)
+				warn(`This is kinda interesting.... We should investigate this more, for now we delete it`)
+				world:add(order_id, c.Vacant)
+				return
+			end
+
+			order_details.destination_id = residence_id :: t.Entity
+			local player = world:exists_get(claimed_by, c.Client)
+
+			local _new_house_id = blink_conv.from_entity(residence_id)
+			local _order_id = blink_conv.from_entity(order_id)
+
+			serverevents.RouberOrders.update_order_address.fire(player, _order_id, _new_house_id)
+		end)
+	end
+end
+
+local function system()
+	delete_invalid_vacant_orders()
+	update_nonvacant_invalid_orders()
 end
 
 return {

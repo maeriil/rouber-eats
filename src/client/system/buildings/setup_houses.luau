@@ -6,8 +6,6 @@ local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
 local setup_door = require(ReplicatedStorage.common.configs.buildings.setup_door)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local get_clientownerid_fromserver =
-	require(ReplicatedStorage.common.utility.get_client_owner_id_from_serverid)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
@@ -104,6 +102,9 @@ local function setup_house_on_client(
 	assert(interior_root, `House {player_name}'s interior model does not have a primary part`)
 	local exterior_root = exterior_model.PrimaryPart
 	assert(exterior_root, `House {player_name}'s exterior model does not have a primary part`)
+
+	interior_root.Transparency = 1
+	exterior_root.Transparency = 1
 
 	world:set(house_id, c.House, exterior_house)
 	world:set(house_id, pairs.BuildingInteriorId, interior_id)

@@ -16,7 +16,7 @@ local __ = jecs.Wildcard
 ]]
 
 local function system()
-	local map = workspace.Map :: Folder?
+	local map = workspace.map :: Folder?
 	assert(map ~= nil, "Map root folder must exist at runtime")
 
 	-- Unparent from workspace and store it in server storage.

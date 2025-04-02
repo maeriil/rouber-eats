@@ -7,7 +7,8 @@ local serverevents = require(ServerScriptService.server.serverevents)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local p = require(ReplicatedStorage.common.ecs.pairs)
+local pair = jecs.pair
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
@@ -25,7 +26,7 @@ local function get_players_who_has_setup_houses()
 	return players_who_have_setup_house
 end
 
-local function mark_orders_as_invalid(house_id: t.Entity)
+local function mark_orders_as_invalid(house_id: t.Entity, landplot_id: t.Entity)
 	--[[
 		TODO: We will need to fire to client world so they can cleanup the order??
 		We still haven't deleted it btw.
@@ -35,7 +36,14 @@ local function mark_orders_as_invalid(house_id: t.Entity)
 		local residence_id = details.destination_id
 
 		if residence_id == house_id then
+			warn(`Found an order for a house we are about to delete. Marking it as invalid!!`)
+			warn(`!!!! COMPLEZTED ===`)
 			world:add(order_id, c.Invalid)
+
+			if world:has(order_id, p.ClaimedBy) then
+				warn(`OKay.... so someone has accepted it.... We need to adjust it now..`)
+				world:add(landplot_id, pair(c.HasOrderToBeDelivered, order_id))
+			end
 		end
 	end
 end
@@ -50,7 +58,7 @@ local function cleanup_the_landplot(
 	assert(cleanup_interior_model, `We have used ref to create interior model. We need to cleanup`)
 
 	cleanup_interior_model()
-	mark_orders_as_invalid(house_id)
+	mark_orders_as_invalid(house_id, parent)
 	--//TODO: tbhm we have the parent id here, maybe we can just change the destination in order
 	--// once we know the new house id becomes?
 
@@ -75,7 +83,7 @@ end
 ]]
 
 local cleanup_house_npc_query = world
-	:query(c.Parent, c.OccupiedByNPC, pairs.BuildingInteriorId, pairs.BuildingExteriorId)
+	:query(c.Parent, c.OccupiedByNPC, p.BuildingInteriorId, p.BuildingExteriorId)
 	:with(c.Cleanup, c.House)
 	:cached()
 local request_delete_house = serverevents.Building.delete_house_owner
@@ -105,7 +113,7 @@ end
   it adds a cleanup component to the landlot. This will be implemented later
 ]]
 local cleanup_house_client_query = world
-	:query(c.Parent, c.OccupiedByPlayer, pairs.BuildingInteriorId, pairs.BuildingExteriorId)
+	:query(c.Parent, c.OccupiedByPlayer, p.BuildingInteriorId, p.BuildingExteriorId)
 	:with(c.Cleanup, c.House)
 	:cached()
 local function cleanup_removed_player_landplot()

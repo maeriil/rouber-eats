@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local gamedata = require(ServerScriptService.server.store.gamedata)
@@ -8,9 +9,8 @@ local playersetupconfig = require(ServerScriptService.server.store.playersetupco
 local serverevents = require(ServerScriptService.server.serverevents)
 local t = require(ReplicatedStorage.types)
 
-local c = require(ReplicatedStorage.common.ecs.components)
-local pair = jecs.pair
 local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
+local c = require(ReplicatedStorage.common.ecs.components)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -26,7 +26,7 @@ local __ = jecs.Wildcard
   What if we want to display some orders that are for everyone?
 ]]
 
-local _TEMPORARY_MAX_ORDER_IN_SERVER = 2
+local _TEMPORARY_MAX_ORDER_IN_SERVER = 5
 local vacant_orders_count = world:query(c.DeliveryOrderDetails):with(c.Vacant):cached()
 local function should_create_order()
 	--[[
@@ -44,6 +44,7 @@ local function should_create_order()
 	end
 
 	if n == _TEMPORARY_MAX_ORDER_IN_SERVER then
+		print(`since n = {n}, we shouldn't create any orders....`)
 		return false
 	end
 	return true
@@ -173,6 +174,12 @@ local function create_order()
   ]]
 end
 
+local function adjust_order_count_limit()
+	local n = #Players:GetPlayers()
+
+	_TEMPORARY_MAX_ORDER_IN_SERVER = math.max(5, math.min(_TEMPORARY_MAX_ORDER_IN_SERVER * n, 25))
+end
+
 local last_created = 0
 local MIN_TIME_UNTIL_NEXT_ORDER = 2 -- seconds
 local function system()
@@ -186,6 +193,7 @@ local function system()
 
 	last_created = now
 	create_order()
+	adjust_order_count_limit()
 end
 
 return {

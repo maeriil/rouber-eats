@@ -181,8 +181,8 @@ scope RouberOrders {
   }
 
   struct DeliveryRewardType {
-    coins: u8,
-    gems: u8,
+    coins: f64,
+    gems: f64,
     has_mystery_box: boolean
   }
 
@@ -200,6 +200,36 @@ scope RouberOrders {
     Call: SingleSync,
     Poll: true,
     Data: (Entity[0..100], DeliveryType[0..100], DeliveryRewardType[0..100])
+  }
+
+  --[[
+    This will called whenever an order is invalid and marked as vacant.
+  ]]
+  event delete_order {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: Entity
+  }
+
+    --[[
+    This will called whenever a player or NPC's house is replace due to either a player joining
+    or leaving. We only fire this order when we have verified that the order is no longer vacant, which
+    means someone accepted it. So we fire event to that person to update the order
+
+    Something to note, we should only process this order AFTER create_house is called
+    or maybe we can defer it or something idk
+
+    @params Entity, the server order id
+    @params Entity, the new server house id
+  ]]
+  event update_order_address {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Poll: true,
+    Data: (Entity, Entity)
   }
 
   --[[
@@ -297,6 +327,6 @@ scope RouberCurrency {
     Type: Reliable,
     Call: SingleSync,
     Poll: true,
-    Data: u8,
+    Data: f64,
   }
 }

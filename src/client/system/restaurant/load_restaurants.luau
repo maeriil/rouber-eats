@@ -14,22 +14,20 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local pair = jecs.pair
 local attributes = require(ReplicatedStorage.types.attributes)
+local tags = require(ReplicatedStorage.types.tags)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local restauranttag = "Temporary"
 local instance_added = {}
 local instance_removed = {}
 
-CollectionService:GetInstanceAddedSignal(restauranttag):Connect(function(instance: Instance)
+CollectionService:GetInstanceAddedSignal(tags.Restaurant):Connect(function(instance: Instance)
 	table.insert(instance_added, instance)
 end)
 
 local function setup_restuarant_to_client(restaurant_name: string, interior: Model, exterior: Model)
 	local interior_primary = interior.PrimaryPart :: Part
 	local exterior_priamry = exterior.PrimaryPart :: Part
-	print(`>> pritning restaurant...`)
-	print(restaurant_map)
 	local restaurant_config = restaurant_map[restaurant_name]
 	assert(
 		restaurant_config,

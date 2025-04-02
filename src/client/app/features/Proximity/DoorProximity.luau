@@ -76,7 +76,7 @@ local function MainProximity(props: {
 						anchor = Vector2.new(1, 1),
 						pos = UDim2.fromScale(0.05, 1),
 						ProximityKey {
-							letter = `e`, -- ECS should contain keybind, we should use that
+							letter = `E`, -- ECS should contain keybind, we should use that
 						},
 					},
 				},

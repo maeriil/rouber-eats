@@ -16,7 +16,7 @@ for _, module in script:GetChildren() do
 	local _, _content = pcall(require, module)
 	local content = _content :: types.RestaurantConfigType
 
-	print(`WE HAVE SETUZP {name} to our restuaramtn map`)
+	-- print(`WE HAVE SETUZP {name} to our restuaramtn map`)
 
 	restaurant_list[name] = content
 end
