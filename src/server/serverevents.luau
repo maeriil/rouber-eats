@@ -167,7 +167,7 @@ export type Model = Model?
 export type Building_HouseType = ("interior" | "exterior")
 export type Building_IsNPC = boolean
 export type Building_ExteriorHouseType = string
-export type RouberOrders_DeliveryType = { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }
+export type RouberOrders_DeliveryType = { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }
 export type RouberOrders_DeliveryRewardType = { coins: number, gems: number, ["has_mystery_box"]: boolean }
 export type RouberOrders_OrderChoices = ("Deliver" | "Steal" | "Tamper")
 local function Building_ReadEVENT_IWantToTeleportInOrOut(): (number, ("interior" | "exterior"))
@@ -426,9 +426,9 @@ local function PlayerEvents_ReadEVENT_i_have_bulk_created_orders_initially(): (n
 	return nil
 end
 
-local function RouberOrders_WriteEVENT_create_order(Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
-	-- Allocate BLOCK: 44 bytes
-	local BLOCK_START = Allocate(44)
+local function RouberOrders_WriteEVENT_create_order(Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
+	-- Allocate BLOCK: 45 bytes
+	local BLOCK_START = Allocate(45)
 	buffer.writeu8(SendBuffer, BLOCK_START + 0, 15)
 	buffer.writef64(SendBuffer, BLOCK_START + 1, Value1)
 	buffer.writef64(SendBuffer, BLOCK_START + 9, Value2["restaurant_id"])
@@ -457,12 +457,13 @@ local function RouberOrders_WriteEVENT_create_order(Value1: number, Value2: { ["
 		buffer.writef64(SendBuffer, OPERATION_OFFSET, Item_1)
 	end
 	-- END ARRAY
-	buffer.writef64(SendBuffer, BLOCK_START + 27, Value3.coins)
-	buffer.writef64(SendBuffer, BLOCK_START + 35, Value3.gems)
-	buffer.writeu8(SendBuffer, BLOCK_START + 43, Value3["has_mystery_box"] and 1 or 0)
+	buffer.writeu8(SendBuffer, BLOCK_START + 27, Value2["order_tier"])
+	buffer.writef64(SendBuffer, BLOCK_START + 28, Value3.coins)
+	buffer.writef64(SendBuffer, BLOCK_START + 36, Value3.gems)
+	buffer.writeu8(SendBuffer, BLOCK_START + 44, Value3["has_mystery_box"] and 1 or 0)
 end
 
-local function RouberOrders_WriteEVENT_bulk_create_order(Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
+local function RouberOrders_WriteEVENT_bulk_create_order(Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
 	-- Allocate BLOCK: 4 bytes
 	local BLOCK_START = Allocate(4)
 	buffer.writeu8(SendBuffer, BLOCK_START + 0, 16)
@@ -480,8 +481,8 @@ local function RouberOrders_WriteEVENT_bulk_create_order(Value1: { number }, Val
 	-- END ARRAY
 	-- START ARRAY
 	buffer.writeu8(SendBuffer, BLOCK_START + 2, #Value2)
-		-- Allocate BLOCK: 18 bytes
-	local ARRAY_START_1 = Allocate(18 * #Value2)
+		-- Allocate BLOCK: 19 bytes
+	local ARRAY_START_1 = Allocate(19 * #Value2)
 	for Index = 1, #Value2 do
 		local Item_1 = Value2[Index]
 		-- Allocate 8
@@ -522,6 +523,10 @@ local function RouberOrders_WriteEVENT_bulk_create_order(Value1: { number }, Val
 			buffer.writef64(SendBuffer, OPERATION_OFFSET, Item_2)
 		end
 		-- END ARRAY
+		-- Allocate 1
+		local OPERATION_OFFSET = ARRAY_START_1
+		ARRAY_START_1 += 1
+		buffer.writeu8(SendBuffer, OPERATION_OFFSET, Item_1["order_tier"])
 	end
 	-- END ARRAY
 	-- START ARRAY
@@ -1516,12 +1521,12 @@ local Returns = table.freeze({
 	},
 	RouberOrders = {
 		create_order = {
-			fire = function(Player: Player, Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
+			fire = function(Player: Player, Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
 				Load(PlayersMap[Player])
 				RouberOrders_WriteEVENT_create_order(Value1, Value2, Value3)
 				PlayersMap[Player] = Save()
 			end,
-			fire_all = function(Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
+			fire_all = function(Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
 				Load()
 				RouberOrders_WriteEVENT_create_order(Value1, Value2, Value3)
 				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
@@ -1533,7 +1538,7 @@ local Returns = table.freeze({
 					PlayersMap[Player] = Save()
 				end
 			end,
-			fire_list = function(List: {Player}, Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
+			fire_list = function(List: {Player}, Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
 				Load()
 				RouberOrders_WriteEVENT_create_order(Value1, Value2, Value3)
 				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
@@ -1545,7 +1550,7 @@ local Returns = table.freeze({
 					PlayersMap[Player] = Save()
 				end
 			end,
-			fire_except = function(Except: Player, Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
+			fire_except = function(Except: Player, Value1: number, Value2: { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, Value3: { coins: number, gems: number, ["has_mystery_box"]: boolean }): ()
 				Load()
 				RouberOrders_WriteEVENT_create_order(Value1, Value2, Value3)
 				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
@@ -1562,12 +1567,12 @@ local Returns = table.freeze({
 			end,
 		},
 		bulk_create_order = {
-			fire = function(Player: Player, Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
+			fire = function(Player: Player, Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
 				Load(PlayersMap[Player])
 				RouberOrders_WriteEVENT_bulk_create_order(Value1, Value2, Value3)
 				PlayersMap[Player] = Save()
 			end,
-			fire_all = function(Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
+			fire_all = function(Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
 				Load()
 				RouberOrders_WriteEVENT_bulk_create_order(Value1, Value2, Value3)
 				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
@@ -1579,7 +1584,7 @@ local Returns = table.freeze({
 					PlayersMap[Player] = Save()
 				end
 			end,
-			fire_list = function(List: {Player}, Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
+			fire_list = function(List: {Player}, Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
 				Load()
 				RouberOrders_WriteEVENT_bulk_create_order(Value1, Value2, Value3)
 				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
@@ -1591,7 +1596,7 @@ local Returns = table.freeze({
 					PlayersMap[Player] = Save()
 				end
 			end,
-			fire_except = function(Except: Player, Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
+			fire_except = function(Except: Player, Value1: { number }, Value2: { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, Value3: { { coins: number, gems: number, ["has_mystery_box"]: boolean } }): ()
 				Load()
 				RouberOrders_WriteEVENT_bulk_create_order(Value1, Value2, Value3)
 				local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances

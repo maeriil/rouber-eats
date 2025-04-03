@@ -10,7 +10,7 @@ local source = vide.source
 local function story()
 	local orders_list = source({
 		["one"] = {
-			clientid = -1 :: any,
+			clientid = -1 :: never,
 			deliverytype = "some type",
 			distance = -1,
 			restaurant = {
@@ -21,7 +21,7 @@ local function story()
 			reward = 100,
 		},
 		["two"] = {
-			clientid = -1 :: any,
+			clientid = -1 :: never,
 			deliverytype = "some type",
 			distance = -1,
 			restaurant = {
@@ -32,7 +32,7 @@ local function story()
 			reward = 100,
 		},
 		["zzz"] = {
-			clientid = -1 :: any,
+			clientid = -1 :: never,
 			deliverytype = "some type",
 			distance = -1,
 			restaurant = {

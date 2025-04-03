@@ -122,7 +122,7 @@ local function render_dialog_choices()
 		end
 		choicequeue:clear()
 
-		uistore.DialogueChoices(content :: any)
+		uistore.DialogueChoices(content :: never)
 		world:remove(i, c.PendingChoices)
 		world:remove(i, c.ActiveDialogue)
 	end

@@ -127,11 +127,11 @@ local function Star(props: {
 end
 
 local function Rating(props: {
-	star: number,
+	star: types.Can<number>,
 })
 	local list = {}
 
-	for i = 1, props.star do
+	for i = 1, read(props.star) do
 		local st = Star {
 			order = i,
 			color = Color3.fromRGB(0, 0, 0),
@@ -306,7 +306,10 @@ local function RouberOrderCard(props: props)
 						name = "right-rating",
 						size = UDim2.new(0.5, 0, 1, 0),
 						Rating {
-							star = 6,
+							star = function()
+								local content = read(props.content) :: types.DeliveryOrderType
+								return content.order_rating
+							end,
 						},
 						flexfill {},
 					},

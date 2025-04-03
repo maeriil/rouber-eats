@@ -15,6 +15,11 @@ local function load_data(player: Player)
 		coins = 0,
 		gems = 0,
 		housetype = "House_BasicHouse",
+		orderpity = 0,
+		rating = 0.0,
+		total_orders_delivered = 0,
+		total_orders_stolen = 0,
+		total_orders_altered = 0,
 	}
 
 	return
@@ -50,6 +55,8 @@ local function setup_config(player: Player)
 
 	playerstore[player] = {
 		my_orders = {},
+		my_accepted_orders = {},
+		my_pickedup_orders = {},
 	}
 end
 

@@ -177,7 +177,8 @@ scope RouberOrders {
       restaurant_id: Entity,
       destination_id: Entity,
       foods_list_id: Entity[1..10],
-      conditions_list_id: Entity[0..10]
+      conditions_list_id: Entity[0..10],
+      order_tier: u8,
   }
 
   struct DeliveryRewardType {

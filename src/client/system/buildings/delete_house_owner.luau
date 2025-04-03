@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
+local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
@@ -33,7 +34,7 @@ local function cleanup_buildings(house_id: t.Entity)
 end
 
 local function cleanup_house_owner(server_owner_id: t.Entity)
-	local client_owner_id = get_client_owner_id_from_serverid(server_owner_id)
+	local client_owner_id = server_id_map.residence_owner_map[server_owner_id]
 	local house_id = world:get(client_owner_id, c.Residence)
 	assert(house_id, `Could not find an appropriate house_id for the client owner. This is a bug`)
 

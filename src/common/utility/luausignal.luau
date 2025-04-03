@@ -119,7 +119,7 @@ end
 	@return void
 ]=]
 function signal.fire<T...>(self: InternalIdentity<T...>, ...: T...)
-	for i = #(self :: any), 1, -1 do
+	for i = #(self :: never), 1, -1 do
 		if not freeThread then
 			freeThread = coroutine.create(yieldLoop)
 			tspawn(freeThread :: thread)

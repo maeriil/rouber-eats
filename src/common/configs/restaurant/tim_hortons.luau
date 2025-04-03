@@ -11,11 +11,21 @@ local restaurant: types.RestaurantConfigType = {
 	string_id = script.Name,
 	display_name = "Tim Horton's",
 	display_image = "http://www.roblox.com/asset/?id=15602025849",
+	star = { 1, 2, 3 },
 
 	foods = {
-		tim_hortons_signature_coffee.id,
-		iced_capp.id,
-		cream_cheese_bagel.id,
+		{
+			id = tim_hortons_signature_coffee.id,
+			star = { 1, 2 },
+		},
+		{
+			id = iced_capp.id,
+			star = { 2, 3 },
+		},
+		{
+			id = cream_cheese_bagel.id,
+			star = { 1 },
+		},
 	},
 
 	base_value = 50,

@@ -28,7 +28,7 @@ type BaseBuildingType = buildings.BaseBuildingType
 -- 	end
 
 -- 	world:set(e, c.PrimaryPart, root)
--- 	world:set(e, c.Position, root.Position :: any)
+-- 	world:set(e, c.Position, root.Position :: never)
 
 -- 	local entry = {} :: BaseBuildingType
 
@@ -44,7 +44,7 @@ type BaseBuildingType = buildings.BaseBuildingType
 -- 	local door_mat_params = OverlapParams.new()
 -- 	door_mat_params:AddToFilter({ door_mat } :: { any })
 -- 	world:set(door_mat_e, c.DoorMat, door_mat)
--- 	world:set(door_mat_e, c.Position, door_mat.Position :: any)
+-- 	world:set(door_mat_e, c.Position, door_mat.Position :: never)
 -- 	world:add(door_mat_e, pair(ChildOf, e))
 -- 	world:set(door_mat_e, c.OverParams, door_mat_params)
 -- 	entry.DoorMat = door_mat_e
@@ -66,7 +66,7 @@ type BaseBuildingType = buildings.BaseBuildingType
 -- 	world:add(door_e, c.Door)
 -- 	world:set(door_e, c.Model, model)
 -- 	world:set(door_e, c.PrimaryPart, door_root)
--- 	world:set(door_e, c.Position, door_root.Position :: any)
+-- 	world:set(door_e, c.Position, door_root.Position :: never)
 -- 	entry.Door = door_e
 
 -- 	buildings[e] = entry

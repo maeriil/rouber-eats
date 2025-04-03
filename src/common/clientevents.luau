@@ -173,7 +173,7 @@ export type Model = Model?
 export type Building_HouseType = ("interior" | "exterior")
 export type Building_IsNPC = boolean
 export type Building_ExteriorHouseType = string
-export type RouberOrders_DeliveryType = { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }
+export type RouberOrders_DeliveryType = { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }
 export type RouberOrders_DeliveryRewardType = { coins: number, gems: number, ["has_mystery_box"]: boolean }
 export type RouberOrders_OrderChoices = ("Deliver" | "Steal" | "Tamper")
 local function Building_WriteEVENT_IWantToTeleportInOrOut(Value1: number, Value2: ("interior" | "exterior")): ()
@@ -480,9 +480,9 @@ local function PlayerEvents_WriteEVENT_i_have_bulk_created_orders_initially(Valu
 	buffer.writeu8(SendBuffer, BLOCK_START + 0, 14)
 end
 
-local function RouberOrders_ReadEVENT_create_order(): (number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
-	-- Read BLOCK: 43 bytes
-	local BLOCK_START = Read(43)
+local function RouberOrders_ReadEVENT_create_order(): (number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
+	-- Read BLOCK: 44 bytes
+	local BLOCK_START = Read(44)
 	local Value1 = buffer.readf64(RecieveBuffer, BLOCK_START + 0)
 	local Value2 = {} :: any
 	Value2["restaurant_id"] = buffer.readf64(RecieveBuffer, BLOCK_START + 8)
@@ -517,14 +517,15 @@ local function RouberOrders_ReadEVENT_create_order(): (number, { ["restaurant_id
 		table.insert(Value2["conditions_list_id"], Item_1)
 	end
 	-- END ARRAY
+	Value2["order_tier"] = buffer.readu8(RecieveBuffer, BLOCK_START + 26)
 	local Value3 = {} :: any
-	Value3.coins = buffer.readf64(RecieveBuffer, BLOCK_START + 26)
-	Value3.gems = buffer.readf64(RecieveBuffer, BLOCK_START + 34)
-	Value3["has_mystery_box"] = (buffer.readu8(RecieveBuffer, BLOCK_START + 42) == 1)
+	Value3.coins = buffer.readf64(RecieveBuffer, BLOCK_START + 27)
+	Value3.gems = buffer.readf64(RecieveBuffer, BLOCK_START + 35)
+	Value3["has_mystery_box"] = (buffer.readu8(RecieveBuffer, BLOCK_START + 43) == 1)
 	return Value1, Value2, Value3
 end
 
-local function RouberOrders_ReadEVENT_bulk_create_order(): ({ number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
+local function RouberOrders_ReadEVENT_bulk_create_order(): ({ number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
 	-- Read BLOCK: 3 bytes
 	local BLOCK_START = Read(3)
 	-- START ARRAY
@@ -547,8 +548,8 @@ local function RouberOrders_ReadEVENT_bulk_create_order(): ({ number }, { { ["re
 	if Length < 0 then error(`Expected "Length" to be larger than 0, got {Length} instead.`) end
 	if Length > 100 then error(`Expected "Length" to be smaller than 100, got {Length} instead.`) end
 	local Value2 = table.create(Length)
-		-- Read BLOCK: 18 bytes
-	local ARRAY_START_1 = Read(18 * Length)
+		-- Read BLOCK: 19 bytes
+	local ARRAY_START_1 = Read(19 * Length)
 	for Index = 1, Length do
 		local Item_1 = {} :: any
 		-- Read 8
@@ -595,6 +596,10 @@ local function RouberOrders_ReadEVENT_bulk_create_order(): ({ number }, { { ["re
 			table.insert(Item_1["conditions_list_id"], Item_2)
 		end
 		-- END ARRAY
+		-- Read 1
+		local OPERATION_OFFSET = ARRAY_START_1
+		ARRAY_START_1 += 1
+		Item_1["order_tier"] = buffer.readu8(RecieveBuffer, OPERATION_OFFSET)
 		table.insert(Value2, Item_1)
 	end
 	-- END ARRAY
@@ -1247,10 +1252,10 @@ local Returns = table.freeze({
 	},
 	RouberOrders = {
 		create_order = {
-			iter = function(): () -> (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
+			iter = function(): () -> (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
 				local index = 0
 				local queue = Queue.Reliable[15]
-				return function (): (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
+				return function (): (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
 					index += 1
 					local arguments = Pop(queue)
 					if arguments ~= nil then
@@ -1260,10 +1265,10 @@ local Returns = table.freeze({
 				end
 			end,
 			--- @deprecated v0.14.1 -- Use `Iter` instead.
-			next = function(): () -> (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
+			next = function(): () -> (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
 				local index = 0
 				local queue = Queue.Reliable[15]
-				return function (): (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
+				return function (): (number, number, { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number }, { coins: number, gems: number, ["has_mystery_box"]: boolean })
 					index += 1
 					local arguments = Pop(queue)
 					if arguments ~= nil then
@@ -1274,10 +1279,10 @@ local Returns = table.freeze({
 			end
 		},
 		bulk_create_order = {
-			iter = function(): () -> (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
+			iter = function(): () -> (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
 				local index = 0
 				local queue = Queue.Reliable[16]
-				return function (): (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
+				return function (): (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
 					index += 1
 					local arguments = Pop(queue)
 					if arguments ~= nil then
@@ -1287,10 +1292,10 @@ local Returns = table.freeze({
 				end
 			end,
 			--- @deprecated v0.14.1 -- Use `Iter` instead.
-			next = function(): () -> (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
+			next = function(): () -> (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
 				local index = 0
 				local queue = Queue.Reliable[16]
-				return function (): (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number } } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
+				return function (): (number, { number }, { { ["restaurant_id"]: number, ["destination_id"]: number, ["foods_list_id"]: { number }, ["conditions_list_id"]: { number }, ["order_tier"]: number } }, { { coins: number, gems: number, ["has_mystery_box"]: boolean } })
 					index += 1
 					local arguments = Pop(queue)
 					if arguments ~= nil then

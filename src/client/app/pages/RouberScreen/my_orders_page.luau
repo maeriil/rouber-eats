@@ -67,7 +67,7 @@ local function my_orders(props: {
 					active_order = selected,
 				},
 			} :: never,
-		} :: any,
+		} :: never,
 	}
 end
 

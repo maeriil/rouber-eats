@@ -11,6 +11,11 @@ local template = {
 	coins = 0,
 	gems = 0,
 	housetype = "House_BasicHouse" :: types.BuildingsType,
+	orderpity = 0,
+	rating = 0.0,
+	total_orders_delivered = 0,
+	total_orders_stolen = 0,
+	total_orders_altered = 0,
 }
 export type template = typeof(template)
 

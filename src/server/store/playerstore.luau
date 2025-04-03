@@ -7,7 +7,9 @@ local t = require(ReplicatedStorage.types)
 	hashmap on the side so we can do lookups much faster rather than doing a dynamic query
 ]]
 export type PlayerDetails = {
-	my_orders: { t.Entity },
+	my_orders: { t.Entity | t.Id },
+	my_accepted_orders: { t.Entity | t.Id },
+	my_pickedup_orders: { t.Entity | t.Id },
 }
 
 local store: {

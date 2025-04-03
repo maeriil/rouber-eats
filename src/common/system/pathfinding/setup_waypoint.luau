@@ -18,7 +18,7 @@ local generate_paths = world:query(StartPos, EndPos, c.Path):with(SetupWaypoint)
 local function system()
 	for id, start, dest, path in generate_paths:iter() do
 		local path_future = createfuture(function(...)
-			path:ComputeAsync(start :: any, dest :: any)
+			path:ComputeAsync(start :: never, dest :: never)
 			if path.Status == Enum.PathStatus.Success then
 				return path:GetWaypoints()
 			else

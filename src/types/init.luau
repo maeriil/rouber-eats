@@ -24,6 +24,14 @@ export type BuildingRemoteParams = {
 	can_enter: boolean,
 }
 
+export type DeliveryOrderDetailsComponentType = {
+	restaurant_id: Entity | Id,
+	destination_id: Entity | Id,
+	foods_list_id: { Entity | Id },
+	conditions_list_id: { Entity | Id },
+	order_tier: number,
+}
+
 export type DeliveryOrderFoodType = {
 	name: string,
 	image: string,
@@ -200,11 +208,17 @@ export type FoodConfigType = {
 	[string]: { __sealed_table: true },
 }
 
+export type RestaurantFoodConfigType = {
+	id: Entity,
+	star: { number },
+}
+
 export type RestaurantConfigType = {
 	id: Entity,
 	string_id: string,
 	display_name: string,
 	display_image: string,
+	star: { number },
 
 	--[[
 		TODO: Figure this out more
@@ -218,10 +232,25 @@ export type RestaurantConfigType = {
 	category: RestaurantMainCategory,
 	nationality: NationalityCategory,
 
-	foods: { Entity },
+	foods: { RestaurantFoodConfigType },
 
 	-- Ensuring we don't type anything else while we create out config
 	[string]: { __sealed_table: true },
+}
+
+-- Some rating may have like specific kind of req? how do we determine that? no idea tbh?
+-- maybe we can export out a function that validates this
+--//TODO LUAU, we should merge the following into a single type and instead use Index type
+export type RatingConfigConditionType = {
+	min_orders_delivered: number,
+	min_orders_stolen: number,
+	min_orders_altered: number,
+
+	min_orders_with_5_star_customer_feedback: number,
+	min_orders_with_4_star_customer_feedback: number,
+}
+export type RatingConfigType = {
+	conditions: RatingConfigConditionType,
 }
 
 return greentea

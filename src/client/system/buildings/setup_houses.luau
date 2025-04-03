@@ -106,6 +106,8 @@ local function setup_house_on_client(
 	interior_root.Transparency = 1
 	exterior_root.Transparency = 1
 
+	world:set(client_owner_id, c.Residence, house_id)
+
 	world:set(house_id, c.House, exterior_house)
 	world:set(house_id, pairs.BuildingInteriorId, interior_id)
 	world:set(house_id, pairs.BuildingExteriorId, exterior_id)

@@ -10,6 +10,8 @@ return {
 	IncreaseGems = pair(c.Gems, c.Increase),
 	DecreaseCoins = pair(c.Coins, c.Decrease),
 	DecreaseGems = pair(c.Gems, c.Decrease),
+	IncreaseRating = pair(c.Rating, c.Increase),
+	DecreaseRating = pair(c.Rating, c.Increase),
 
 	DoNotUpdateModel = pair(c.DoNotReconcile, c.Model),
 

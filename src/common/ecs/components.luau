@@ -51,6 +51,7 @@ local components = {
 	-- Questionable names tbh...
 	Coins = world:component() :: t.Id<number>,
 	Gems = world:component() :: t.Id<number>,
+	Rating = world:component() :: t.Id<number>,
 
 	--//TODO Do we even use Position?? If we don't remove it
 	Position = world:component() :: t.Id<vector>,
@@ -59,12 +60,7 @@ local components = {
 	Transform = world:component() :: t.Id<CFrame>,
 
 	DeliveryOrderStatus = world:component() :: t.Id<t.DeliveryOrderStatus>,
-	DeliveryOrderDetails = world:component() :: t.Id<{
-		restaurant_id: t.Entity,
-		destination_id: t.Entity,
-		foods_list_id: { t.Entity },
-		conditions_list_id: { t.Entity },
-	}>,
+	DeliveryOrderDetails = world:component() :: t.Id<t.DeliveryOrderDetailsComponentType>,
 	HasOrderToBeDelivered = world:entity() :: t.Entity,
 	HasMysteryBox = world:entity() :: t.Entity,
 	-- DeliveryOrderDetails = world:component() :: t.Id<{

@@ -19,7 +19,7 @@ local __ = jecs.Wildcard
 local function find_valid_client_restaurant_id(server_id: t.Entity)
 	local id = server_id_map.restaurant_map[server_id]
 
-	assert(id ~= nil, `Restaurant ID must not be nil`)
+	assert(id ~= nil, `Restaurant server ID {server_id} must not be nil`)
 	assert(world:contains(id), `Restaurant Id must exist in the world`)
 
 	return id
@@ -62,11 +62,12 @@ local function add_order_to_world(
 	local order_id = world:entity() :: t.Entity
 
 	--//TODO : we need to convert the food into [Server]: Client map too
-	local delivery_details = {
+	local delivery_details: types.DeliveryOrderDetailsComponentType = {
 		restaurant_id = client_restaurant_id,
 		destination_id = client_destination_id,
 		foods_list_id = server_food_list :: never,
 		conditions_list_id = server_cond_list :: never,
+		order_tier = _details.order_tier,
 	}
 	world:set(order_id, c.EntityId, server_id)
 	world:set(order_id, c.DeliveryOrderDetails, delivery_details)
@@ -99,6 +100,7 @@ local function create_order_to_world()
 	end
 
 	for _, server_id, details, reward in clientevents.RouberOrders.create_order.iter() do
+		warn(`Create order called...`)
 		add_order_to_world(server_id, details, reward)
 	end
 end
@@ -157,7 +159,7 @@ local function display_orders_to_ui()
 			house_name = house_name,
 			order_id = client_id :: t.Entity,
 			-- We have not worked on this yet
-			order_rating = 6,
+			order_rating = details.order_tier,
 			restaurant_address = "W.I.P address",
 			restaurant_image = client_restuarant_details.display_image,
 			restaurant_name = client_restuarant_details.display_name,

@@ -59,7 +59,7 @@ do
 			first = 0,
 			last = -1,
 			list = {},
-		}, Queue) :: any
+		}, Queue) :: never
 
 		return self :: Queue<T...>
 	end

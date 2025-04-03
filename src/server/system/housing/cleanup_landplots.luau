@@ -26,7 +26,7 @@ local function get_players_who_has_setup_houses()
 	return players_who_have_setup_house
 end
 
-local function mark_orders_as_invalid(house_id: t.Entity, landplot_id: t.Entity)
+local function mark_orders_as_invalid(house_id: t.Entity, landplot_id: t.Entity, owner_id: t.Entity)
 	--[[
 		TODO: We will need to fire to client world so they can cleanup the order??
 		We still haven't deleted it btw.
@@ -36,8 +36,23 @@ local function mark_orders_as_invalid(house_id: t.Entity, landplot_id: t.Entity)
 		local residence_id = details.destination_id
 
 		if residence_id == house_id then
+			--[[
+				if the house to deletes owner is a player who is leavign, then we just force delete
+				the order right here...
+				How do we know that its the player leaving though?
+			]]
+
+			local order_client_id = world:target(order_id, c.Client) :: t.Entity
+
+			print(`order client id = {order_client_id}`)
+			print(`they are the same ?? = {owner_id == order_client_id}`)
+
+			if owner_id == order_client_id then
+				world:delete(order_id)
+				continue
+			end
+
 			warn(`Found an order for a house we are about to delete. Marking it as invalid!!`)
-			warn(`!!!! COMPLEZTED ===`)
 			world:add(order_id, c.Invalid)
 
 			if world:has(order_id, p.ClaimedBy) then
@@ -52,13 +67,14 @@ local function cleanup_the_landplot(
 	house_id: t.Entity,
 	parent: t.Entity,
 	interior_id: t.Entity,
-	exterior_id: t.Entity
+	exterior_id: t.Entity,
+	owner_id: t.Entity
 )
 	local cleanup_interior_model = world:get(interior_id, c.Cleanup)
 	assert(cleanup_interior_model, `We have used ref to create interior model. We need to cleanup`)
 
 	cleanup_interior_model()
-	mark_orders_as_invalid(house_id, parent)
+	mark_orders_as_invalid(house_id, parent, owner_id)
 	--//TODO: tbhm we have the parent id here, maybe we can just change the destination in order
 	--// once we know the new house id becomes?
 
@@ -100,7 +116,7 @@ local function cleanup_npc_landplot()
 			`Cleaning up the existing npc landplot and sending it to the following users {players_who_have_completed_setup}`
 		)
 		request_delete_house.fire_list(players_who_have_completed_setup, npc_owner_id :: never)
-		cleanup_the_landplot(house_id, parent, interior_id, exterior_id)
+		cleanup_the_landplot(house_id, parent, interior_id, exterior_id, npc_owner_id)
 
 		world:remove(parent, c.OccupiedByNPC)
 		world:delete(npc_owner_id)
@@ -117,7 +133,16 @@ local cleanup_house_client_query = world
 	:with(c.Cleanup, c.House)
 	:cached()
 local function cleanup_removed_player_landplot()
+	local players_who_have_completed_setup = get_players_who_has_setup_houses()
+
 	for house_id, parent, player_id, interior_id, exterior_id in cleanup_house_client_query:iter() do
+		print(
+			`Cleaning up the players landplot and sending it to the following users {players_who_have_completed_setup}`
+		)
+		request_delete_house.fire_list(players_who_have_completed_setup, player_id :: never)
+		cleanup_the_landplot(house_id, parent, interior_id, exterior_id, player_id)
+
+		world:remove(parent, c.OccupiedByPlayer)
 	end
 end
 

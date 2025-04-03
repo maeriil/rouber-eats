@@ -21,6 +21,9 @@ local function player_removing()
 		task.defer(function()
 			-- Once everything is verified to be completed, we should delete the entity
 			-- We should probably defer the deleting stuff to the end
+			local residence_id = world:exists_get(id, c.Residence)
+			world:add(residence_id, c.Cleanup)
+
 			world:remove(id, c.Client)
 			cleanup()
 		end)
