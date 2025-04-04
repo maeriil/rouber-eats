@@ -4,6 +4,8 @@ local DialogueProximity = require(script.features.Proximity.DialogueProximity)
 local DialogueScene = require(script.pages.DialogueScene)
 local DoorProximity = require(script.features.Proximity.DoorProximity)
 local HudScreen = require(script.pages.HudScreen)
+local ItemProximity = require(script.features.Proximity.ItemProximity)
+local MailboxProximity = require(script.features.Proximity.MailboxProximity)
 local PhoneScreen = require(script.pages.PhoneScreen)
 local RouberScreen = require(script.pages.RouberScreen)
 local frame = require(script.components.pane.frame)
@@ -88,22 +90,36 @@ local function root(): { any }
 			ResetOnSpawn = false,
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 			ScreenInsets = Enum.ScreenInsets.None,
-			-- indexes(alldoors, function(details: () -> types.DoorProximityDetails, a1: number)
-			-- 	return DoorProximity {
-			-- 		details = details,
-			-- 	}
-			-- end),
 
 			indexes(alldoors, function(details: () -> types.DoorProximityDetails, _: number)
 				return DoorProximity {
 					details = details,
 				}
 			end),
+
 			indexes(all_dialogues, function(details: () -> types.DialogueProximityDetails, n: number)
 				return DialogueProximity {
 					details = details,
 				}
 			end),
+
+			indexes(
+				uistore.MailboxProximity,
+				function(details: () -> types.MailboxProximityDetails, a1: number)
+					return MailboxProximity {
+						details = details,
+					}
+				end
+			),
+
+			indexes(
+				uistore.ItemProximity,
+				function(details: () -> types.ItemProximityDetails, a1: number)
+					return ItemProximity {
+						details = details,
+					}
+				end
+			),
 
 			switch(page) {
 				[""] = function()

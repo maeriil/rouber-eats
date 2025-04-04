@@ -13,11 +13,15 @@ local __ = jecs.Wildcard
 
 local teleport = world:query(c.Model, c.TeleportTo, c.PrimaryPart):without(p.TPCooldown):cached()
 local teleport_event = serverevents.Building.IWantToTeleportInOrOut
+local events = ReplicatedStorage.common.events
+
 local function system()
 	for _, player, _building_id, curr_building in teleport_event.iter() do
 		local building_id = (_building_id :: never) :: types.Entity
 		if not building_id or not world:contains(building_id) then
-			warn(`The specified building id = {building_id} does not exist. Aborting request`)
+			local error_msg = `The specified building id = {building_id} does not exist. Aborting request`
+			warn(error_msg)
+			events.teleport:FireClient(player, false, error_msg)
 			continue
 		end
 
@@ -38,9 +42,11 @@ local function system()
 		if going_interior then
 			local destination = world:get(interior_id, c.Transform) :: CFrame
 			world:set(e, c.TeleportTo, destination)
+			events.teleport:FireClient(player, true, nil, true, building_id)
 		else
 			local destination = world:get(exterior_id, c.Transform) :: CFrame
 			world:set(e, c.TeleportTo, destination)
+			events.teleport:FireClient(player, true, nil, false, building_id)
 		end
 	end
 

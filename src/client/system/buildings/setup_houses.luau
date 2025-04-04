@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local basepartmap = require(ReplicatedStorage.client.store.basepartmap)
 local buildings_map = require(ReplicatedStorage.common.configs.buildings.buildings_map)
 local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
@@ -9,12 +10,13 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
-local types = require(ReplicatedStorage.types)
+local t = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
+local pair = jecs.pair
 
-local function setup_house_owner(server_owner_id: types.Entity, owner: Model, is_npc: boolean)
-	local owner_id = world:entity() :: types.Entity
+local function setup_house_owner(server_owner_id: t.Entity, owner: Model, is_npc: boolean)
+	local owner_id = world:entity() :: t.Entity
 	world:add(owner_id, c.HouseOwner)
 	world:set(owner_id, c.EntityId, server_owner_id)
 	world:set(owner_id, c.Name, owner.Name)
@@ -68,12 +70,26 @@ end
 
 local house_parent = workspace:FindFirstChild("House") :: Folder
 
+local function setup_mailbox(mailbox_base: BasePart, parent: t.Entity, params: OverlapParams)
+	local e = world:entity() :: t.Entity
+	world:add(parent, pair(c.Mailbox, e))
+	world:set(e, c.Parent, parent)
+	-- world:set(e, c.OverParams, params)
+	-- world:set(e, c.CastStatus, false)
+	world:set(e, c.BasePart, mailbox_base)
+	world:add(e, c.Mailbox)
+
+	basepartmap[mailbox_base] = e
+
+	return e
+end
+
 local function setup_house_on_client(
-	server_id: types.Entity,
+	server_id: t.Entity,
 	doormat_cf: CFrame,
 	interior_model: Model,
 	exterior_house: string,
-	owner_id: types.Entity
+	owner_id: t.Entity
 )
 	-- local client_owner_id = get_clientownerid_fromserver(owner_id)
 	local client_owner_id = server_id_map.residence_owner_map[owner_id]
@@ -87,7 +103,7 @@ local function setup_house_on_client(
 	)
 	exterior_model.Parent = house_parent
 
-	local house_id = world:entity() :: types.Entity
+	local house_id = world:entity() :: t.Entity
 	local interior_id, interior_cleanup = ref(interior_model)
 	local exterior_id, exterior_cleanup = ref(exterior_model)
 	local player_name = world:get(client_owner_id, c.Name)
@@ -135,6 +151,16 @@ local function setup_house_on_client(
 
 	setup_door(interior_model, interior_id)
 	setup_door(exterior_model, exterior_id)
+
+	local mailbox = exterior_model:FindFirstChild("mailbox") :: Model?
+	assert(
+		mailbox ~= nil,
+		`Every exterior house must have a mail box as this is used to identify player`
+	)
+	assert(mailbox.PrimaryPart ~= nil, `Every mailbox must have a primary part`)
+	local mailbox_params = OverlapParams.new()
+	mailbox_params:AddToFilter({ mailbox } :: never)
+	setup_mailbox(mailbox.PrimaryPart, exterior_id, mailbox_params)
 
 	server_id_map.residence_map[server_id] = house_id
 	return house_id

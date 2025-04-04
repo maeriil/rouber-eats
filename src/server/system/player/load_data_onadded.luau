@@ -57,6 +57,8 @@ local function setup_config(player: Player)
 		my_orders = {},
 		my_accepted_orders = {},
 		my_pickedup_orders = {},
+		my_backpack_collectables = {},
+		my_backpack_furnishings = {},
 	}
 end
 

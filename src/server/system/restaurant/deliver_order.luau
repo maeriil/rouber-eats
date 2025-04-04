@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local playerstore = require(ServerScriptService.server.store.playerstore)
@@ -10,7 +11,6 @@ local p = require(ReplicatedStorage.common.ecs.pairs)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local t = require(ReplicatedStorage.types)
 local pair = jecs.pair
-local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 

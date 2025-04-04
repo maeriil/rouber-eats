@@ -124,6 +124,7 @@ local components = {
 	--//TODO Not sure if we need teleport zone anymore?
 	TeleportZone = world:entity() :: t.Entity,
 	DoormatZone = world:entity() :: t.Entity,
+	Mailbox = world:entity() :: t.Entity,
 	Door = world:entity() :: t.Entity,
 	Radius = world:component() :: t.Id<number>, -- How close player has to be to open it
 	CannotOpen = world:entity() :: t.Entity,
@@ -136,6 +137,7 @@ local components = {
 
 	-- In future, player can own a restaurant too, not our problem right now though
 	Restaurant = world:entity() :: t.Entity,
+	Store = world:entity() :: t.Entity,
 
 	TeleportTo = world:component() :: t.Id<CFrame>,
 	--//TODO DO we use Connection somewhere?
@@ -209,6 +211,8 @@ local components = {
 	Food = world:entity() :: t.Entity,
 	Value = world:component() :: t.Id<number>,
 	Invalid = world:entity() :: t.Entity,
+
+	Item = world:entity() :: t.Entity,
 }
 do
 	-- Because luau is ass

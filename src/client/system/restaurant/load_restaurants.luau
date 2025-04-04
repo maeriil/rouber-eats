@@ -22,10 +22,22 @@ local instance_added = {}
 local instance_removed = {}
 
 CollectionService:GetInstanceAddedSignal(tags.Restaurant):Connect(function(instance: Instance)
-	table.insert(instance_added, instance)
+	local client_id_attribute = instance:GetAttribute(attributes.clientid)
+
+	if client_id_attribute == nil then
+		warn(
+			`Client attribute isn't set yet, which means this ({instance.Name}) is a new item. Setting it up`
+		)
+		table.insert(instance_added, instance)
+	end
 end)
 
-local function setup_restuarant_to_client(restaurant_name: string, interior: Model, exterior: Model)
+local function setup_restuarant_to_client(
+	restaurant_folder: Folder,
+	interior: Model,
+	exterior: Model
+)
+	local restaurant_name = restaurant_folder.Name
 	local interior_primary = interior.PrimaryPart :: Part
 	local exterior_priamry = exterior.PrimaryPart :: Part
 	local restaurant_config = restaurant_map[restaurant_name]
@@ -75,6 +87,10 @@ local function setup_restuarant_to_client(restaurant_name: string, interior: Mod
 
 	setup_door(interior, interior_id)
 	setup_door(exterior, exterior_id)
+
+	interior:SetAttribute(attributes.clientid, parent_id)
+	exterior:SetAttribute(attributes.clientid, parent_id)
+	restaurant_folder:SetAttribute(attributes.clientid, parent_id)
 
 	server_id_map.restaurant_map[interior_server_mapped_id] = parent_id
 	clientgamedata.restaurant_map[parent_id] = restaurant_config
@@ -131,7 +147,7 @@ local function system()
 		)
 
 		warn(`Client-sided, Setting up the restaurant {restaurant_name}`)
-		setup_restuarant_to_client(restaurant_name, interior, exterior)
+		setup_restuarant_to_client(folder, interior, exterior)
 
 		instance_added[i] = nil
 	end
@@ -142,6 +158,9 @@ local function system()
 		-- -- table.clear(restaurant_map)
 		-- print("setting it to nil....")
 		-- -- restaurant_map = nil :: never
+
+		--//TODO: THIS IS NOT GOOD. We should have a better way of letting the server know we
+		-- have successfully completed all the client restaurant setups
 		completed = true
 	end
 end

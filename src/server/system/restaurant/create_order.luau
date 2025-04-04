@@ -1,7 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local condition_test_convo =
-	require(ReplicatedStorage.common.configs.dialogues.npc.condition_test_convo)
 local gamedata = require(ServerScriptService.server.store.gamedata)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
@@ -9,6 +7,12 @@ local playerdatastore = require(ServerScriptService.server.store.playerdatastore
 local playersetupconfig = require(ServerScriptService.server.store.playersetupconfig)
 local playerstore = require(ServerScriptService.server.store.playerstore)
 local serverevents = require(ServerScriptService.server.serverevents)
+
+local star_0 = require(ReplicatedStorage.common.configs.rating.star_0)
+local star_1 = require(ReplicatedStorage.common.configs.rating.star_1)
+local star_2 = require(ReplicatedStorage.common.configs.rating.star_2)
+local star_3 = require(ReplicatedStorage.common.configs.rating.star_3)
+local star_4 = require(ReplicatedStorage.common.configs.rating.star_4)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
@@ -43,6 +47,36 @@ local function determine_if_should_create_order(list: { Player })
 			table.insert(list, client)
 		end
 	end
+end
+
+local hard_pity_to_high_tier = 25
+local soft_pity_to_high_tier = 15
+local function get_high_tier_success_rate(current_pity: number)
+	if current_pity < soft_pity_to_high_tier then
+		return 0.085
+	elseif current_pity < hard_pity_to_high_tier then
+		return 0.3334
+	else
+		return 1
+	end
+end
+
+local function weighted_random(weights)
+	local total_weight = 0
+	for _, weight in ipairs(weights) do
+		total_weight = total_weight + weight
+	end
+
+	local rand = math.random() * total_weight -- Scale to total weight
+	local cumulative = 0
+
+	for tier, weight in ipairs(weights) do
+		cumulative = cumulative + weight
+		if rand <= cumulative then
+			return tier -- Return the selected tier
+		end
+	end
+	return 1 -- Default fallback
 end
 
 --[[
@@ -121,8 +155,23 @@ local function should_create_mystery_box()
 	return false
 end
 
-local function determine_coins_amount()
-	return math.random(250, 1000)
+local star_ratings = {
+	star_0,
+	star_1,
+	star_2,
+	star_3,
+	star_4,
+}
+
+local function determine_coins_amount(client: Player, is_high_tier: boolean, order_idx: number)
+	local datastore = playerdatastore[client]
+	local curr_rating_int = math.floor(datastore.rating)
+
+	local coins_weights = if is_high_tier
+		then star_ratings[curr_rating_int + 1].high_tier_base_coins
+		else star_ratings[curr_rating_int + 1].regular_tier_base_coins
+
+	return coins_weights[order_idx]
 end
 
 local function determine_order_rating_amount()
@@ -147,16 +196,43 @@ local function determine_order_rating_amount()
 	return 0.85
 end
 
+local function select_order_tier(client: Player)
+	local datastore = playerdatastore[client]
+	local curr_pity = datastore.orderpity
+	local curr_rating_int = math.floor(datastore.rating)
+
+	if curr_rating_int >= 5 then
+		error(`We have not implemented a 5 Star player rating mechanism`)
+	end
+
+	local success_rate = get_high_tier_success_rate(curr_pity)
+	local random = Random.new(os.clock())
+	local curr_chance = random:NextNumber()
+	local should_be_high_tier = curr_chance <= success_rate
+	-- if player rating is 0.something, it becomes 0, but luau array begins from 1
+	local weights = if should_be_high_tier
+		then star_ratings[curr_rating_int + 1].high_tier_order_weights
+		else star_ratings[curr_rating_int + 1].regular_tier_order_weights
+
+	-- This returns an integer from [1, 6], with each representing the tier of the order
+	local order_tier = weighted_random(weights)
+
+	if should_be_high_tier then
+		-- reset the order pity back to 0 now
+		datastore.orderpity = 0
+	else
+		datastore.orderpity += 1
+	end
+
+	return order_tier, should_be_high_tier
+end
+
 local function create_orders(list: { Player })
 	for _, client in list do
 		local client_id = ref(client)
-		local datastore = playerdatastore[client]
 		local livestore = playerstore[client]
-		local client_order_pity = datastore.orderpity
-		local client_rating = datastore.rating
 
-		local selected_order_tier = 1
-
+		local selected_order_tier, is_high_tier = select_order_tier(client)
 		local order_dest_owner_id = select_a_house_owner()
 		local residence_id = world:exists_get(order_dest_owner_id, c.Residence)
 
@@ -179,7 +255,7 @@ local function create_orders(list: { Player })
 
 		-- Coins reward should be created with some formula using the rarity of
 		-- restaurant + foods + house + order combnined
-		local coins_reward = determine_coins_amount()
+		local coins_reward = determine_coins_amount(client, is_high_tier, selected_order_tier)
 		local should_have_mystery_box = should_create_mystery_box()
 
 		world:set(order_id, c.DeliveryOrderDetails, delivery_details)

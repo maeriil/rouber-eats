@@ -11,6 +11,8 @@ do
 
 	require(ReplicatedStorage.common.configs.food)
 	require(ReplicatedStorage.common.configs.restaurant)
+	require(ReplicatedStorage.common.configs.store)
+	require(ReplicatedStorage.common.configs.items)
 	-- require(ReplicatedStorage.common.configs.restaurant)
 	require(ReplicatedStorage.common.configs.buildings.buildings_map)
 	require(script.store.playerstore)

@@ -18,6 +18,10 @@ local conditions: types.RatingConfigConditionType = {
 
 local config: types.RatingConfigType = {
 	conditions = conditions,
+	high_tier_order_weights = { 0.0, 0.0, 0.0, 1, 0.22, 0.09 },
+	regular_tier_order_weights = { 0.35, 0.65, 1, 0.25, 0, 0 },
+	high_tier_base_coins = { 0, 0, 0, 340, 490, 800 },
+	regular_tier_base_coins = { 50, 85, 120, 180, 240, 290 },
 }
 
 return config

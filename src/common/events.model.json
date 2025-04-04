@@ -1,0 +1,17 @@
+{
+  "ClassName": "Folder",
+  "Children": [
+    {
+      "Name": "teleport",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "item_added",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "item_removed",
+      "ClassName": "RemoteEvent"
+    }
+  ]
+}

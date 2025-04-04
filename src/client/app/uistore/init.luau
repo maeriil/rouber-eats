@@ -45,6 +45,8 @@ local sources = {
 	]]
 
 	DoorProximity = source({} :: { types.DoorProximityDetails }),
+	MailboxProximity = source({} :: { types.MailboxProximityDetails }),
+	ItemProximity = source({} :: { types.ItemProximityDetails }),
 	-- For all of our actions, we can create a source like so
 	-- InvestigateProximity = source({}),
 	DialogueProximity = source({} :: { types.DialogueProximityDetails }),

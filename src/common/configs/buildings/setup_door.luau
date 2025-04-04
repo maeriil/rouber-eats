@@ -38,6 +38,7 @@ local pair = jecs.pair
 
 ]]
 
+--//TODO: idk if we need over params , verify tho before removing it
 local function setup_doormatzone(doormat: Part, parent: t.Entity, params: OverlapParams)
 	local e = world:entity() :: t.Entity
 	world:add(parent, pair(c.DoormatZone, e))

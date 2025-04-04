@@ -10,6 +10,8 @@ local greentea = require(ReplicatedStorage.pkg.greentea)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local vide = require(ReplicatedStorage.pkg.vide)
 
+export type Array<T> = { T }
+
 -- export type Id<T = unknown> = jecs.Id<T>
 export type Id<T = unknown> = jecs.Entity<T>
 export type Entity<T = nil> = jecs.Entity<T>
@@ -91,6 +93,18 @@ export type DoorProximityDetails = {
 	-- The id contains the entity id of the proximity prompt it belongs to
 	-- we only display the full proximity if it equals to whatever is the ActiveProximtiy
 	-- at that moment
+	promptid: Entity,
+}
+
+export type MailboxProximityDetails = {
+	adornee: BasePart,
+	owner_text: string,
+}
+
+export type ItemProximityDetails = {
+	adornee: BasePart,
+	item_name: string,
+
 	promptid: Entity,
 }
 
@@ -251,6 +265,28 @@ export type RatingConfigConditionType = {
 }
 export type RatingConfigType = {
 	conditions: RatingConfigConditionType,
+	high_tier_order_weights: { number },
+	high_tier_base_coins: { number },
+	regular_tier_order_weights: { number },
+	regular_tier_base_coins: { number },
+}
+
+export type StoreConfigType = {
+	id: Entity,
+	string_id: string,
+	display_name: string,
+	display_image: string,
+}
+
+export type ItemConfigType = {
+	id: Entity,
+	string_id: string,
+	display_name: string,
+	-- no display image since we would use viewport model here
+	-- so at runtime, we should do a world:get call and grab the model
+
+	base_price: number,
+	rarity: number,
 }
 
 return greentea

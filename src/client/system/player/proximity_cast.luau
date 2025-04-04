@@ -132,6 +132,65 @@ local function update_door_proximity(hit_parts: { BasePart }, min_part: BasePart
 	uistore.DoorProximity(door_proximity)
 end
 
+local function update_mailbox_proximity(
+	hit_parts: { BasePart },
+	min_part: BasePart,
+	min_dist: number
+)
+	local mailbox_proximity = {} :: { types.MailboxProximityDetails }
+
+	for _, part in hit_parts do
+		local id = basepartmap[part]
+		local is_mailbox = world:has(id, c.Mailbox)
+		if not is_mailbox then
+			continue
+		end
+
+		local parent = world:exists_get(id, c.Parent)
+		local name = world:exists_get(parent, c.Name)
+
+		local details: types.MailboxProximityDetails = {
+			adornee = part,
+			owner_text = name,
+		}
+		table.insert(mailbox_proximity, details)
+	end
+
+	uistore.MailboxProximity(mailbox_proximity)
+end
+
+local function update_item_proximity(hit_parts: { BasePart }, min_part: BasePart, min_dist: number)
+	local item_proximity = {} :: { types.ItemProximityDetails }
+
+	for _, part in hit_parts do
+		local id = basepartmap[part]
+		local is_item = world:has(id, c.Item)
+		if not is_item then
+			continue
+		end
+
+		local item_name = world:exists_get(id, c.Name)
+		local details: types.ItemProximityDetails = {
+			adornee = part,
+			promptid = id,
+			item_name = item_name,
+		}
+		table.insert(item_proximity, details)
+
+		if part == min_part then
+			--//TODO: tbh, we could probably store the active radius somewhere in our components
+			-- but for now, im just using 8 cuz i thin our doormat is like 8x8? or supposed to at least LOL
+			if min_dist <= 4 then
+				uistore.ActiveProximity(id)
+			else
+				uistore.ActiveProximity(nil)
+			end
+		end
+	end
+
+	uistore.ItemProximity(item_proximity)
+end
+
 local cached = world
 	:query(c.OverParams, c.PrimaryPart, c.Radius)
 	:with(c.Client)
@@ -162,6 +221,8 @@ local function system()
 
 	update_dialogue_proximity(filtered, min_part, min_dist)
 	update_door_proximity(filtered, min_part, min_dist)
+	update_mailbox_proximity(filtered, min_part, min_dist)
+	update_item_proximity(filtered, min_part, min_dist)
 end
 
 return {
