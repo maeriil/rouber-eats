@@ -71,18 +71,19 @@ local function IF(check_function: () -> boolean)
 	end
 end
 
-local build_dialogue_tree: (parent: t.Entity, node: TABLE) -> t.Entity
-local build_choices: (parent: t.Entity, node: TABLE) -> ()
+local build_dialogue_tree: (parent: t.Entity, node: TABLE, key_map: { [string]: t.Entity }) -> t.Entity
+local build_choices: (parent: t.Entity, node: TABLE, key_map: { [string]: t.Entity }) -> ()
 
-local function create_choicecontainer(parent)
+local function create_choicecontainer(parent, key_map)
 	local container_id = world:entity() :: t.Entity
 	world:set(container_id, c.Parent, parent)
 	world:add(parent, pair(c.Next, container_id))
 	world:add(container_id, c.DialogueChoiceContainer)
+
 	return container_id
 end
 
-local function create_choice(parent, t)
+local function create_choice(parent, t, key_map)
 	local choice_id = world:entity() :: t.Entity
 	world:set(choice_id, c.Parent, parent)
 	world:add(choice_id, c.DialogueChoice)
@@ -91,8 +92,15 @@ local function create_choice(parent, t)
 	return choice_id
 end
 
-local function create_response(parent: t.Entity, dialogue_text: string)
+local function create_response(parent: t.Entity, props, key_map)
+	local dialogue_text = props.text
+	local key = props.key
 	local response_id = world:entity() :: t.Entity
+
+	if key then
+		key_map[key] = response_id
+	end
+
 	world:add(parent, pair(c.Next, response_id))
 	world:add(response_id, c.DialogueResponse)
 	world:set(response_id, c.Parent, parent)
@@ -101,7 +109,7 @@ local function create_response(parent: t.Entity, dialogue_text: string)
 	return response_id
 end
 
-local function create_if(parent, check_function, success, failure)
+local function create_if(parent, check_function, success, failure, key_map)
 	-- I think this one might have bugs
 	local if_id = world:entity() :: t.Entity
 	world:add(parent, pair(c.Next, if_id))
@@ -112,27 +120,27 @@ local function create_if(parent, check_function, success, failure)
 	local success_id = world:entity() :: t.Entity
 	world:add(success_id, c.DialogueSuccess)
 	if #success > 1 then
-		build_choices(success_id, success)
+		build_choices(success_id, success, key_map)
 	else
 		local _, next_node = next(success)
-		build_dialogue_tree(success_id, next_node)
+		build_dialogue_tree(success_id, next_node, key_map)
 	end
 	world:add(if_id, pair(c.DialogueSuccess, success_id))
 
 	local failure_id = world:entity() :: t.Entity
 	world:add(failure_id, c.DialogueFailure)
 	if #failure > 1 then
-		build_choices(failure_id, failure)
+		build_choices(failure_id, failure, key_map)
 	else
 		local _, next_node = next(failure)
-		build_dialogue_tree(failure_id, next_node)
+		build_dialogue_tree(failure_id, next_node, key_map)
 	end
 	world:add(if_id, pair(c.DialogueFailure, failure_id))
 
 	return if_id
 end
 
-local function create_callback(parent: t.Entity, callback: () -> ())
+local function create_callback(parent: t.Entity, callback: () -> (), key_map)
 	local callback_id = world:entity() :: t.Entity
 	world:set(callback_id, c.Parent, parent)
 	world:add(parent, pair(c.Next, callback_id))
@@ -141,63 +149,68 @@ local function create_callback(parent: t.Entity, callback: () -> ())
 	return callback_id
 end
 
-local function create_goto(parent, props)
-	warn(`todo, goto needs some work...`)
+local function create_goto(parent, props, key_map)
 	local goto_id = world:entity() :: t.Entity
+	local key = props.key
+	local next_id = key_map[key]
+	if next_id == nil then
+		error(`Could not find the key speciifed, verify that it exists`)
+	end
+
 	world:set(goto_id, c.Parent, parent)
-	world:set(goto_id, c.DialogueGoto, props.target)
+	world:add(goto_id, c.DialogueGoto)
+	world:add(goto_id, pair(c.Next, next_id))
 	world:add(parent, pair(c.Next, goto_id))
 	return goto_id
+
+	-- This is typically the leaf node
 end
 
 -- WE will need to create other things like create_response etc as well
-function build_choices(parent: t.Entity, props: TABLE)
-	local container_id = create_choicecontainer(parent)
+function build_choices(parent: t.Entity, props: TABLE, key_map)
+	local container_id = create_choicecontainer(parent, key_map)
 	for _, choice in ipairs(props) do
-		local choice_id = create_choice(container_id, choice)
+		local choice_id = create_choice(container_id, choice, key_map)
 		local num_of_children = #choice.props
 
 		if num_of_children > 1 then
-			build_choices(choice_id, choice.props)
+			build_choices(choice_id, choice.props, key_map)
 		else
 			local _, choice_nextnode = next(choice.props)
-			build_dialogue_tree(choice_id, choice_nextnode)
+			build_dialogue_tree(choice_id, choice_nextnode, key_map)
 		end
 	end
 
 	return
 end
 
-function build_dialogue_tree(parent, node)
+function build_dialogue_tree(parent, node, key_map)
 	if not node or typeof(node) == "function" or not node.props then
 		return parent
 	end
 
 	local _, next_node = next(node.props)
 	if is_response(node) then
-		local response_id = create_response(parent, node.props.text)
+		local response_id = create_response(parent, node.props, key_map)
 
 		local num_of_children = #node.props
 		if num_of_children > 1 then
-			build_choices(response_id, node.props)
-			warn(`completed creating choices... verify it first`)
+			build_choices(response_id, node.props, key_map)
 		else
-			return build_dialogue_tree(response_id, next_node)
+			return build_dialogue_tree(response_id, next_node, key_map)
 		end
 	elseif is_callback(node) then
-		local callbackid = create_callback(parent, node.func)
+		local callbackid = create_callback(parent, node.func, key_map)
 		local num_of_children = #node.props
 		if num_of_children > 1 then
-			build_choices(callbackid, node.props)
+			build_choices(callbackid, node.props, key_map)
 		else
-			return build_dialogue_tree(callbackid, next_node)
+			return build_dialogue_tree(callbackid, next_node, key_map)
 		end
 	elseif is_if(node) then
-		warn(`IF Dialgoue is not created yet`)
-		return create_if(parent, node.check, node.success, node.failure)
+		return create_if(parent, node.check, node.success, node.failure, key_map)
 	elseif is_goto(node) then
-		error(`GOTO dialogue is not created yet`)
-		return create_goto(parent, node.props)
+		return create_goto(parent, node.props, key_map)
 	else
 		error(`SHouldn't reach here`)
 	end
@@ -207,10 +220,11 @@ end
 
 local function DIALOGUE(props: TABLE & { key: string })
 	local root = world:entity() :: t.Entity
+	local key_map = {} :: { [string]: t.Entity }
 
 	-- Add some configuration here
 	local _, next_props = next(props)
-	local _ = build_dialogue_tree(root, next_props)
+	local _ = build_dialogue_tree(root, next_props, key_map)
 
 	return root
 end

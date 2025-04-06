@@ -19,7 +19,12 @@ export type Tag = Entity
 export type DeliveryOrderStatus = "NotPickedUp" | "PickedUp" | "Delivered"
 export type Source<T> = vide.Source<T>
 export type Can<T> = T | (() -> T)
-export type GamePages = "HudScreen" | "PhoneScreen" | "RouberScreen" | "DialogueScene"
+export type GamePages =
+	"HudScreen"
+	| "PhoneScreen"
+	| "RouberScreen"
+	| "DialogueScene"
+	| "BackpackScreen"
 export type RouberScreenPages = "My Orders" | "Orders" | "My Profile"
 
 export type BuildingRemoteParams = {
@@ -220,6 +225,8 @@ export type FoodConfigType = {
 
 	-- Ensuring we don't type anything else while we create out config
 	[string]: { __sealed_table: true },
+
+	items: { Entity },
 }
 
 export type RestaurantFoodConfigType = {
@@ -287,6 +294,15 @@ export type ItemConfigType = {
 
 	base_price: number,
 	rarity: number,
+}
+
+export type BackpackItemType = {
+	count: number,
+}
+
+export type BackpackEnumConfigType = {
+	furnishing: number,
+	items: number,
 }
 
 return greentea

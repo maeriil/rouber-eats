@@ -19,4 +19,5 @@ return {
 	residence_owner_map = {} :: EntityTable,
 	food_map = {} :: EntityTable,
 	store_map = {} :: EntityTable,
+	item_map = {} :: EntityTable,
 }

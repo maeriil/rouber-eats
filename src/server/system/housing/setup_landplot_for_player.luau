@@ -50,7 +50,7 @@ local request_create_house = serverevents.Building.create_house
 local function system()
 	for plot_id, player_tp_cf, exterior_doormat_cf, client_id in empty_land:iter() do
 		local player = world:get(client_id, c.Client) :: Player
-		local character = clone_player_character(player, client_id)
+		local character = clone_player_character(player, client_id :: types.Entity)
 		local datastore = playerdatastore[player]
 		local is_npc = false
 		local house_type = datastore.housetype

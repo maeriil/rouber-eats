@@ -12,6 +12,7 @@ local function system()
 	for _, player in response_restaurant_setup.iter() do
 		local store = playersetupconfig[player]
 		store.restaurant_setup.client_completed = true
+		store.order_setup.client_completed = true
 	end
 end
 

@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local test_part_1 = require(ReplicatedStorage.common.configs.items.test_part_1)
 local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 
@@ -16,6 +17,9 @@ local food: types.FoodConfigType = {
 
 	-- Conditions
 	can_be_hot = false,
+	items = {
+		test_part_1.id,
+	},
 }
 
 return food

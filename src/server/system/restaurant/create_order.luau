@@ -253,6 +253,8 @@ local function create_orders(list: { Player })
 			order_tier = selected_order_tier,
 		}
 
+		warn(`[SERVER ORDER]: Created an order with entity id {order_id}`)
+
 		-- Coins reward should be created with some formula using the rarity of
 		-- restaurant + foods + house + order combnined
 		local coins_reward = determine_coins_amount(client, is_high_tier, selected_order_tier)

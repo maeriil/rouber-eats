@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- local DoorProximity = require(script.features.Proximity.Attaching.DoorProximity)
+local BackpackScreen = require(script.pages.BackpackScreen)
 local DialogueProximity = require(script.features.Proximity.DialogueProximity)
 local DialogueScene = require(script.pages.DialogueScene)
 local DoorProximity = require(script.features.Proximity.DoorProximity)
@@ -77,6 +78,7 @@ local function root(): { any }
 	local phone: types.GamePages = "PhoneScreen"
 	local rouber: types.GamePages = "RouberScreen"
 	local dialoguescene: types.GamePages = "DialogueScene"
+	local backpack: types.GamePages = "BackpackScreen"
 
 	local alldoors = uistore.DoorProximity
 	local all_dialogues = uistore.DialogueProximity
@@ -144,6 +146,9 @@ local function root(): { any }
 				end,
 				[dialoguescene] = function()
 					return DialogueScene {}
+				end,
+				[backpack] = function()
+					return BackpackScreen {}
 				end,
 			},
 		},

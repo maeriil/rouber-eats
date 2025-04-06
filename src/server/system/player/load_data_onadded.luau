@@ -7,6 +7,7 @@ local playerstore = require(ServerScriptService.server.store.playerstore)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local phases = require(ReplicatedStorage.common.ecs.phases)
+local ref = require(ReplicatedStorage.common.ecs.ref)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -21,6 +22,12 @@ local function load_data(player: Player)
 		total_orders_stolen = 0,
 		total_orders_altered = 0,
 	}
+
+	local client_id = ref(player)
+	world:set(client_id, c.Backpack, {
+		items = {},
+		slot_kind = 1,
+	})
 
 	return
 end

@@ -7,9 +7,11 @@ export type create_server<T...> = {
 
 local function create_client<T...>(remote: RemoteEvent)
 	local queue = {}
-	remote.OnClientEvent:Connect(function(...: any)
+	local connection = remote.OnClientEvent:Connect(function(...: any)
 		table.insert(queue, { ... })
 	end)
+
+	-- warn(`SETUP ONCLIENTEVENT CONNECTION {connection} for {remote.Name}`)
 
 	return {
 		iter = function(): () -> (number, T...)
@@ -29,7 +31,7 @@ end
 
 local function create_server<T...>(remote: RemoteEvent)
 	local queue = {} :: any
-	remote.OnServerEvent:Connect(function(player, ...: any)
+	local connection = remote.OnServerEvent:Connect(function(player, ...: any)
 		table.insert(queue, { player, ... })
 	end)
 
@@ -40,7 +42,7 @@ local function create_server<T...>(remote: RemoteEvent)
 				index += 1
 				local last_args = table.remove(queue)
 				if last_args ~= nil then
-					return index, unpack(last_args) :: any
+					return index, unpack(last_args)
 				end
 
 				return

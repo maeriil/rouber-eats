@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BackpackIconButton = require(ReplicatedStorage.client.app.features.Icons.BackpackIconButton)
 local RouberPhone = require(ReplicatedStorage.client.app.features.RouberPhone)
 local TaxiButton = require(ReplicatedStorage.client.app.features.Icons.TaxiButton)
+local basefont = require(ReplicatedStorage.common.configs.gamefont.basefont)
 local change_page = require(ReplicatedStorage.client.app.utility.change_page)
 local flexfill = require(ReplicatedStorage.client.app.components.flex.flexfill)
 local frame = require(ReplicatedStorage.client.app.components.pane.frame)
@@ -8,6 +10,7 @@ local next_order = require(ReplicatedStorage.common.utility.next_order)
 local padding = require(ReplicatedStorage.client.app.components.padding)
 local padding_types = require(ReplicatedStorage.client.app.components.padding.padding_types)
 local pane = require(ReplicatedStorage.client.app.components.pane.pane)
+local uistore = require(ReplicatedStorage.client.app.uistore)
 local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local vide = require(ReplicatedStorage.pkg.vide)
 local vlayout = require(ReplicatedStorage.client.app.components.layouts.vlayout)
@@ -42,6 +45,22 @@ local function PhoneScreen(props)
 				end,
 				color = Color3.fromRGB(0, 255, 0),
 				order = order(),
+
+				--//TODO: we should revamp this and make it cleaner
+				create "TextLabel" {
+					FontFace = basefont.font,
+					RichText = true,
+					BackgroundTransparency = 1,
+					Size = function()
+						return UDim2.new(1, 0, 1, 0)
+					end,
+					Text = function()
+						return `<b>Rating=<i>{uistore.MyRating()}</i>/5</b>`
+					end,
+					TextSize = function()
+						return px(36)
+					end,
+				},
 			},
 			frame {
 				name = "phone-profile-bar",
@@ -79,6 +98,12 @@ local function PhoneScreen(props)
 				TaxiButton {
 					click = function()
 						change_page("RouberScreen")
+					end,
+					order = order,
+				},
+				BackpackIconButton {
+					click = function()
+						change_page("BackpackScreen")
 					end,
 					order = order,
 				},

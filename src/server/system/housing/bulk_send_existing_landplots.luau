@@ -88,11 +88,11 @@ local client_house_details_query = world
 	:cached()
 local request_bulk_create_houses = serverevents.Building.bulk_create_house
 local function bulk_send_house_details_to_new_players(players: { Player })
-	local house_serverid_list = {} :: { t.Entity }
+	local house_serverid_list = {} :: { t.Entity | t.Id }
 	local house_exteriordoormat_list = {} :: { CFrame }
 	local house_interiormodel_list = {} :: { Model }
 	local house_type_list = {} :: { string }
-	local house_owner_id_list = {} :: { t.Entity }
+	local house_owner_id_list = {} :: { t.Entity | t.Id }
 
 	for house_id, house_type, exterior_id, interior_id, parent_id, owner_id in
 		npc_house_details_query:iter()
@@ -134,15 +134,6 @@ local function bulk_send_house_details_to_new_players(players: { Player })
 	end
 
 	for i, player in players do
-		-- events.BulkCreateHouses
-		-- 	:send(
-		-- 		house_serverid_list,
-		-- 		house_exteriordoormat_list,
-		-- 		house_interiormodel_list,
-		-- 		house_type_list,
-		-- 		house_owner_id_list
-		-- 	)
-		-- 	:to(player)
 		request_bulk_create_houses.fire(
 			player,
 			house_serverid_list :: never,

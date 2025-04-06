@@ -25,9 +25,6 @@ CollectionService:GetInstanceAddedSignal(tags.Store):Connect(function(instance: 
 	local client_id_attribute = instance:GetAttribute(attributes.clientid)
 
 	if client_id_attribute == nil then
-		warn(
-			`Client attribute isn't set yet, which means this ({instance.Name}) is a new item. Setting it up`
-		)
 		table.insert(instance_added, instance)
 	end
 end)
@@ -131,6 +128,8 @@ local function setup_store_to_client(store_folder: Folder, interior: Model, exte
 		item.PrimaryPart:SetAttribute(attributes.clientid, item_id)
 
 		basepartmap[item.PrimaryPart] = item_id
+		clientgamedata.item_map[item_id] = details
+		server_id_map.item_map[item_server_id] = item_id
 	end
 
 	interior:SetAttribute(attributes.clientid, parent_id)
@@ -189,7 +188,7 @@ local function system()
 			`Interior must contain a folder called items`
 		)
 
-		warn(`Client-sided, Setting up the store {store_name}`)
+		print(`Client-sided, Setting up the store {store_name}`)
 		setup_store_to_client(folder, interior, exterior)
 
 		instance_added[i] = nil

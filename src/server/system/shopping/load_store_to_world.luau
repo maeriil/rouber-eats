@@ -144,6 +144,7 @@ local function setup_interior_exterior_store()
 
 			item:SetAttribute(attributes.serverid, item_id)
 			item.PrimaryPart:SetAttribute(attributes.serverid, item_id)
+			gamedata.item_map[item_id] = details
 		end
 	end
 end

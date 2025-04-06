@@ -48,6 +48,7 @@ local function delete_invalid_vacant_orders()
 	-- end
 
 	for order_id, details in invalid_vacant_query:iter() do
+		warn(`Found Invalid order, deleteing {order_id}`)
 		local client_id = world:target(order_id, c.Client) :: t.Entity
 		local client = world:exists_get(client_id, c.Client)
 

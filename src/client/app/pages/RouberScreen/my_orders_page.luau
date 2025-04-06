@@ -36,6 +36,7 @@ local function my_orders(props: {
 					local details = orders_list[selected_key]
 					-- warn(`dispatching the order id to event queue...`)
 					eventqueue.dispatch_order_accept(details.order_id)
+					selected("")
 				end,
 				details = function()
 					local content = orderlist()[selected()]

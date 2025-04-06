@@ -16,6 +16,8 @@ local food: types.FoodConfigType = {
 
 	-- Conditions
 	can_be_hot = true,
+
+	items = {},
 }
 
 return food

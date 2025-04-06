@@ -1,0 +1,41 @@
+{
+  "ClassName": "Folder",
+  "Children": [
+    {
+      "Name": "teleport",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "item_added",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "item_removed",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "restaurant_pickup_order",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "restaurant_steal_order",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "restaurant_deliver_order",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "restaurant_alter_order",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "restaurant_complete_order",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "player_rating_change",
+      "ClassName": "RemoteEvent"
+    }
+  ]
+}

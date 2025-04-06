@@ -15,7 +15,7 @@ local __ = jecs.Wildcard
   that isn't claimed by any other players
 ]]
 local vacant_plot_query = world:query(c.LandPlot):with(c.Vacant):without():cached()
-local function claim_vacant_landplot(player_id: t.Entity)
+local function claim_vacant_landplot(player_id: t.Entity | t.Id)
 	local n = 0
 	for plot_id in vacant_plot_query:iter() do
 		n += 1
@@ -36,7 +36,7 @@ end
 ]]
 local plot_owned_by_npc_query =
 	world:query(c.Parent):with(c.House, c.OccupiedByNPC):without(c.Cleanup):cached()
-local function claim_npc_owned_landplot(player_id: t.Entity)
+local function claim_npc_owned_landplot(player_id: t.Entity | t.Id)
 	for house_id, plot_id in plot_owned_by_npc_query:iter() do
 		print("Force removing an existing npc lot and replacing with player")
 		world:add(house_id, c.Cleanup)

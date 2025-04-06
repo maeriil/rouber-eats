@@ -116,7 +116,13 @@ local function cleanup_npc_landplot()
 			`Cleaning up the existing npc landplot and sending it to the following users {players_who_have_completed_setup}`
 		)
 		request_delete_house.fire_list(players_who_have_completed_setup, npc_owner_id :: never)
-		cleanup_the_landplot(house_id, parent, interior_id, exterior_id, npc_owner_id)
+		cleanup_the_landplot(
+			house_id :: t.Entity,
+			parent :: t.Entity,
+			interior_id :: t.Entity,
+			exterior_id :: t.Entity,
+			npc_owner_id :: t.Entity
+		)
 
 		world:remove(parent, c.OccupiedByNPC)
 		world:delete(npc_owner_id)
@@ -140,7 +146,13 @@ local function cleanup_removed_player_landplot()
 			`Cleaning up the players landplot and sending it to the following users {players_who_have_completed_setup}`
 		)
 		request_delete_house.fire_list(players_who_have_completed_setup, player_id :: never)
-		cleanup_the_landplot(house_id, parent, interior_id, exterior_id, player_id)
+		cleanup_the_landplot(
+			house_id :: t.Entity,
+			parent :: t.Entity,
+			interior_id :: t.Entity,
+			exterior_id :: t.Entity,
+			player_id :: t.Entity
+		)
 
 		world:remove(parent, c.OccupiedByPlayer)
 	end

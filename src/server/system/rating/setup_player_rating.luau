@@ -7,6 +7,7 @@ type Entity = types.Entity
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local phases = require(ReplicatedStorage.common.ecs.phases)
+local player_rating_event = require(ReplicatedStorage.common.events.player.player_rating_event)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -20,6 +21,7 @@ local function system()
 		end
 
 		world:set(player_id, c.Rating, data.rating)
+		player_rating_event.to_client(client, data.rating, false)
 	end
 end
 

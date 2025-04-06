@@ -170,7 +170,7 @@ local components = {
 	DialogueIf = world:component() :: t.Id<() -> boolean>,
 	DialogueSuccess = world:entity() :: t.Entity,
 	DialogueFailure = world:entity() :: t.Entity,
-	DialogueGoto = world:component() :: t.Id,
+	DialogueGoto = world:entity() :: t.Entity,
 	DialogueText = world:component() :: t.Id<string | (() -> string)>,
 	DialogueKey = world:component() :: t.Id<string>,
 	DialogueAuthor = world:component() :: t.Id<string>,
@@ -213,7 +213,20 @@ local components = {
 	Invalid = world:entity() :: t.Entity,
 
 	Item = world:entity() :: t.Entity,
+	Backpack = world:component() :: t.Id<{
+		items: {
+			[t.Entity]: {
+				count: number,
+			},
+		},
+		slot_kind: number,
+	}>,
+	BackpackItem = world:component() :: t.Id<t.Array<{
+		item_id: t.Entity | t.Id,
+		count: number,
+	}>>,
 }
+
 do
 	-- Because luau is ass
 	local comp_to_iterate = (components :: unknown) :: { [string]: t.Entity | t.Entity<nil> }

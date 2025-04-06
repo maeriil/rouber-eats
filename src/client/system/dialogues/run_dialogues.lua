@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local go_back_page = require(ReplicatedStorage.client.app.utility.go_back_page)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local p = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local t = require(ReplicatedStorage.types)
 local uistore = require(ReplicatedStorage.client.app.uistore)
@@ -41,7 +40,7 @@ local function on_dialogue_started()
 	configs.action_completed = true
 
 	uistore.DialogueAuthor(author)
-	uistore.MyDialogueId(my_id)
+	uistore.MyDialogueId(my_id :: t.Entity)
 	world:remove(my_id, c.Start)
 end
 
@@ -154,6 +153,10 @@ local function queue_next_dialogue_options()
 		world:set(condition_id, c.BoolFuture, futured)
 		world:set(condition_id, pair(c.EntityId, c.DialogueIf), next_id)
 		world:set(condition_id, pair(c.EntityId, c.MyDialogue), my_id)
+	elseif world:has(next_id, c.DialogueCallback) then
+		world:add(my_id, c.DialogueCallback)
+	elseif world:has(next_id, c.DialogueGoto) then
+		world:add(my_id, c.DialogueGoto)
 	end
 
 	configs.system_completed = false
@@ -245,12 +248,41 @@ local function display_choices_to_ui()
 	configs.action_completed = false
 end
 
+local my_dialogue_callback = world:query(c.MyDialogue):with(c.DialogueCallback):cached()
+local function run_callback()
+	local it = my_dialogue_callback:iter()
+	local my_id, configs = it()
+	if not my_id or configs.system_completed then
+		return
+	end
+
+	local callback = world:exists_get(configs.current_position, c.DialogueCallback)
+	callback()
+
+	configs.system_completed = true
+	configs.action_completed = true
+end
+
+local my_dialogue_goto = world:query(c.MyDialogue):with(c.DialogueGoto):cached()
+local function run_goto()
+	local it = my_dialogue_goto:iter()
+	local my_id, configs = it()
+	if not my_id or configs.system_completed then
+		return
+	end
+
+	configs.system_completed = true
+	configs.action_completed = true
+end
+
 local function system()
 	on_dialogue_started()
 	queue_next_dialogue_options()
 	poll_dialogue_condition()
 	display_response_to_ui()
 	display_choices_to_ui()
+	run_callback()
+	run_goto()
 	on_dialogue_cleanup()
 end
 

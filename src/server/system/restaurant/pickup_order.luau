@@ -3,14 +3,13 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local playerstore = require(ServerScriptService.server.store.playerstore)
-local serverevents = require(ServerScriptService.server.serverevents)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local t = require(ReplicatedStorage.types)
 local pair = jecs.pair
-local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
+local pickup_order_event = require(ReplicatedStorage.common.events.restaurant.pickup_order_event)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -23,13 +22,20 @@ local __ = jecs.Wildcard
 ]]
 local function end_with_failure(player: Player, message: string)
 	warn(`The server failed, with message = {message}`)
-	return serverevents.RouberOrders.pickup_order_response.fire(player, false, -1, message)
+	pickup_order_event.to_client(player, {
+		success = false,
+		error_msg = message,
+	})
 end
 
-local function try_pickup_order_request(player: Player, restaurant_id: t.Entity)
+local function try_pickup_order_request(player: Player, restaurant_id: t.Entity?)
 	local player_id = ref(player)
-
-	if not world:contains(restaurant_id) or not world:has(restaurant_id, c.Restaurant) then
+	print(`REstaurant id we got was {restaurant_id}`)
+	if
+		not restaurant_id
+		or not world:contains(restaurant_id)
+		or not world:has(restaurant_id, c.Restaurant)
+	then
 		end_with_failure(player, `Could not find a valid restaurant. Ignoring your request`)
 		return
 	end
@@ -37,7 +43,7 @@ local function try_pickup_order_request(player: Player, restaurant_id: t.Entity)
 	if not world:has(player_id, c.IsWorking) then
 		end_with_failure(
 			player,
-			`You are curren't not working! There is no way you have accepted orders!`
+			`You are currently not working! There is no way you have accepted orders!`
 		)
 		return
 	end
@@ -50,6 +56,7 @@ local function try_pickup_order_request(player: Player, restaurant_id: t.Entity)
 		if details.restaurant_id ~= restaurant_id then
 			continue
 		end
+		warn(`Found a valid order!, adding details..`)
 
 		-- If it is, here, we need to move it to picked up, then we will let client know
 		-- it was valid
@@ -59,23 +66,28 @@ local function try_pickup_order_request(player: Player, restaurant_id: t.Entity)
 		table.remove(store.my_accepted_orders, idx)
 		table.insert(store.my_pickedup_orders, my_order_id)
 		warn(`Okay we can go and pickup order for the house {world:get(target_house_id, c.Name)}`)
-		return serverevents.RouberOrders.pickup_order_response.fire(
-			player,
-			true,
-			blink_conv.from_entity(target_house_id)
-		)
+
+		-- Mark this order as being processed
+		world:add(my_order_id, c.WorkingAt)
+
+		pickup_order_event.to_client(player, {
+			success = true,
+			error_msg = ``,
+		})
+		return
 	end
 
 	-- If we do reach here, then it means we did not find it.. So mark it as failed
 
+	warn(`found no order... ending with failure and sending to client..`)
 	end_with_failure(player, `You do not have any orders to pickup!`)
 	return
 end
 
-local function system()
-	for _, player, _restaurant_id in serverevents.RouberOrders.i_want_to_pickup_order.iter() do
-		local restaurant_id = blink_conv.as_entity(_restaurant_id)
+local from_client_event = pickup_order_event.from_client()
 
+local function system()
+	for a, player, restaurant_id in from_client_event.iter() do
 		try_pickup_order_request(player, restaurant_id)
 	end
 end

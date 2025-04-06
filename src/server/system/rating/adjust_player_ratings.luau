@@ -12,6 +12,7 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
 local t = require(ReplicatedStorage.types)
 local pair = jecs.pair
+local player_rating_event = require(ReplicatedStorage.common.events.player.player_rating_event)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -41,7 +42,6 @@ local function increase_rating()
 	for client_id, client, rating, increase_amount in
 		world:query(c.Client, c.Rating, p.IncreaseRating):iter()
 	do
-		warn(`We want to increaes client rating from {rating} by adding {increase_amount}`)
 		local new_rating = rating + increase_amount
 		local curr_int_rating = math.floor(rating)
 		local next_int_rating = math.floor(new_rating)
@@ -69,14 +69,36 @@ local function increase_rating()
 
 		world:set(client_id, c.Rating, new_rating)
 		datastore.rating = new_rating
+		player_rating_event.to_client(client, new_rating, going_next_tier)
 		world:remove(client_id, p.IncreaseRating)
-
-		warn(`Final client rating is {new_rating}`)
 	end
 end
 
+--[[
+	NOTE: A potential game pass idea
+
+	Since steal and maybe some other mechanics can make you lose rating, we could introduce a gamepass
+	or some kind of mechanism that stops the rating from falling any further than the current min threshold
+]]
+
 local function decrease_rating()
-	--//TODO : implement this
+	for client_id, client, rating, decrease_amount in
+		world:query(c.Client, c.Rating, p.DecreaseRating):iter()
+	do
+		local new_rating = rating - decrease_amount
+		local datastore = playerdatastore[client]
+		local curr_int_rating = math.floor(rating)
+		local next_int_rating = math.floor(new_rating)
+		local going_next_tier = curr_int_rating ~= next_int_rating
+
+		assert(new_rating >= 0, `Rating cannot be negative at this point`)
+
+		world:set(client_id, c.Rating, new_rating)
+		datastore.rating = new_rating
+
+		world:remove(client_id, p.DecreaseRating)
+		player_rating_event.to_client(client, new_rating, going_next_tier)
+	end
 end
 
 local function system()

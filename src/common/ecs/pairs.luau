@@ -11,7 +11,7 @@ return {
 	DecreaseCoins = pair(c.Coins, c.Decrease),
 	DecreaseGems = pair(c.Gems, c.Decrease),
 	IncreaseRating = pair(c.Rating, c.Increase),
-	DecreaseRating = pair(c.Rating, c.Increase),
+	DecreaseRating = pair(c.Rating, c.Decrease),
 
 	DoNotUpdateModel = pair(c.DoNotReconcile, c.Model),
 

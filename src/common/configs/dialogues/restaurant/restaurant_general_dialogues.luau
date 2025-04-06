@@ -1,17 +1,22 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local alter_order_event = require(ReplicatedStorage.common.events.restaurant.alter_order_event)
 local attributes = require(ReplicatedStorage.types.attributes)
-local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
-local clientevents = require(ReplicatedStorage.common.clientevents)
 local components = require(ReplicatedStorage.common.ecs.components)
 local create_dialogue = require(ReplicatedStorage.common.utility.create_dialogue)
+local deliver_order_event = require(ReplicatedStorage.common.events.restaurant.deliver_order_event)
 local luausignal = require(ReplicatedStorage.common.utility.luausignal)
+local pickup_order_event = require(ReplicatedStorage.common.events.restaurant.pickup_order_event)
+local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
+local steal_order_event = require(ReplicatedStorage.common.events.restaurant.steal_order_event)
 local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 
 local DIALOGUE = create_dialogue.DIALOGUE
+local CALLBACK = create_dialogue.CALLBACK
 local CHOICE = create_dialogue.CHOICE
 local RESPONSE = create_dialogue.RESPONSE
 local IF = create_dialogue.IF
+local GOTO = create_dialogue.GOTO
 
 local key = "restaurant_general"
 
@@ -19,7 +24,9 @@ type props = {
 	npc: Model,
 }
 
-local verify_order_signal: luausignal.Identity<boolean, string?> = luausignal()
+local verify_order_signal: luausignal.Identity<boolean, string> = luausignal()
+local steal_success_signal: luausignal.Identity<boolean, string> = luausignal()
+local alter_success_signal: luausignal.Identity<boolean, string> = luausignal()
 
 local function dialogue(props: props)
 	local npc_name = props.npc.Name
@@ -32,25 +39,26 @@ local function dialogue(props: props)
 	]]
 	local npc_folder = props.npc.Parent :: Folder
 	local interior = npc_folder.Parent :: Model
-	local server_house_id = interior:GetAttribute(attributes.serverid) :: types.Entity?
+	local server_restaurant_id = interior:GetAttribute(attributes.serverid) :: types.Entity?
 
-	if server_house_id == nil then
+	if server_restaurant_id == nil then
 		error(
 			`We could not find a server entity id on the model... This is definitely not right either`
 		)
 	else
-		warn(`LMAO we found the server id, this is hacky though, don't do this...`)
+		warn(`LMAO we found the server id, this is hacky though, {server_restaurant_id}`)
 	end
 
+	local client_mapped = server_id_map.restaurant_map[server_restaurant_id]
 	local error_msg_handling = ``
+	local restaurant_name = world:exists_get(client_mapped, components.Name)
 
-	local function create_awaiting_server_verification(restuarant_id: types.Entity)
+	local function select_choice_to_steal()
 		return function()
-			clientevents.RouberOrders.i_want_to_pickup_order.fire(blink_conv.from_entity(restuarant_id))
+			steal_order_event.to_server()
 
-			local res, msg = verify_order_signal:wait()
-			warn(`We recieved the results in signal as {res}, and msg as {msg}`)
-			if msg then
+			local res, msg = steal_success_signal:wait()
+			if not res then
 				error_msg_handling = msg
 			end
 
@@ -58,10 +66,38 @@ local function dialogue(props: props)
 		end
 	end
 
-	local restaurant_name = `Tim Horton's`
-	local function select_choice_to_steal() end
-	local function select_choice_to_tamper() end
-	local function select_choice_to_deliver() end
+	local function select_choice_to_tamper()
+		return function()
+			alter_order_event.to_server()
+
+			local res, msg = alter_success_signal:wait()
+			if not res then
+				error_msg_handling = msg
+			end
+
+			return res
+		end
+	end
+
+	local function select_choice_to_deliver()
+		-- This is by default should just be a callback function, that is, there is no need
+		-- to await for server verification
+
+		deliver_order_event.to_server()
+	end
+
+	local function await_server_pickup_verification(restaurant_id: types.Entity)
+		return function()
+			pickup_order_event.to_server(restaurant_id)
+
+			local res, msg = verify_order_signal:wait()
+			if not res then
+				error_msg_handling = msg
+			end
+
+			return res
+		end
+	end
 
 	local dialogue_id = DIALOGUE {
 		key = key,
@@ -69,6 +105,7 @@ local function dialogue(props: props)
 			text = `Welcome to {restaurant_name}!`,
 			RESPONSE {
 				text = `How can I help you today?`,
+				key = "root_goto",
 				CHOICE {
 					text = `I'm just browsing for now!`,
 					RESPONSE {
@@ -77,49 +114,79 @@ local function dialogue(props: props)
 				},
 				CHOICE {
 					text = `Here to pickup my order!`,
-					IF(create_awaiting_server_verification(server_house_id)) {
+					IF(await_server_pickup_verification(server_restaurant_id)) {
 						success = {
 							RESPONSE {
 								text = function()
-									return `Yup, everything looks correc! Here is the order!`
+									return `Yup, everything looks correct! Here is the order!`
 								end,
-								CHOICE {
-									text = `Perfect. Going to deliver this right away!`,
-									RESPONSE {
-										text = `Sounds good! Thanks and have a great day!`,
-									},
-								},
-								CHOICE {
-									text = `Actually, I know the owner and they told me to modify this slightly`,
-									RESPONSE {
-										text = `Did they really say that?`,
-										CHOICE {
-											text = `Yes. I am sure`,
-											--//TODO: IMPLEMENT Callback here
+								RESPONSE {
+									text = `What would you like to do with it?`,
+									key = `choice_goto`,
+									CHOICE {
+										text = `Perfect. Going to deliver this right away!`,
+										CALLBACK(select_choice_to_deliver) {
 											RESPONSE {
-												text = `Fair enough, here is your order! Have a great day!`,
+												text = `Sounds good! Thanks and have a great day!`,
 											},
 										},
-										CHOICE {
-											text = `No, I would like to rethink my decision`,
-											--//TODO: IMPLEMENT GOTO HERE
-										},
 									},
-								},
-								CHOICE {
-									text = `I spoke with the owner and they told me I can keep it!`,
-									RESPONSE {
-										text = `Are you sure? You cannot change this decision`,
-										CHOICE {
-											text = `Yes. I am sure`,
-											--//TODO: IMPLEMENT Callback here
-											RESPONSE {
-												text = `Fair enough, here is your order! Have a great day!`,
+									CHOICE {
+										text = `I spoke with the owner and they told me I can keep it!`,
+										RESPONSE {
+											text = `Did they really say that?`,
+											CHOICE {
+												text = `Yes. I am sure`,
+												IF(select_choice_to_steal()) {
+													success = {
+														RESPONSE {
+															text = `Fair enough, here is your order! Have a great day!`,
+														},
+													},
+													failure = {
+														RESPONSE {
+															text = function()
+																return `No you do not! {error_msg_handling}`
+															end,
+														},
+													},
+												},
+											},
+											CHOICE {
+												text = `No, I would like to rethink my decision...`,
+												GOTO {
+													key = "choice_goto",
+												},
 											},
 										},
-										CHOICE {
-											text = `No, I would like to rethink my decision`,
-											--//TODO: IMPLEMENT GOTO HERE
+									},
+									CHOICE {
+										text = `I spoke with the owner and they told me change it up slightly`,
+										RESPONSE {
+											text = `Are you sure? You cannot change this decision`,
+											CHOICE {
+												text = `Yes. I am sure`,
+												IF(select_choice_to_tamper()) {
+													success = {
+														RESPONSE {
+															text = `Fair enough, here is your order! I will show you to the kitchen`,
+														},
+													},
+													failure = {
+														RESPONSE {
+															text = function()
+																return `No you do not! {error_msg_handling}`
+															end,
+														},
+													},
+												},
+											},
+											CHOICE {
+												text = `No, I would like to rethink my decision...`,
+												GOTO {
+													key = "choice_goto",
+												},
+											},
 										},
 									},
 								},
@@ -146,4 +213,6 @@ return {
 	key = key,
 	dialogue = dialogue,
 	verify_order_signal = verify_order_signal,
+	steal_success_signal = steal_success_signal,
+	alter_success_signal = alter_success_signal,
 }

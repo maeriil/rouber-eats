@@ -7,13 +7,13 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local ref = require(ReplicatedStorage.common.ecs.ref)
+local teleport_player_event = require(ReplicatedStorage.common.events.teleport_player_event)
 local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local teleport = world:query(c.Model, c.TeleportTo, c.PrimaryPart):without(p.TPCooldown):cached()
 local teleport_event = serverevents.Building.IWantToTeleportInOrOut
-local events = ReplicatedStorage.common.events
 
 local function system()
 	for _, player, _building_id, curr_building in teleport_event.iter() do
@@ -21,7 +21,11 @@ local function system()
 		if not building_id or not world:contains(building_id) then
 			local error_msg = `The specified building id = {building_id} does not exist. Aborting request`
 			warn(error_msg)
-			events.teleport:FireClient(player, false, error_msg)
+			-- events.teleport:FireClient(player, false, error_msg)
+			teleport_player_event.to_client(player, {
+				success = false,
+				error_msg = error_msg,
+			})
 			continue
 		end
 
@@ -42,11 +46,19 @@ local function system()
 		if going_interior then
 			local destination = world:get(interior_id, c.Transform) :: CFrame
 			world:set(e, c.TeleportTo, destination)
-			events.teleport:FireClient(player, true, nil, true, building_id)
+
+			teleport_player_event.to_client(player, {
+				success = true,
+				error_msg = "",
+			}, building_id, true)
 		else
 			local destination = world:get(exterior_id, c.Transform) :: CFrame
 			world:set(e, c.TeleportTo, destination)
-			events.teleport:FireClient(player, true, nil, false, building_id)
+
+			teleport_player_event.to_client(player, {
+				success = true,
+				error_msg = "",
+			}, building_id, false)
 		end
 	end
 

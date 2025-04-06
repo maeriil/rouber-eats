@@ -45,15 +45,8 @@ local function add_order_to_world(
 
 	local client_restaurant_id = find_valid_client_restaurant_id(restaurant_id)
 	local client_destination_id = find_valid_client_destination_id(destination_id)
-
-	print(`client restaurant id = {client_restaurant_id}`)
-	print(`server destination id = {client_destination_id}`)
-
 	local server_food_list = _details.foods_list_id
 	local server_cond_list = _details.conditions_list_id
-
-	print(server_food_list)
-	print(server_cond_list)
 
 	local coins = _rewards.coins
 	local gems = _rewards.gems
@@ -83,24 +76,23 @@ local function add_order_to_world(
 end
 
 local function create_order_to_world()
-	for _, server_id_list, details_list, reward_list in
-		clientevents.RouberOrders.bulk_create_order.iter()
-	do
-		local n = #server_id_list
-		warn(`Bulk creating {n} delivery orders in the client...`)
-		for i = 1, n do
-			local server_id = server_id_list[i]
-			local details = details_list[i]
-			local reward = reward_list[i]
+	-- Bulk creating is no longer necessary
+	-- for _, server_id_list, details_list, reward_list in
+	-- 	clientevents.RouberOrders.bulk_create_order.iter()
+	-- do
+	-- 	local n = #server_id_list
+	-- 	for i = 1, n do
+	-- 		local server_id = server_id_list[i]
+	-- 		local details = details_list[i]
+	-- 		local reward = reward_list[i]
 
-			add_order_to_world(server_id, details, reward)
-		end
+	-- 		add_order_to_world(server_id, details, reward)
+	-- 	end
 
-		clientevents.PlayerEvents.i_have_bulk_created_orders_initially.fire()
-	end
+	-- 	clientevents.PlayerEvents.i_have_bulk_created_orders_initially.fire()
+	-- end
 
 	for _, server_id, details, reward in clientevents.RouberOrders.create_order.iter() do
-		warn(`Create order called...`)
 		add_order_to_world(server_id, details, reward)
 	end
 end
@@ -110,11 +102,15 @@ local vacant_orders_query =
 local function display_orders_to_ui()
 	local orders_map = {} :: { [string]: types.DeliveryOrderType }
 
-	for client_id, details, server_id, coins, gems in vacant_orders_query:iter() do
+	-- for client_id, details, server_id, coins, gems in vacant_orders_query:iter() do
+	for client_id, details, server_id, coins, gems in
+		world:query(c.DeliveryOrderDetails, c.EntityId, c.Coins, c.Gems):with(c.Vacant):iter()
+	do
 		local key = tostring(server_id)
-		local restaurant_id = details.restaurant_id
+		-- print(`building the key = {key} with client_id = {client_id}`)
+		local restaurant_id = details.restaurant_id :: t.Entity
 		local food_list = details.foods_list_id
-		local house_id = details.destination_id
+		local house_id = details.destination_id :: t.Entity
 		local conditions = details.conditions_list_id
 
 		local foods_list_display_type = {} :: { t.DeliveryOrderFoodType }
@@ -160,7 +156,7 @@ local function display_orders_to_ui()
 			order_id = client_id :: t.Entity,
 			-- We have not worked on this yet
 			order_rating = details.order_tier,
-			restaurant_address = "W.I.P address",
+			restaurant_address = `debug-orderid={client_id}, vacant={world:has(client_id, c.Vacant)}`,
 			restaurant_image = client_restuarant_details.display_image,
 			restaurant_name = client_restuarant_details.display_name,
 			reward_amount = coins,
@@ -183,7 +179,6 @@ local function mark_order_as_claimed()
 				continue
 			end
 
-			warn(`MAKRING IT AS CLAIMED NOW SO WE REMOVED VACANT!!!`)
 			world:remove(client_order_id, c.Vacant)
 		end
 	end
