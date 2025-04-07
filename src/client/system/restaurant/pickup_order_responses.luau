@@ -14,7 +14,6 @@ local __ = jecs.Wildcard
 local from_server_verification = pickup_order_event.from_server()
 local function system()
 	for _, status in from_server_verification.iter() do
-		print(`GOT STATUS {status.success} with msg {status.error_msg}`)
 		restaurant_general_dialogues.verify_order_signal:fire(status.success, status.error_msg)
 	end
 end

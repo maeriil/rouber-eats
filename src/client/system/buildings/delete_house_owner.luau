@@ -5,8 +5,6 @@ local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
-local get_client_owner_id_from_serverid =
-	require(ReplicatedStorage.common.utility.get_client_owner_id_from_serverid)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)

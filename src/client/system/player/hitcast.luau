@@ -1,8 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local basepartmap = require(ReplicatedStorage.client.store.basepartmap)
-local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local c = require(ReplicatedStorage.common.ecs.components)
-local clientevents = require(ReplicatedStorage.common.clientevents)
 local complete_order_event =
 	require(ReplicatedStorage.common.events.restaurant.complete_order_event)
 local gizmo = require(ReplicatedStorage.common.utility.gizmo)
@@ -52,6 +50,8 @@ local cached = world
 	:with(c.Client)
 	:without(c.IsCutscenePlaying)
 	:cached()
+local should_visualize = false
+
 local function system()
 	-- local params, hrp, radius = world:get(c.Client, c.OverParams, c.PrimaryPart, c.Radius)
 	local it = cached:iter()
@@ -65,11 +65,13 @@ local function system()
 	local result = workspace:GetPartBoundsInRadius(current_pos, radius, params)
 	local set = {}
 
-	-- gizmo.sphere.drawWithStyle({
-	-- 	alwaysOnTop = true,
-	-- 	color = Color3.fromRGB(255, 0, 0),
-	-- 	transparency = 0.5,
-	-- }, current_pos, radius)
+	if should_visualize then
+		gizmo.sphere.drawWithStyle({
+			alwaysOnTop = true,
+			color = Color3.fromRGB(255, 0, 0),
+			transparency = 0.5,
+		}, current_pos, radius)
+	end
 
 	for _, instance in result do
 		local id = basepartmap[instance]
@@ -83,15 +85,9 @@ local function system()
 
 			if world:has(id, c.HasOrderToBeDelivered) then
 				local exterior_id = world:parent(id)
-				print(`exterior_id  = {exterior_id}`)
 				local parent_id = world:exists_get(exterior_id, c.Parent)
-				print(`parent_id  = {exterior_id}`)
 
 				local server_parent_id = world:exists_get(parent_id, c.EntityId)
-
-				-- clientevents.RouberOrders.i_want_to_complete_order.fire(
-				-- 	blink_conv.from_entity(server_parent_id)
-				-- )
 				complete_order_event.to_server(server_parent_id :: types.Entity)
 			end
 		end

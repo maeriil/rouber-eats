@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local future = require(ReplicatedStorage.pkg.future)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 
 type Entity<T = nil> = jecs.Entity<T>
 local c = require(ReplicatedStorage.common.ecs.components)

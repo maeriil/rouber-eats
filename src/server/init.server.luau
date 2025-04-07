@@ -20,7 +20,6 @@ do
 	-- require(script.store.serverstore)
 	require(script.store.playersetupconfig)
 	require(ReplicatedStorage.common.configs.job_configs)
-	require(ReplicatedStorage.common.store.buildings)
 end
 
 startup({

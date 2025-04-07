@@ -1,19 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
--- local old_phases = require(script.Parent.phases)
 local phases = require(script.Parent.phases)
 local planck = require(ReplicatedStorage.pkg.planck)
 local planckjabby = require(ReplicatedStorage.pkg.planckjabby)
--- local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
--- local server_phases = require(script.Parent.server_phases)
 local world = require(script.Parent.world)
 
 local jabby_plugin = planckjabby.new()
--- local runservice_plugin = planckrunservice.Plugin.new()
-
--- local client_pipelines = old_phases.Pipelines
--- local server_pipelines = server_phases._pipelines
-
 local scheduler: planck.Scheduler<...any>
 
 local server = phases.Server._pipelines

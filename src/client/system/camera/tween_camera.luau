@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local pairs = require(ReplicatedStorage.common.ecs.pairs)

@@ -1,7 +1,6 @@
 local PathfindingService = game:GetService("PathfindingService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 

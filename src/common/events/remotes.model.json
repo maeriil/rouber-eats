@@ -36,6 +36,10 @@
     {
       "Name": "player_rating_change",
       "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "player_pose",
+      "ClassName": "RemoteEvent"
     }
   ]
 }

@@ -1,11 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local test_part_1 = require(ReplicatedStorage.common.configs.items.test_part_1)
 local vide = require(ReplicatedStorage.pkg.vide)
 
 local types = require(ReplicatedStorage.types)
 type Entity = types.Entity
 type source<T> = vide.Source<T>
 local source = vide.source
+
+--[[
+	Cleanup the file
+]]
 
 local sources = {
 	-- By default, the player is not initially working. When a player is not working and they

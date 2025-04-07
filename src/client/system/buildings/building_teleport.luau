@@ -10,63 +10,18 @@ local teleport_player_event = require(ReplicatedStorage.common.events.teleport_p
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
--- local cast_query =
--- 	world:query(c.CastStatus):with(c.TeleportZone):without(pairs.TPCooldown):cached()
-
 local door_interaction_query = world
 	:query(c.BasePart)
 	:with(c.DoormatZone, c.Interacted)
 	:without(pairs.InteractedCooldown)
 	:cached()
 
+--//TODO: swap over to regular events
 local request_to_teleport = clientevents.Building.IWantToTeleportInOrOut
--- local from_server = {} :: t.Array<{
--- 	status: boolean,
--- 	error_msg: string?,
--- 	going_interior: boolean?,
--- 	house_id: t.Entity?,
--- }>
-
--- events.teleport.OnClientEvent:Connect(function(status, error_msg, going_interior, house_id)
--- 	assert(status and typeof(status) == "boolean", `Status sent to client must be a boolean`)
-
--- 	table.insert(from_server, {
--- 		status = status,
--- 		error_msg = error_msg,
--- 		going_interior = going_interior,
--- 		house_id = house_id,
--- 	})
--- end)
-
 local all_exterior_models = world:query(c.Model):with(c.Exterior):cached()
 local teleport_response = teleport_player_event.from_server()
 
 local function on_server_teleport_handle()
-	-- local n = #from_server
-
-	-- for i = n, 1, -1 do
-	-- 	local details = from_server[i]
-
-	-- 	if not details.status then
-	-- 		warn(details.error_msg)
-	-- 	else
-	-- 		local going_interior = details.going_interior
-
-	-- 		if going_interior then
-	-- 			for _, model in all_exterior_models:iter() do
-	-- 				model.Parent = nil
-	-- 			end
-	-- 		else
-	-- 			-- How do we know what their parent position is? We could keep track of it ig?
-	-- 			for _, model in all_exterior_models:iter() do
-	-- 				model.Parent = workspace
-	-- 			end
-	-- 		end
-	-- 	end
-
-	-- 	from_server[i] = nil
-	-- end
-
 	for _, result, interior_id, going_interior in teleport_response.iter() do
 		if not result.success then
 			warn(result.error_msg)

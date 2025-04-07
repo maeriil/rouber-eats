@@ -17,7 +17,6 @@ do
 
 	require(ReplicatedStorage.common.configs.buildings.buildings_map)
 	require(ReplicatedStorage.common.configs.job_configs)
-	require(ReplicatedStorage.common.store.buildings)
 	require(script.inputs)
 end
 

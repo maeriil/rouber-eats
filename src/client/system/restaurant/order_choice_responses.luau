@@ -20,7 +20,6 @@ local function on_deliver_order()
 	for _, server_house_id in deliver_order_response.iter() do
 		-- this is the house_id we are meant to deliver too
 		-- At here, we want to add details that the house has potential cutscene
-		warn(`we received response to add cutscene...`)
 		local client_house_id = server_id_map.residence_map[server_house_id]
 		if client_house_id == nil then
 			error(

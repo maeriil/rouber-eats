@@ -148,6 +148,10 @@ local function dialogue(props: props)
 															text = function()
 																return `No you do not! {error_msg_handling}`
 															end,
+															--// The order is still marked as in process, so we should force them to deliver it
+															GOTO {
+																key = "choice_goto",
+															},
 														},
 													},
 												},
@@ -177,6 +181,10 @@ local function dialogue(props: props)
 															text = function()
 																return `No you do not! {error_msg_handling}`
 															end,
+															--// The order is still marked as in process, so we should force them to deliver it
+															GOTO {
+																key = "choice_goto",
+															},
 														},
 													},
 												},
