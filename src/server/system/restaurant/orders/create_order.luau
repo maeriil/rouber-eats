@@ -1,5 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+
+local hot_food_condition =
+	require(ReplicatedStorage.common.configs.delivery_conditions.hot_food_condition)
 local gamedata = require(ServerScriptService.server.store.gamedata)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
@@ -249,6 +252,7 @@ local function create_orders(list: { Player })
 			foods_list_id = { selected_food.id },
 			conditions_list_id = {
 				-- Conditions aren't created yet
+				hot_food_condition.entity_id,
 			},
 			order_tier = selected_order_tier,
 		}
@@ -265,7 +269,7 @@ local function create_orders(list: { Player })
 			world:add(order_id, c.HasMysteryBox)
 		end
 
-		world:set(order_id, c.Coins, coins_reward)
+		world:set(order_id, c.Roubins, coins_reward)
 		world:set(order_id, c.Rating, order_base_rating)
 		world:set(order_id, c.Gems, 0)
 		world:add(order_id, pair(c.Client, client_id))

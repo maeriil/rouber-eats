@@ -1,17 +1,21 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
-local jecs = require(ReplicatedStorage.pkg.jecs)
-local phases = require(ReplicatedStorage.common.ecs.phases)
-local playerstore = require(ServerScriptService.server.store.playerstore)
+-- stylua: ignore start
+local ReplicatedStorage          = game:GetService("ReplicatedStorage")
+local ServerScriptService        = game:GetService("ServerScriptService")
 
-local c = require(ReplicatedStorage.common.ecs.components)
-local p = require(ReplicatedStorage.common.ecs.pairs)
-local ref = require(ReplicatedStorage.common.ecs.ref)
-local t = require(ReplicatedStorage.types)
-local pair = jecs.pair
-local pickup_order_event = require(ReplicatedStorage.common.events.restaurant.pickup_order_event)
-local world = require(ReplicatedStorage.common.ecs.world)
-local __ = jecs.Wildcard
+local start_delivery_conditions  = require(ServerScriptService.server.server_utils.start_delivery_conditions)
+local update_delivery_conditions = require(ServerScriptService.server.server_utils.update_delivery_conditions)
+local jecs                       = require(ReplicatedStorage.pkg.jecs)
+local phases                     = require(ReplicatedStorage.common.ecs.phases)
+local playerstore                = require(ServerScriptService.server.store.playerstore)
+local try_pickup_order_event     = require(ReplicatedStorage.common.events.order.try_pickup_order_event)
+
+local c                          = require(ReplicatedStorage.common.ecs.components)
+local p                          = require(ReplicatedStorage.common.ecs.pairs)
+local ref                        = require(ReplicatedStorage.common.ecs.ref)
+local t                          = require(ReplicatedStorage.types)
+local world                      = require(ReplicatedStorage.common.ecs.world)
+local __                         = jecs.Wildcard
+-- stylua: ignore end
 
 --[[
 	This one below is for when a player reaches restaurant and they are trying to pickup their
@@ -22,7 +26,7 @@ local __ = jecs.Wildcard
 ]]
 local function end_with_failure(player: Player, message: string)
 	warn(`The server failed, with message = {message}`)
-	pickup_order_event.to_client(player, {
+	try_pickup_order_event.to_client(player, {
 		success = false,
 		error_msg = message,
 	})
@@ -30,7 +34,6 @@ end
 
 local function try_pickup_order_request(player: Player, restaurant_id: t.Entity?)
 	local player_id = ref(player)
-	print(`REstaurant id we got was {restaurant_id}`)
 	if
 		not restaurant_id
 		or not world:contains(restaurant_id)
@@ -56,35 +59,38 @@ local function try_pickup_order_request(player: Player, restaurant_id: t.Entity?
 		if details.restaurant_id ~= restaurant_id then
 			continue
 		end
-		warn(`Found a valid order!, adding details..`)
-
-		-- If it is, here, we need to move it to picked up, then we will let client know
-		-- it was valid
-		local target_house_id = details.destination_id
 
 		-- Move this from the accepted array to picked up array now
 		table.remove(store.my_accepted_orders, idx)
 		table.insert(store.my_pickedup_orders, my_order_id)
-		warn(`Okay we can go and pickup order for the house {world:get(target_house_id, c.Name)}`)
-
 		-- Mark this order as being processed
 		world:add(my_order_id, c.WorkingAt)
 
-		pickup_order_event.to_client(player, {
+		try_pickup_order_event.to_client(player, {
 			success = true,
 			error_msg = ``,
 		})
+
+		--[[
+			NOTE: We didn't do Delivery conditions creation here. This is a design choice!
+			we should only stop the conditions that were meant to be picked up. But after that
+			the player has a choice on what they want to do. So we should be creating it during that
+			phase
+		]]
+		local order_id = my_order_id :: t.Entity --//TODO: luau and jecs
+		update_delivery_conditions(c.PickupOrderPhase, player, order_id)
+
+		-- NOTE: we are returning here cuz we only want to process an order at a time
+		-- this is a design choice which idk if i will change in future
 		return
 	end
 
 	-- If we do reach here, then it means we did not find it.. So mark it as failed
-
-	warn(`found no order... ending with failure and sending to client..`)
 	end_with_failure(player, `You do not have any orders to pickup!`)
 	return
 end
 
-local from_client_event = pickup_order_event.from_client()
+local from_client_event = try_pickup_order_event.from_client()
 
 local function system()
 	for a, player, restaurant_id in from_client_event.iter() do

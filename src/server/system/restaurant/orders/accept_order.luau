@@ -1,5 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+
+local start_delivery_conditions =
+	require(ServerScriptService.server.server_utils.start_delivery_conditions)
+local update_delivery_conditions =
+	require(ServerScriptService.server.server_utils.update_delivery_conditions)
+local delivery_conditions = require(ReplicatedStorage.common.configs.delivery_conditions)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local playerstore = require(ServerScriptService.server.store.playerstore)
@@ -66,6 +72,7 @@ local function try_accept_order_request(player: Player, order_id: t.Entity)
 	-- Now, verify that the player actually owns this order
 	local livestore = playerstore[player]
 	local my_orders = livestore.my_orders
+	local my_conditions = livestore.my_active_delivery_conditions
 
 	local order_id_index = table.find(my_orders, order_id)
 	if order_id_index == nil then
@@ -86,8 +93,26 @@ local function try_accept_order_request(player: Player, order_id: t.Entity)
 
 	table.remove(livestore.my_orders, order_id_index)
 	table.insert(livestore.my_accepted_orders, order_id)
-
 	serverevents.RouberOrders.accept_order_response.fire_all(true, blink_conv.from_entity(order_id))
+
+	-- Determine if the order has conditions and check to see if they belong in the category
+	update_delivery_conditions(c.AcceptOrderPhase, player, order_id)
+	start_delivery_conditions(c.AcceptOrderPhase, player, order_id)
+
+	-- local order_details = world:exists_get(order_id, c.DeliveryOrderDetails)
+	-- for _, condition_id in order_details.conditions_list_id do
+	-- 	-- get the condition details
+	-- 	warn(`Found some condition related stuff...`)
+	-- 	local condition_name: t.rouber_delivery_conditions_t =
+	-- 		world:exists_get(condition_id, c.Name) :: t.rouber_delivery_conditions_t
+	-- 	local details = delivery_conditions[condition_name]
+
+	-- 	if details.start_phase == c.AcceptOrderPhase then
+	-- 		warn(`The starting phase is accept.. So we are starting the condition`)
+	-- 		local ticket_id = details.create_order_condition(order_id)
+	-- 		table.insert(my_conditions, ticket_id)
+	-- 	end
+	-- end
 end
 
 local function system()

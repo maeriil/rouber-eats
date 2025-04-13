@@ -32,12 +32,9 @@ end
 local function system()
 	for _, server_id_list, food_name_list in clientevents.RouberOrders.bulk_setup_food.iter() do
 		local n = #server_id_list
-		warn(`Setting up food in client!`)
-
 		for i = 1, n do
 			local server_id = server_id_list[i]
 			local food_name = food_name_list[i]
-			warn(`setting up {food_name}`)
 
 			setup_food(server_id, food_name)
 		end

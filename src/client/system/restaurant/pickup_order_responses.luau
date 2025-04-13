@@ -1,15 +1,9 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local jecs = require(ReplicatedStorage.pkg.jecs)
-local phases = require(ReplicatedStorage.common.ecs.phases)
-local restaurant_general_dialogues =
-	require(ReplicatedStorage.common.configs.dialogues.restaurant.restaurant_general_dialogues)
-
-local c = require(ReplicatedStorage.common.ecs.components)
-local p = require(ReplicatedStorage.common.ecs.pairs)
-local pickup_order_event = require(ReplicatedStorage.common.events.restaurant.pickup_order_event)
-local t = require(ReplicatedStorage.types)
-local world = require(ReplicatedStorage.common.ecs.world)
-local __ = jecs.Wildcard
+-- stylua: ignore start
+local ReplicatedStorage            = game:GetService("ReplicatedStorage")
+local phases                       = require(ReplicatedStorage.common.ecs.phases)
+local restaurant_general_dialogues = require(ReplicatedStorage.common.configs.dialogues.restaurant.restaurant_general_dialogues)
+local pickup_order_event           = require(ReplicatedStorage.common.events.order.try_pickup_order_event)
+-- stylua: ignore end
 
 local from_server_verification = pickup_order_event.from_server()
 local function system()

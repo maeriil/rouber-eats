@@ -1,0 +1,33 @@
+local assets = {
+	images = {
+		["ActionBubble.svg"] = "rbxassetid://132567444580644",
+		["ActionBubbleInverted.svg"] = "rbxassetid://137827464390336",
+		["ActiveBackground1.svg"] = "rbxassetid://103004830613775",
+		["ActiveStar.svg"] = "rbxassetid://78318422267239",
+		["ArtStripe1.svg"] = "rbxassetid://80440253136479",
+		["ArtStripe2.svg"] = "rbxassetid://112789224181629",
+		["CardEffect_test.svg"] = "rbxassetid://91204713529641",
+		["Dialogue.svg"] = "rbxassetid://115560044633714",
+		["DialogueBubbleIndicator.svg"] = "rbxassetid://112426936141269",
+		["DialogueFlipped.svg"] = "rbxassetid://129177868904742",
+		["DialogueProfile.svg"] = "rbxassetid://77453206465606",
+		["DialogueUsername.svg"] = "rbxassetid://121714049904966",
+		["ExclamationIcon.svg"] = "rbxassetid://106310399826506",
+		["ExitButton.svg"] = "rbxassetid://108458614111422",
+		["ExitButtonInverted.svg"] = "rbxassetid://138678271887230",
+		["Hexagon.svg"] = "rbxassetid://86168630452495",
+		["HoverEffect1.svg"] = "rbxassetid://121742107016552",
+		["Label.svg"] = "rbxassetid://74544873090118",
+		["LabelInverted.svg"] = "rbxassetid://94946592216636",
+		["ParallelogramLeft.svg"] = "rbxassetid://109855268093546",
+		["ParallelogramRight.svg"] = "rbxassetid://90418956261299",
+		["PhoneDesign1.svg"] = "rbxassetid://71544389570017",
+		["PhoneIconFrame.svg"] = "rbxassetid://131345212811127",
+		["SidebarFrame.svg"] = "rbxassetid://122955910247999",
+		["SpeechBubbleInverted.svg"] = "rbxassetid://111673599591318",
+		["TaxiAppIcon.svg"] = "rbxassetid://111701628898861",
+		["blur.png"] = "rbxassetid://114895176910548",
+	},
+}
+
+return assets

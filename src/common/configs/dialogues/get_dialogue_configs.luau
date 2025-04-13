@@ -42,7 +42,7 @@ local function get_dialogue_configs(configuration: Configuration)
 		found[name] = true
 	end
 
-	print(found)
+	-- print(found)
 	for name, value in found do
 		if value ~= true then
 			error(`DialogueConfig expects {name} but no value is provided. Check {parent_name}`)

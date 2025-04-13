@@ -10,6 +10,7 @@ local HudScreen         = require(script.pages.HudScreen)
 local ItemProximity     = require(script.features.Proximity.ItemProximity)
 local MailboxProximity  = require(script.features.Proximity.MailboxProximity)
 local PhoneScreen       = require(script.pages.PhoneScreen)
+local PosesScreen = require(script.pages.PosesScreen)
 local RouberScreen      = require(script.pages.RouberScreen)
 local frame             = require(script.components.pane.frame)
 local types             = require(ReplicatedStorage.types)
@@ -29,6 +30,7 @@ local function root(): { any }
   local rouber        : types.GamePages = "RouberScreen"
   local dialoguescene : types.GamePages = "DialogueScene"
   local backpack      : types.GamePages = "BackpackScreen"
+  local poses         : types.GamePages = "pose_screen"
 
   local page          = uistore.page
   local alldoors      = uistore.DoorProximity
@@ -100,6 +102,9 @@ local function root(): { any }
 				end,
 				[backpack] = function()
 					return BackpackScreen {}
+				end,
+				[poses] = function()
+					return PosesScreen {}
 				end,
 			},
 		},

@@ -14,16 +14,18 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local function get_players_who_has_setup_houses()
-	local players_who_have_setup_house = {} :: { Player }
+	-- local players_who_have_setup_house = {} :: { Player }
 
-	for i, player in Players:GetPlayers() do
-		local player_config = playersetupconfig[player]
-		if player_config and player_config.house_setup.client_completed then
-			table.insert(players_who_have_setup_house, player)
-		end
-	end
+	-- for i, player in Players:GetPlayers() do
+	-- 	local player_config = playersetupconfig[player]
+	-- 	if player_config and player_config.house_setup.client_completed then
+	-- 		table.insert(players_who_have_setup_house, player)
+	-- 	end
+	-- end
 
-	return players_who_have_setup_house
+	-- return players_who_have_setup_house
+
+	return Players:GetPlayers()
 end
 
 local function mark_orders_as_invalid(house_id: t.Entity, landplot_id: t.Entity, owner_id: t.Entity)
@@ -112,8 +114,12 @@ local function cleanup_npc_landplot()
 		-- server will filter out the players to send to. The housing setup runs after this phase
 		-- so we are guaranteed that this list contains players who has setup this npc
 
+		-- print(
+		-- 	"Cleaning up the existing npc landplot and sending it to the following users" {players_who_have_completed_setup}`
+		-- )
 		print(
-			`Cleaning up the existing npc landplot and sending it to the following users {players_who_have_completed_setup}`
+			"Cleaning up the existing npc landplot and sending it to the following users",
+			players_who_have_completed_setup
 		)
 		request_delete_house.fire_list(players_who_have_completed_setup, npc_owner_id :: never)
 		cleanup_the_landplot(
@@ -142,8 +148,12 @@ local function cleanup_removed_player_landplot()
 	local players_who_have_completed_setup = get_players_who_has_setup_houses()
 
 	for house_id, parent, player_id, interior_id, exterior_id in cleanup_house_client_query:iter() do
+		-- print(
+		-- 	`Cleaning up the players landplot and sending it to the following users {players_who_have_completed_setup}`
+		-- )
 		print(
-			`Cleaning up the players landplot and sending it to the following users {players_who_have_completed_setup}`
+			"Cleaning up the existing npc landplot and sending it to the following users",
+			players_who_have_completed_setup
 		)
 		request_delete_house.fire_list(players_who_have_completed_setup, player_id :: never)
 		cleanup_the_landplot(

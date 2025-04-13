@@ -7,7 +7,7 @@ type source<T> = vide.Source<T>
 local source = vide.source
 
 --[[
-	Cleanup the file
+	TODO: Cleanup the file
 ]]
 
 local sources = {
@@ -20,7 +20,7 @@ local sources = {
 
 	IsWorking = source(false),
 	ShowPhone = source(false),
-	MyModel = source(workspace:FindFirstChild("Maeriil")),
+	MyModel = source(workspace:FindFirstChild("Maeriil") :: Model),
 
 	page = source("HudScreen" :: types.GamePages) :: source<types.GamePages>,
 	lastpage = source("HudScreen" :: types.GamePages) :: source<types.GamePages>,
@@ -64,6 +64,24 @@ local sources = {
 	MyBackpack = source({}) :: types.Source<{ [types.Entity]: types.BackpackItemType }>,
 
 	MyRating = source(0),
+	ActiveOrder = source(nil) :: types.Source<types.Entity?>,
+
+	poses_that_i_like = source({} :: { types.rouber_pose_category_t }),
+	poses_that_i_dislike = source({} :: { types.rouber_pose_category_t }),
+	pose_list = source({
+		"default_deliver_pose",
+		"default_deliver_pose",
+		"default_deliver_pose",
+		"default_deliver_pose",
+		"default_deliver_pose",
+		"default_deliver_pose",
+		"default_deliver_pose",
+		"default_deliver_pose",
+		-- "deliver_elegantly",
+	} :: { types.rouber_pose_t }),
+	hint_description = source(
+		`JohnDoe likes <font color="#00A2FF">flashy poses</font> but he hates poses with <font color="#FF0000">props!</font>`
+	),
 }
 
 return sources

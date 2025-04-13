@@ -14,12 +14,12 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local function system()
-	for i, client, add_amount, curr_amount in world:query(c.Client, p.IncreaseCoins, c.Coins):iter() do
+	for i, client, add_amount, curr_amount in world:query(c.Client, p.IncreaseCoins, c.Roubins):iter() do
 		local player_id = ref(client)
 		local new_amount = curr_amount + add_amount
 		warn(`Updated client's currency to {new_amount} from {curr_amount} by adding {add_amount}`)
 
-		world:set(player_id, c.Coins, new_amount)
+		world:set(player_id, c.Roubins, new_amount)
 
 		-- Fire remote event to client letting it know our coins increased by X amount
 		serverevents.RouberCurrency.IncreaseCoins.fire(client, new_amount)

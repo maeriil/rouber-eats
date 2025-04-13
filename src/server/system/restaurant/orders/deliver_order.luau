@@ -1,17 +1,21 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
-local jecs = require(ReplicatedStorage.pkg.jecs)
-local phases = require(ReplicatedStorage.common.ecs.phases)
-local playerstore = require(ServerScriptService.server.store.playerstore)
+-- stylua: ignore start
+local ReplicatedStorage         = game:GetService("ReplicatedStorage")
+local ServerScriptService       = game:GetService("ServerScriptService")
 
-local c = require(ReplicatedStorage.common.ecs.components)
-local p = require(ReplicatedStorage.common.ecs.pairs)
-local ref = require(ReplicatedStorage.common.ecs.ref)
-local t = require(ReplicatedStorage.types)
-local pair = jecs.pair
-local deliver_order_event = require(ReplicatedStorage.common.events.restaurant.deliver_order_event)
-local world = require(ReplicatedStorage.common.ecs.world)
-local __ = jecs.Wildcard
+local start_delivery_conditions = require(ServerScriptService.server.server_utils.start_delivery_conditions)
+local jecs                      = require(ReplicatedStorage.pkg.jecs)
+local phases                    = require(ReplicatedStorage.common.ecs.phases)
+local playerstore               = require(ServerScriptService.server.store.playerstore)
+local invoke_delivering_order   = require(ReplicatedStorage.common.events.order.invoke_delivering_order_event)
+local throw_error               = require(ReplicatedStorage.common.utility.throw_error)
+
+local c                         = require(ReplicatedStorage.common.ecs.components)
+local p                         = require(ReplicatedStorage.common.ecs.pairs)
+local ref                       = require(ReplicatedStorage.common.ecs.ref)
+local t                         = require(ReplicatedStorage.types)
+local world                     = require(ReplicatedStorage.common.ecs.world)
+local __                        = jecs.Wildcard
+-- stylua: ignore end
 
 local function try_deliver_order(player: Player)
 	local store = playerstore[player]
@@ -25,14 +29,17 @@ local function try_deliver_order(player: Player)
 		local house_id = details.destination_id :: t.Entity
 
 		world:remove(my_order_id, c.WorkingAt)
-		warn(`oka we sending to client to do the house cutscene setu pnow yawn..`)
-		deliver_order_event.to_client(player, house_id)
+		invoke_delivering_order.to_client(player, house_id, my_order_id :: t.Entity)
+
+		local order_id = my_order_id :: t.Entity --//TODO: luau and jecs
+		start_delivery_conditions(c.PickupOrderPhase, player, order_id)
+		return
 	end
 
-	warn(`we should never reach this point @deliver_order`)
+	throw_error(`Could not find a valid order to deliver...`)
 end
 
-local from_client_event = deliver_order_event.from_client()
+local from_client_event = invoke_delivering_order.from_client()
 local function system()
 	for _, player in from_client_event.iter() do
 		try_deliver_order(player)

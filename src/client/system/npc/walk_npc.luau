@@ -65,7 +65,7 @@ end
 -- end
 
 local function system()
-	test_walk_npc_system()
+	-- test_walk_npc_system()
 	-- start_the_npc_walk()
 	-- on_npc_walk_ended()
 end

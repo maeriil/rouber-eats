@@ -139,7 +139,7 @@ local function setup_interior_exterior_store()
 
 			world:set(item_id, c.Name, details.display_name)
 			world:set(item_id, c.Parent, store_id)
-			world:set(item_id, c.Coins, details.base_price)
+			world:set(item_id, c.Roubins, details.base_price)
 			world:add(item_id, c.Item)
 
 			item:SetAttribute(attributes.serverid, item_id)

@@ -120,7 +120,7 @@ local function setup_store_to_client(store_folder: Folder, interior: Model, exte
 
 		world:set(item_id, c.Name, details.display_name)
 		world:set(item_id, c.Parent, parent_id)
-		world:set(item_id, c.Coins, details.base_price)
+		world:set(item_id, c.Roubins, details.base_price)
 		world:set(item_id, c.EntityId, item_server_id)
 		world:add(item_id, c.Item)
 

@@ -35,10 +35,11 @@ end
   It is guaranteed that there exists at least enough landplots as the max number of players in server
 ]]
 local plot_owned_by_npc_query =
-	world:query(c.Parent):with(c.House, c.OccupiedByNPC):without(c.Cleanup):cached()
+	world:query(c.Parent, c.Name):with(c.House, c.OccupiedByNPC):without(c.Cleanup):cached()
 local function claim_npc_owned_landplot(player_id: t.Entity | t.Id)
-	for house_id, plot_id in plot_owned_by_npc_query:iter() do
-		print("Force removing an existing npc lot and replacing with player")
+	for house_id, plot_id, name in plot_owned_by_npc_query:iter() do
+		local player = world:exists_get(player_id, c.Client)
+		print(`Force removing an existing npc lot {name} and replacing with player, {player.Name}`)
 		world:add(house_id, c.Cleanup)
 		world:set(plot_id, pairs.ClaimedBy, player_id)
 

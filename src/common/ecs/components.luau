@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local future = require(ReplicatedStorage.pkg.future)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local world = require(script.Parent.world)
 
 local t = require(ReplicatedStorage.types)
-type Poll<T = unknown> = future.Poll<T>
 
 -- If components are almost always queried together, we should look to turn them into a table
 -- Theres no point in introducing more fragmentation if they are alwyas together
@@ -15,8 +15,9 @@ local components = {
 	BasePart = world:component() :: t.Id<BasePart>,
 	PrimaryPart = world:component() :: t.Id<BasePart>,
 	Humanoid = world:component() :: t.Id<Humanoid>,
-	Animator = world:component() :: t.Id<Animator>,
-	AnimationTrack = world:component() :: t.Id<AnimationTrack>,
+	-- Animator = world:component() :: t.Id<Animator>,
+	-- AnimationTrack = world:component() :: t.Id<AnimationTrack>,
+
 	AgentParams = world:component() :: t.Id<{
 		radius: number,
 		height: number,
@@ -28,7 +29,7 @@ local components = {
 	Path = world:component() :: t.Id<Path>,
 	PathWaypoints = world:component() :: t.Id<{ PathWaypoint }>,
 	PathFuture = world:component() :: t.Id<future.FutureLike<string, { PathWaypoint }>>,
-	WalkToFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
+	-- WalkToFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
 	BoolFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
 
 	--//TODO: merge the ray and over params together into a single {}
@@ -45,39 +46,43 @@ local components = {
 
 	Lifetime = world:component() :: t.Id<number>,
 	-- Typically should be used for component only I would say
-	--//TODO: remove this component, we use Lifetime for everything
-	Cooldown = world:component() :: t.Id<number>,
 
 	-- Questionable names tbh...
-	Coins = world:component() :: t.Id<number>,
+	--//TODO, turn them into  a single table like so
+	-- However, i am unsure about the names too so theres that
+	-- Currency = world:component() :: t.Id<{
+	-- 	coins: number,
+	-- 	gems: number,
+	-- }>,
+	Roubins = world:component() :: t.Id<number>,
 	Gems = world:component() :: t.Id<number>,
 	Rating = world:component() :: t.Id<number>,
 
 	--//TODO Do we even use Position?? If we don't remove it
+	-- Apparently we use it on Pathfinding part, so i wont remove it just yet
 	Position = world:component() :: t.Id<vector>,
-	--//TODO Do we even use Size?? If we don't remove it
-	Size = world:component() :: t.Id<vector>,
+	-- //TODO Do we even use Size?? If we don't remove it
+	-- We apparently only use it to set Landplot, but we don't need to do that tbh
+	-- Size = world:component() :: t.Id<vector>,
+
 	Transform = world:component() :: t.Id<CFrame>,
 
-	DeliveryOrderStatus = world:component() :: t.Id<t.DeliveryOrderStatus>,
+	-- DeliveryOrderStatus = world:component() :: t.Id<t.DeliveryOrderStatus>,
 	DeliveryOrderDetails = world:component() :: t.Id<t.DeliveryOrderDetailsComponentType>,
 	HasOrderToBeDelivered = world:entity() :: t.Entity,
+	ToDropOff = world:entity() :: t.Entity,
+	ToAlter = world:entity() :: t.Entity,
+	ToKeep = world:entity() :: t.Entity,
 	HasMysteryBox = world:entity() :: t.Entity,
-	-- DeliveryOrderDetails = world:component() :: t.Id<{
-	-- 	restaurant_name: t.Entity,
-	-- 	audience_name: t.Entity,
-	-- 	items: { string }, -- Food/Groceries/services too and etc?
-	-- 	-- Right now only server can create orders, in future, players can too
-	-- }>,
 
 	-- Used like pair(WorkingAt, Order t.EntityId)
 	WorkingAt = world:entity(),
 
 	-- whether player is on job duty or on break
-	-- Probably don't need this tbh if we are using WorkingAt
+	-- Probably don't need this tbh if we are using WorkingAt?
 	IsWorking = world:entity(),
 
-	EventRequest = world:entity() :: t.Entity,
+	-- EventRequest = world:entity() :: t.Entity,
 	Timestamp = world:component() :: t.Id<number>,
 	Start = world:entity(),
 	End = world:entity(),
@@ -92,26 +97,27 @@ local components = {
 	Job = world:component() :: t.Id<t.Entity | t.Id>,
 
 	--//TODO: we might not need this
-	OwnsBuilding = world:entity() :: t.Entity,
-	OwnedBy = world:entity() :: t.Entity,
+	-- OwnsBuilding = world:entity() :: t.Entity,
+	-- OwnedBy = world:entity() :: t.Entity,
 
 	--//TODO Deprecate the usage of OwnerOf, as its too generic. The entities are on thing that
 	-- makes more sense that their aren't generic because they are super cheap to create
 	OwnerOf = world:entity() :: t.Entity,
 	Claim = world:entity() :: t.Entity,
 
+	Vacant = world:entity() :: t.Entity,
 	-- Residence is basically any place a player can claim as their own living space
 	-- Player should be able to own multiple. They will start off with a basic apartment
 	Residence = world:component() :: t.Id<t.Entity | t.Id>,
-	Vacant = world:entity() :: t.Entity,
 	House = world:component() :: t.Id<string>,
 
 	--//TODO: Add apt only when we need it tbh, same for mansion
-	Apartment = world:entity() :: t.Entity,
-	ApartmentUnit = world:entity() :: t.Entity,
-	AptUnitOf = world:entity() :: t.Entity,
-	Mansion = world:entity() :: t.Entity,
+	-- Apartment = world:entity() :: t.Entity,
+	-- ApartmentUnit = world:entity() :: t.Entity,
+	-- AptUnitOf = world:entity() :: t.Entity,
+	-- Mansion = world:entity() :: t.Entity,
 	LandPlot = world:entity() :: t.Entity,
+
 	--//TODO
 	-- We could instead turn this into a single componet called OccupiedBy
 	-- which contains two values, "npc" or "player", or it can contain entity Id too
@@ -122,14 +128,16 @@ local components = {
 	HouseOwner = world:entity() :: t.Entity,
 
 	--//TODO Not sure if we need teleport zone anymore?
+	-- has some dependencies in pairs file but those can be changed im pretty sure...
 	TeleportZone = world:entity() :: t.Entity,
 	DoormatZone = world:entity() :: t.Entity,
 	Mailbox = world:entity() :: t.Entity,
 	Door = world:entity() :: t.Entity,
 	Radius = world:component() :: t.Id<number>, -- How close player has to be to open it
 	CannotOpen = world:entity() :: t.Entity,
-	CannotTeleport = world:entity() :: t.Entity,
+	-- CannotTeleport = world:entity() :: t.Entity,
 
+	--//TODO
 	--TBH This could be a generic Status with <Status, Door>, <Status, Params>, <Status, Tween>
 	DoorStatus = world:component() :: t.Id<boolean>,
 	CastStatus = world:component() :: t.Id<boolean>,
@@ -141,7 +149,7 @@ local components = {
 
 	TeleportTo = world:component() :: t.Id<CFrame>,
 	--//TODO DO we use Connection somewhere?
-	Connection = world:component() :: t.Id<RBXScriptConnection>,
+	-- Connection = world:component() :: t.Id<RBXScriptConnection>,
 
 	EntityId = world:component() :: t.Id<t.Entity | t.Id>,
 	Cleanup = world:component() :: t.Id<() -> ()>,
@@ -191,9 +199,9 @@ local components = {
 	}>,
 
 	--//TODO: I dont think we need any of the below...
-	AnimationFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
-	SoundFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
-	Sound = world:component() :: t.Id<Sound>,
+	-- AnimationFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
+	-- SoundFuture = world:component() :: t.Id<future.FutureLike<string, boolean>>,
+	-- Sound = world:component() :: t.Id<Sound>,
 
 	Camera = world:entity() :: t.Entity,
 	CameraProperties = world:component() :: t.Id<{
@@ -209,6 +217,7 @@ local components = {
 	Interacted = world:entity() :: t.Entity,
 
 	Food = world:entity() :: t.Entity,
+	-- This is too generic ngl, too hard to understand if we are just directly using it...
 	Value = world:component() :: t.Id<number>,
 	Invalid = world:entity() :: t.Entity,
 
@@ -225,25 +234,49 @@ local components = {
 		item_id: t.Entity | t.Id,
 		count: number,
 	}>>,
+
+	--// This is how the player would present their food
+	PreferredPoseCategory = world:component() :: t.Id<{
+		likes: { t.rouber_pose_category_t },
+		dislikes: { t.rouber_pose_category_t },
+	}>,
+	Pose = world:component() :: t.Id<t.rouber_pose_t>,
+
+	DeliveryCutscene = world:entity() :: t.Entity,
+	DeliveryRewardCutscene = world:entity() :: t.Entity,
+	Request = world:component() :: t.Id<() -> any>,
+	-- Below are some of the UI event requests that we should fire to the server
+	UpdateMyPreferences = world:entity(),
+	Source = world:component() :: t.Id<(...any) -> ...any>,
+
+	HotFoodCondition = world:entity(),
+	DeliveryOrderCondition = world:entity(),
+	Success = world:entity() :: t.Entity,
+	Failure = world:entity() :: t.Entity,
+
+	AcceptOrderPhase = world:entity() :: t.Entity,
+	PickupOrderPhase = world:entity() :: t.Entity,
+	DropOffOrderPhase = world:entity() :: t.Entity,
+	CompleteOrderPhase = world:entity() :: t.Entity,
 }
 
 do
 	-- Because luau is ass
-	local comp_to_iterate = (components :: unknown) :: { [string]: t.Entity | t.Entity<nil> }
+	local comp_to_iterate = (components :: unknown) :: { [string]: t.Entity }
 	for name, comp in comp_to_iterate do
 		world:set(comp, jecs.Name, name)
 	end
 end
 
 -- Remember to not delete any other components in OnRemove as that messes up with archetype moves
-world:set(components.Connection, jecs.OnRemove, function(entity)
-	local connection = world:get(entity, components.Connection)
+-- world:set(components.Connection, jecs.OnRemove, function(entity)
+-- 	local connection = world:get(entity, components.Connection)
 
-	if connection then
-		connection:Disconnect()
-		connection = nil
-	end
-end)
+-- 	if connection then
+-- 		connection:Disconnect()
+-- 		connection = nil
+-- 	end
+-- end)
 
 world:set(components.Model, jecs.OnRemove, function(entity)
 	local model = world:get(entity, components.Model)
@@ -272,10 +305,12 @@ end)
 world:add(components.Parent, jecs.pair(jecs.OnDeleteTarget, jecs.Delete))
 
 do
-	warn(
-		`Found {world.max_component_id} components in game with jecs.Component. Ensure that we aren't going over the limit set`
-	)
-	warn(`The max component limit is {_G.__JECS_HI_COMPONENT_ID}`)
+	if RunService:IsStudio() or _G.__DEV__ then
+		print(
+			`Found {world.max_component_id} components in game with jecs.Component. Ensure that we aren't going over the limit set`
+		)
+		print(`The max component limit is {_G.__JECS_HI_COMPONENT_ID}`)
+	end
 end
 
-return components
+return table.freeze(components)

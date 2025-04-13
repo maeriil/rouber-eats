@@ -27,7 +27,7 @@ local function system()
 	local instances = CollectionService:GetTagged(tags.Dialogue)
 
 	for _, config_instance in instances do
-		warn(`Setting up dialogues! yay....`)
+		-- warn(`Setting up dialogues! yay....`)
 		assert(
 			config_instance:IsA("Configuration"),
 			`Only Configurations must contain the dialogue tag as it contains properties`

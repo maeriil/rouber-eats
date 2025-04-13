@@ -1,13 +1,12 @@
-asset_dir = "assets/"
-exclude_assets = []
-write_dir = "src/assets"
-
 [creator]
-type = "group"
-id = 35223719
+type = "user"
+id = 7593197485
 
 [codegen]
-output_name = "init"
 typescript = false
 style = "nested"
 strip_extension = false
+
+[inputs.assets]
+path = "assets/**/*"
+output_path = "src/assets/"

@@ -31,10 +31,9 @@ local function DialogueProximity(props: props)
 				return details().proximity_text
 			end,
 			click = function()
-				print(`Dispatching the dialogue id {uistore.ActiveDialogueProximity()}`)
 				-- We should actually dispatch the active dialgoue proximity to dialogue started
 				-- eventqueue.dispatch_proximity_clicked(uistore.ActiveProximity())
-				eventqueue.add_dialogue_started(uistore.ActiveDialogueProximity())
+				eventqueue.add_dialogue_started(uistore.ActiveDialogueProximity() :: types.Entity)
 			end,
 		},
 	}

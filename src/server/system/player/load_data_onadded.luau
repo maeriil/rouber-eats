@@ -66,6 +66,8 @@ local function setup_config(player: Player)
 		my_pickedup_orders = {},
 		my_backpack_collectables = {},
 		my_backpack_furnishings = {},
+		my_orders_to_drop_off = {},
+		my_active_delivery_conditions = {},
 	}
 end
 

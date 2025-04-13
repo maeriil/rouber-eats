@@ -82,9 +82,11 @@ end
 ]]
 local npc_house_details_query = world
 	:query(c.House, pairs.BuildingExteriorId, pairs.BuildingInteriorId, c.Parent, c.OccupiedByNPC)
+	:without(c.Cleanup)
 	:cached()
 local client_house_details_query = world
 	:query(c.House, pairs.BuildingExteriorId, pairs.BuildingInteriorId, c.Parent, c.OccupiedByPlayer)
+	:without(c.Cleanup)
 	:cached()
 local request_bulk_create_houses = serverevents.Building.bulk_create_house
 local function bulk_send_house_details_to_new_players(players: { Player })

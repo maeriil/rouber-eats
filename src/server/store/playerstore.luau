@@ -10,6 +10,8 @@ export type PlayerDetails = {
 	my_orders: { t.Entity | t.Id },
 	my_accepted_orders: { t.Entity | t.Id },
 	my_pickedup_orders: { t.Entity | t.Id },
+	my_orders_to_drop_off: { t.Entity },
+	my_active_delivery_conditions: { t.Entity },
 	-- Would we actually turn this into a table containing multiple other fields?
 
 	-- This should actually behave like a set

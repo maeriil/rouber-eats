@@ -1,255 +1,109 @@
-[entries."assets/images/ActionBubble.svg"]
-hash = "316f7ed2ec66f18a16a83205068a9aad4ee17ddeca213a1345639e97b30f56ab"
-asset_id = 129504285891746
+version = 1
 
-[entries."assets/images/ActionBubbleInverted.svg"]
-hash = "3fc2f0dbefa763a24c461c1d5881060760aea7021ec5063354e1696cf362f4fe"
-asset_id = 116680509777131
+[inputs.assets."assets/images/ActionBubble.svg"]
+hash = "8e10d56cc764bb129e416ab4efb219225a313d0be78a49548568e613f99a3a05"
+asset_id = 132567444580644
 
-[entries."assets/images/ActiveStar.svg"]
-hash = "04b79783513f7056f11549d16b04dd3ce41a80fa9944b7a8cdb115f6a6528629"
-asset_id = 99303162879991
+[inputs.assets."assets/images/ActionBubbleInverted.svg"]
+hash = "d92830300db2a5e61bfd87940e7d2d303c3b2c25e342267ccaa86f91f42e8548"
+asset_id = 137827464390336
 
-[entries."assets/images/ArtStripe1.svg"]
-hash = "a542e9d6d73cc769a954929c3944f6658be859bd5a14b69d3cbeae197b767167"
-asset_id = 92260793178212
+[inputs.assets."assets/images/ActiveBackground1.svg"]
+hash = "64d2cfd0ceb98ed94596605bd7ef2d583cd22a2c01aa0138f568a58490646da1"
+asset_id = 103004830613775
 
-[entries."assets/images/ArtStripe2.svg"]
-hash = "5d7dc135db6c5251ebc45c9037290b34982fbc1415cedf05731f7cf26f928bdd"
-asset_id = 128556395418164
+[inputs.assets."assets/images/ActiveStar.svg"]
+hash = "d92d7af298877a79a87717d9b3430670b0101aa99a1fbd522705e0af2ad47049"
+asset_id = 78318422267239
 
-[entries."assets/images/CardEffect_test.svg"]
-hash = "524bdcf0aa2e842a08df8aba118e94f48ba9f835d750b1d2e42970fcbeed40d2"
-asset_id = 124434407722310
+[inputs.assets."assets/images/ArtStripe1.svg"]
+hash = "bf9ebe7552f1e5d9a768c0baeda97ca795d0a66cf96a54c61f81b23f34b4936e"
+asset_id = 80440253136479
 
-[entries."assets/images/Dialogue.svg"]
-hash = "2f1fda2a7c296da31c886b69686d7127b52377028bccf97aa98e8b8b4463da12"
-asset_id = 134267041295470
+[inputs.assets."assets/images/ArtStripe2.svg"]
+hash = "e375a9da67b3e34e4c388c1de99cdb0b87de2bc45aa904de8b252dc17d4751c8"
+asset_id = 112789224181629
 
-[entries."assets/images/DialogueBubbleIndicator.svg"]
-hash = "c87dcb931501662b6efc99e47284efc4f7206414e1abc25fc76de1990a6705ac"
-asset_id = 78259420024750
+[inputs.assets."assets/images/CardEffect_test.svg"]
+hash = "50cb27d588b6e7d5584b64df1b62a74cdc7cb6abcff3c35617e5b612937419cf"
+asset_id = 91204713529641
 
-[entries."assets/images/DialogueFlipped.svg"]
-hash = "788459def42836f57cb27b9fd472467b8f7031b6cb23f471c419c209c0c8baa2"
-asset_id = 71252644122890
+[inputs.assets."assets/images/Dialogue.svg"]
+hash = "977b072f2235744caf2515a0f28309e3fe70a4e33f57e10f8df2a9c1710d2b00"
+asset_id = 115560044633714
 
-[entries."assets/images/DialogueProfile.svg"]
-hash = "4decaa833b0fa968bd6c2d42c2e7ba0acf3c3290270352cf43f49f39ef2b86fd"
-asset_id = 70661544405103
+[inputs.assets."assets/images/DialogueBubbleIndicator.svg"]
+hash = "6fe6b929c1604dca85baff26fb38f8a48761fa19e61afbe24672d7c7c09d7e57"
+asset_id = 112426936141269
 
-[entries."assets/images/DialogueUsername.svg"]
-hash = "30f8c1b327f35788d09152a3cd3c7bda0b8774937e6f2d9e3ae666395821803e"
-asset_id = 127370511454991
+[inputs.assets."assets/images/DialogueFlipped.svg"]
+hash = "288d1bff23a9bc03c665a1f84a3a15fd1864767384656b8d91196e4a6042cf5a"
+asset_id = 129177868904742
 
-[entries."assets/images/ExclamationIcon.svg"]
-hash = "a5e69a434f658ebe12a835b9077899aa4e41e00088383ca3e78a5f8bff3581a1"
-asset_id = 139734034364282
+[inputs.assets."assets/images/DialogueProfile.svg"]
+hash = "8fa6ec11d6473aa413e0e8588b239fa23d52002d5c14f4114efe51fb27e555e8"
+asset_id = 77453206465606
 
-[entries."assets/images/ExitButton.svg"]
-hash = "06789e56aefb5bba0c984be018cd8103fa20e4d0952f2256b4aacab61987f521"
-asset_id = 101224825839546
+[inputs.assets."assets/images/DialogueUsername.svg"]
+hash = "22c0eed9d25af08961575c7a23e057c2f8798647700131c0e43e94812c8a1af0"
+asset_id = 121714049904966
 
-[entries."assets/images/ExitButtonInverted.svg"]
-hash = "2a6f5c31c32e313616e42e641090fc319b15ad0aed91c1f00124fefc2cb40f53"
-asset_id = 135155603345133
+[inputs.assets."assets/images/ExclamationIcon.svg"]
+hash = "fa2bec070b8cfb29a6ac738e7a2b0c1351d9304c2c6ddfbcf8dbf99a38ea95f9"
+asset_id = 106310399826506
 
-[entries."assets/images/Hexagon.svg"]
-hash = "eea1229fc05a6bf1b28a7b682448891ee0ed4da222bac66025a2efcb1fe78e7d"
-asset_id = 113821992656466
+[inputs.assets."assets/images/ExitButton.svg"]
+hash = "5358d60190ec27c53d810e806c975fb06c1bbb3e938602c5b1f28357a0467843"
+asset_id = 108458614111422
 
-[entries."assets/images/HoverEffect1.svg"]
-hash = "e0de2864e4a2f7fbd876e58ee0c160de3fa19ca4e01f3866044de66d93c11ee2"
-asset_id = 92462709048961
+[inputs.assets."assets/images/ExitButtonInverted.svg"]
+hash = "00801f3df04b6a29d0d41ec0063eb2f525957b547f6e7b9a056363bfb27dcd66"
+asset_id = 138678271887230
 
-[entries."assets/images/Label.svg"]
-hash = "ada8d6d3e89a9d5bf151dfd0eb1a08011a53d26e836fccf980df4e331f83c389"
-asset_id = 129893366688406
+[inputs.assets."assets/images/Hexagon.svg"]
+hash = "9f47d2661e7136eca0bd1a36766aa289dd9fca990fc5e4e1612f0c070a32a029"
+asset_id = 86168630452495
 
-[entries."assets/images/LabelInverted.svg"]
-hash = "ebf5ba72595ba45a8b9b075e4ae3b0bae8e0678ecf4f1c40bbe75501a2546d14"
-asset_id = 124291415335756
+[inputs.assets."assets/images/HoverEffect1.svg"]
+hash = "c3d7b29a8bfda1afa42e05b6d33ef76eda626668c106771de716a4ab68adfc56"
+asset_id = 121742107016552
 
-[entries."assets/images/Order_List_Back.png"]
-hash = "d0ef92a634169896fb3f9b5a3714f2df060870e0e5f28b7808df682d250bbcc6"
-asset_id = 126126494446320
+[inputs.assets."assets/images/Label.svg"]
+hash = "c1158690b981d2af2d208f542f5d539cbfed47004bd8a430dab0f71eb5f963d3"
+asset_id = 74544873090118
 
-[entries."assets/images/Order_List_Front.png"]
-hash = "ad78233fc3cca027b642f0f0de35245589a50a725a9c6d5db2a90cf207d0f46d"
-asset_id = 70502070150372
+[inputs.assets."assets/images/LabelInverted.svg"]
+hash = "3e1f367576162f0074c668e39047d8fbb3ba0a433ab21ea8995328bc73ea4b44"
+asset_id = 94946592216636
 
-[entries."assets/images/ParallelogramLeft.svg"]
-hash = "52dbdd43f8b8a48c7f3ac50f3e5913d0ad1b441fe4e3d47b367b1272edc95d50"
-asset_id = 117697437558772
+[inputs.assets."assets/images/ParallelogramLeft.svg"]
+hash = "8689a98453f466b562e6569cd6691973617054ef537fca293795c7194e91251a"
+asset_id = 109855268093546
 
-[entries."assets/images/ParallelogramRight.svg"]
-hash = "48f07f382e347c7843a61cb9bfcaa7ad0c26855bc63dcbb0e0a2c7657e9627e0"
-asset_id = 105891122572510
+[inputs.assets."assets/images/ParallelogramRight.svg"]
+hash = "77c664fb10a520ecd1b2f41eab562f60bc8bd0d67bedc6c25d60c55f1486aa7b"
+asset_id = 90418956261299
 
-[entries."assets/images/PhoneDesign1.svg"]
-hash = "d6966b723bfaab79ab023f9a810257fe009cac8fc60d17e4b3aa0ae5e7b3dc1e"
-asset_id = 126615497961611
+[inputs.assets."assets/images/PhoneDesign1.svg"]
+hash = "1dc5661bcb622c71d10ebe71cc967fbc4066a1e5affac5515483c876f045905a"
+asset_id = 71544389570017
 
-[entries."assets/images/PhoneIconFrame.svg"]
-hash = "594e52a008c4c3d9ed23dbe54a5f893b2bddeba2b1b0156b3a4ec2c288433bf6"
-asset_id = 137856131398050
+[inputs.assets."assets/images/PhoneIconFrame.svg"]
+hash = "d414afbde15361e4ad6e11107f40df499beb5af28714a23b8c4b64d8c0ace759"
+asset_id = 131345212811127
 
-[entries."assets/images/SidebarFrame.svg"]
-hash = "7632e245dcec5ebafe12bd18bf79684fe8acd0790d403b4dc95704efb4599a0b"
-asset_id = 117386399087386
+[inputs.assets."assets/images/SidebarFrame.svg"]
+hash = "a0c78aa2f9c61d059bcbf8eb727090870124a91ba5d53e3cc356e4be2a2bdce9"
+asset_id = 122955910247999
 
-[entries."assets/images/Sidebar_Main.png"]
-hash = "7e7cbf3e596a155621119b1e685d2cf4c859ddb15282f58cb0ba2656b6f2726f"
-asset_id = 116974007477757
+[inputs.assets."assets/images/SpeechBubbleInverted.svg"]
+hash = "8671f8669b7e05c34119304fcac18233b1bcf4b0f06abc0b098d17cb6da0b1a2"
+asset_id = 111673599591318
 
-[entries."assets/images/Sidebar_Side.png"]
-hash = "14a2d4b74d4f8bd261e4927917db8761c50d49fa393997dc75f6d152e2aa2121"
-asset_id = 131100412612049
+[inputs.assets."assets/images/TaxiAppIcon.svg"]
+hash = "275498200b567a0245839469ee7e3f52171fa3681d54017bf70e11c9017f7d83"
+asset_id = 111701628898861
 
-[entries."assets/images/SiderbarPattern.png"]
-hash = "db857525461c39e52253d9ca6fab2bb9723da296377ea1aff78d0c106487edd5"
-asset_id = 128045156855763
-
-[entries."assets/images/SiderbarPatternInverted.png"]
-hash = "4aba424ee0dfaaeca24c5d283f859a9fca26b3adebbf1cfae65732c5cf0c8901"
-asset_id = 90188759870952
-
-[entries."assets/images/SpeechBubbleInverted.svg"]
-hash = "d1f820386be86a4b48c78c53cf4fb2bd8177cb1e19f2cb4b29c25402c97e84be"
-asset_id = 105510096014087
-
-[entries."assets/images/TaxiAppIcon.svg"]
-hash = "ee842273c56c140dc9d778d4a826f1139f8c14bd43938c3943bbf164c9ec35dd"
-asset_id = 88237947006716
-
-[entries."assets/images/Title_Back.png"]
-hash = "a6647388c0f4288134322a967531f35ce95a69365589781a2ae702756587a19a"
-asset_id = 70394450755891
-
-[entries."assets/images/Title_Front.png"]
-hash = "091a28ef2dc684a87cd054850ce4c8fc2cc93d05c7f5c18510b9ed6670a71c16"
-asset_id = 81690712017944
-
-[entries."assets/images/achievement.png"]
-hash = "950affd9c9433f6108cbf33574450c158a394b7a0bc2ca998bcf58336c10dd46"
-asset_id = 81186057703014
-
-[entries."assets/images/address.png"]
-hash = "75bab8a02faec5f6ea39f3f24af64f6cb3926c51b03b25457da9241e033f2a87"
-asset_id = 97962498493341
-
-[entries."assets/images/bag.png"]
-hash = "25fc01072113554978fea59926aa2831d71cdd0876c7d901d2f714734ebc05db"
-asset_id = 127412392264416
-
-[entries."assets/images/battery_full.png"]
-hash = "7d260f7e2f8786db45616759c996a86a14eb53cdcb45e7452f7ef41247756818"
-asset_id = 125998018797054
-
-[entries."assets/images/car.png"]
-hash = "9cdc5dadeb9bc430a5c7277db5704479e9969b315ee519fe4da2d7a52aa14582"
-asset_id = 115034243777395
-
-[entries."assets/images/cart.png"]
-hash = "df20b84f53e4ba7376494e730a9dc7a8fcc21c56fd6b4fc78a01704e67a6f56c"
-asset_id = 90404677131740
-
-[entries."assets/images/chat.png"]
-hash = "4a1c9226c9fb7bba586511481d5de76d4f4afe73f5cd8210209615b3de137543"
-asset_id = 101500373119828
-
-[entries."assets/images/check.png"]
-hash = "df872053f33cbeba515c06d7c5256df6689ac4891458ea34b9319d0126a6b11d"
-asset_id = 90636678315012
-
-[entries."assets/images/checklist.png"]
-hash = "ea2659de14da45c75da0c5c244cbbd9ead7e18b8eba8cd18679592f53df13c78"
-asset_id = 122144730096549
-
-[entries."assets/images/chevron_left.png"]
-hash = "8619efb30c366c03c3c2e962fd7efc65641ffb641c8c37e5f43c08f2502ea2f3"
-asset_id = 126438640593639
-
-[entries."assets/images/chevron_right.png"]
-hash = "7d33e2c818c2b0fdbe68799f1ee4838e7eddb0ac206f41b74dfc1a0d0a5c9558"
-asset_id = 130663680264703
-
-[entries."assets/images/clock.png"]
-hash = "f2b1827d166ce63a8bd3a530288b7d8d1f1c087f202129b4a83c8779e86a32c7"
-asset_id = 76635367217590
-
-[entries."assets/images/confetti.png"]
-hash = "b1b872e914be1331f4b1fa83b83b4356ed642a1d945f4471aa0a1058f2c088ff"
-asset_id = 77239712954230
-
-[entries."assets/images/cross.png"]
-hash = "3b6af2b302d5582ad1f54687e27bba935c09f92a3ae52f76cbc29f6ccca14118"
-asset_id = 126647323192275
-
-[entries."assets/images/double_arrow.png"]
-hash = "58b8b6a8e50dc4acc07f0545c4edf0ce8a1ed5cd2df614e96d09832975ea5628"
-asset_id = 81758847625504
-
-[entries."assets/images/drawstring_bag.png"]
-hash = "394d5e4dc55f01b128bccecda1b730c25c2dc1b5efa9fa96403a28c433df4bfa"
-asset_id = 100270621856083
-
-[entries."assets/images/exclamation.png"]
-hash = "0b3990d18845b6d607fe877ac9e918b242b4055ce1e5bdabe72d5f87c1c946f6"
-asset_id = 112762753615261
-
-[entries."assets/images/expand_arrow.png"]
-hash = "6e511cd58229abd1a57d9a0fd0c5c7acd0ebcc666df8b7c96b216acd1dc6aae6"
-asset_id = 74041241173845
-
-[entries."assets/images/food.png"]
-hash = "545ecce8ddc5e706f4cf1eff5c5a3095fcb8b9287a934aacc5b3bfdc3131a695"
-asset_id = 139535785344437
-
-[entries."assets/images/food_mascot1.png"]
-hash = "f5c77c9cb18b3cdca038bd894f8809d4dde3637a12bdd5cfd06f8271bd9ea882"
-asset_id = 136259483706242
-
-[entries."assets/images/home.png"]
-hash = "d6273fdd0966126d79a1e165342e7d29e3c301db7bbf1902be658938539e0452"
-asset_id = 97678301757572
-
-[entries."assets/images/information.png"]
-hash = "dfc0a67290e023753d0a1dbb12129ed90e1a9f545377dc0028b5752462042967"
-asset_id = 126735013234073
-
-[entries."assets/images/mail.png"]
-hash = "7f72b6f734c230c96f88170820213f32f0318320819aaebceeab3e7c9aca7038"
-asset_id = 115119773206384
-
-[entries."assets/images/pickup.png"]
-hash = "519850ecf43bb007a4c8a04e3771a75f22dc6163c60dd798476ca3a72732cbab"
-asset_id = 81238474592618
-
-[entries."assets/images/plus.png"]
-hash = "496eb00c765dc221fa18adcc7127a655f24d013aefa6be97b02d091bcd9e05b6"
-asset_id = 98455173639561
-
-[entries."assets/images/settings.png"]
-hash = "2ab10e30c8e177ba17b5c1a44c2413a795e59adfb8a5e12208e990bfc01f23e7"
-asset_id = 122653279725588
-
-[entries."assets/images/shop.png"]
-hash = "aee0b8875ef34cca5c67743b06ef94aa3ae79fc39ffb8996cf345689297e0b8c"
-asset_id = 128189376120825
-
-[entries."assets/images/signal.png"]
-hash = "ca5399c5936161f6eaf2b10ffdda5016c581fd46619be0b4c91c7a800028b8e6"
-asset_id = 87885280662051
-
-[entries."assets/images/tutorial.png"]
-hash = "88d7c4a7347dba2d3b94d54beb75b742ac41422437a1d7143dfc363150e79670"
-asset_id = 111681438454335
-
-[entries."assets/images/vip.png"]
-hash = "2589c97ec70df2dd8e95d97fed039ca66da8029cd053e29d15a6c4a75c185aa5"
-asset_id = 128376517626202
-
-[entries."assets/images/wifi.png"]
-hash = "ee03c27007a4acb0ceb0a51a0fef22ee142a4aad0c4cee995eea637353d0fbdc"
-asset_id = 82362573362192
+[inputs.assets."assets/images/blur.png"]
+hash = "d1b211a8eaaf1a834836d63b984aaf85538b10e34a714d06fc65ba0faf440af6"
+asset_id = 114895176910548

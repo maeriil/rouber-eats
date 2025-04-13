@@ -1,32 +1,36 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local alter_order_event = require(ReplicatedStorage.common.events.restaurant.alter_order_event)
-local attributes = require(ReplicatedStorage.types.attributes)
-local components = require(ReplicatedStorage.common.ecs.components)
-local create_dialogue = require(ReplicatedStorage.common.utility.create_dialogue)
-local deliver_order_event = require(ReplicatedStorage.common.events.restaurant.deliver_order_event)
-local luausignal = require(ReplicatedStorage.common.utility.luausignal)
-local pickup_order_event = require(ReplicatedStorage.common.events.restaurant.pickup_order_event)
-local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
-local steal_order_event = require(ReplicatedStorage.common.events.restaurant.steal_order_event)
-local types = require(ReplicatedStorage.types)
-local world = require(ReplicatedStorage.common.ecs.world)
+-- stylua: ignore start
+local ReplicatedStorage             = game:GetService("ReplicatedStorage")
+local attributes                    = require(ReplicatedStorage.types.attributes)
+local create_dialogue               = require(ReplicatedStorage.common.utility.create_dialogue)
+local luausignal                    = require(ReplicatedStorage.common.utility.luausignal)
+local server_id_map                 = require(ReplicatedStorage.client.store.server_id_map)
+
+local try_altering_order_event      = require(ReplicatedStorage.common.events.order.try_altering_order_event)
+local invoke_delivering_order_event = require(ReplicatedStorage.common.events.order.invoke_delivering_order_event)
+local try_picking_up_order_event    = require(ReplicatedStorage.common.events.order.try_pickup_order_event)
+local try_keeping_order_event       = require(ReplicatedStorage.common.events.order.try_keeping_order_event)
+
+local t                             = require(ReplicatedStorage.types)
+local c                             = require(ReplicatedStorage.common.ecs.components)
+local world                         = require(ReplicatedStorage.common.ecs.world)
+
+local verify_order_signal  : luausignal.Identity<boolean, string> = luausignal()
+local steal_success_signal : luausignal.Identity<boolean, string> = luausignal()
+local alter_success_signal : luausignal.Identity<boolean, string> = luausignal()
 
 local DIALOGUE = create_dialogue.DIALOGUE
 local CALLBACK = create_dialogue.CALLBACK
-local CHOICE = create_dialogue.CHOICE
+local CHOICE   = create_dialogue.CHOICE
 local RESPONSE = create_dialogue.RESPONSE
-local IF = create_dialogue.IF
-local GOTO = create_dialogue.GOTO
+local IF       = create_dialogue.IF
+local GOTO     = create_dialogue.GOTO
+-- stylua: ignore end
 
 local key = "restaurant_general"
 
 type props = {
 	npc: Model,
 }
-
-local verify_order_signal: luausignal.Identity<boolean, string> = luausignal()
-local steal_success_signal: luausignal.Identity<boolean, string> = luausignal()
-local alter_success_signal: luausignal.Identity<boolean, string> = luausignal()
 
 local function dialogue(props: props)
 	local npc_name = props.npc.Name
@@ -39,7 +43,7 @@ local function dialogue(props: props)
 	]]
 	local npc_folder = props.npc.Parent :: Folder
 	local interior = npc_folder.Parent :: Model
-	local server_restaurant_id = interior:GetAttribute(attributes.serverid) :: types.Entity?
+	local server_restaurant_id = interior:GetAttribute(attributes.serverid) :: t.Entity?
 
 	if server_restaurant_id == nil then
 		error(
@@ -51,11 +55,11 @@ local function dialogue(props: props)
 
 	local client_mapped = server_id_map.restaurant_map[server_restaurant_id]
 	local error_msg_handling = ``
-	local restaurant_name = world:exists_get(client_mapped, components.Name)
+	local restaurant_name = world:exists_get(client_mapped, c.Name)
 
 	local function select_choice_to_steal()
 		return function()
-			steal_order_event.to_server()
+			try_keeping_order_event.to_server()
 
 			local res, msg = steal_success_signal:wait()
 			if not res then
@@ -68,7 +72,7 @@ local function dialogue(props: props)
 
 	local function select_choice_to_tamper()
 		return function()
-			alter_order_event.to_server()
+			try_altering_order_event.to_server()
 
 			local res, msg = alter_success_signal:wait()
 			if not res then
@@ -83,12 +87,12 @@ local function dialogue(props: props)
 		-- This is by default should just be a callback function, that is, there is no need
 		-- to await for server verification
 
-		deliver_order_event.to_server()
+		invoke_delivering_order_event.to_server()
 	end
 
-	local function await_server_pickup_verification(restaurant_id: types.Entity)
+	local function await_server_pickup_verification(restaurant_id: t.Entity)
 		return function()
-			pickup_order_event.to_server(restaurant_id)
+			try_picking_up_order_event.to_server(restaurant_id)
 
 			local res, msg = verify_order_signal:wait()
 			if not res then
@@ -213,7 +217,7 @@ local function dialogue(props: props)
 		},
 	}
 
-	world:set(dialogue_id, components.DialogueAuthor, npc_name)
+	world:set(dialogue_id, c.DialogueAuthor, npc_name)
 	return dialogue_id
 end
 

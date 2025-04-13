@@ -64,5 +64,7 @@ return {
 		["tutorial.png"] = "rbxassetid://111681438454335",
 		["vip.png"] = "rbxassetid://128376517626202",
 		["wifi.png"] = "rbxassetid://82362573362192",
+		["ActiveBackground1.svg"] = "rbxassetid://84216593621584",
+		["ActiveBackground2.svg"] = "rbxassetid://132709140833956",
 	},
 }

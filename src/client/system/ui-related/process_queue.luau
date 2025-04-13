@@ -14,7 +14,10 @@ local handle_proximity_interaction =
 	require(ReplicatedStorage.common.utility.handle_proximity_interaction)
 local last_fired = require(ReplicatedStorage.common.utility.last_fired)
 local phases = require(ReplicatedStorage.common.ecs.phases)
+local throw_error = require(ReplicatedStorage.common.utility.throw_error)
 local world = require(ReplicatedStorage.common.ecs.world)
+local try_strike_order_pose_event =
+	require(ReplicatedStorage.common.events.order.try_strike_order_pose_event)
 local __ = jecs.Wildcard
 
 local is_valid_time, update = last_fired(1)
@@ -108,11 +111,20 @@ local map: {
 			return warn(`Passed an client id {client_order_id} that is not an order. Ignoring request`)
 		end
 
-		warn(`Firing the order req to server...`)
 		local server_entity_id = world:get(client_order_id, c.EntityId) :: t.Entity
 		clientevents.RouberOrders.i_want_to_accept_order.fire(blink_conv.from_entity(server_entity_id))
 
 		update(player)
+	end,
+	["pose_select"] = function(payload: () -> (t.rouber_pose_t, t.Entity))
+		local pose_kind: t.rouber_pose_t, order_id = payload()
+
+		if not order_id or not world:contains(order_id) then
+			return throw_error(`Sending an unknown order_id to pose_select`)
+		end
+
+		local server_order_id = world:exists_get(order_id, c.EntityId) :: t.Entity
+		try_strike_order_pose_event.to_server(server_order_id, pose_kind)
 	end,
 }
 

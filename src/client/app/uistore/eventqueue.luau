@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local queue = require(ReplicatedStorage.common.utility.queue)
 local types = require(ReplicatedStorage.types)
+local uistore = require(script.Parent)
 local vide = require(ReplicatedStorage.pkg.vide)
 
 type queue<T> = queue.Queue<T>
@@ -13,6 +14,7 @@ export type qevent_types =
 	| "DialogueNextResponse"
 	| "ProximityClicked"
 	| "OrderAccept"
+	| "pose_select"
 export type qevent = {
 	type: qevent_types,
 	payload: (() -> any)?,
@@ -33,9 +35,9 @@ local function add_dialogue_event_choice(id: Entity)
 	})
 end
 
-local function add_dialogue_started(npc: Model)
+local function add_dialogue_started(npc_id: Entity)
 	local payload = function()
-		return npc
+		return npc_id
 	end
 
 	event_queue:add({
@@ -53,6 +55,17 @@ local function dispatch_next_dialogue(id: Entity)
 		type = "DialogueNextResponse",
 		payload = payload,
 	})
+end
+
+local function dispatch_pose_select(pose_kind: string)
+	local payload = function()
+		return pose_kind, uistore.ActiveOrder()
+	end
+
+	event_queue:add {
+		type = "pose_select",
+		payload = payload,
+	}
 end
 
 local function add_ui_openclose_event(page: string)
@@ -105,4 +118,5 @@ return {
 	dispatch_next_dialogue = dispatch_next_dialogue,
 	dispatch_proximity_clicked = dispatch_proximity_clicked,
 	dispatch_order_accept = dispatch_order_accept,
+	dispatch_pose_select = dispatch_pose_select,
 }

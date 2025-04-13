@@ -25,9 +25,7 @@ CollectionService:GetInstanceAddedSignal(tags.Restaurant):Connect(function(insta
 	local client_id_attribute = instance:GetAttribute(attributes.clientid)
 
 	if client_id_attribute == nil then
-		warn(
-			`Client attribute isn't set yet, which means this ({instance.Name}) is a new item. Setting it up`
-		)
+		-- warn(`Setting up restaurant {instance.Name}`)
 		table.insert(instance_added, instance)
 	end
 end)
@@ -153,7 +151,7 @@ local function system()
 	end
 
 	if not completed and n > 0 then
-		print(restaurant_map)
+		-- print(restaurant_map)
 		clientevents.PlayerEvents.i_have_setup_restaurants.fire()
 		-- -- table.clear(restaurant_map)
 		-- print("setting it to nil....")

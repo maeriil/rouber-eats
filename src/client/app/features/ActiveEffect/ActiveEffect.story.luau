@@ -8,6 +8,7 @@ local pane = require(ReplicatedStorage.client.app.components.pane.pane)
 local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local vide = require(ReplicatedStorage.pkg.vide)
 local vlayout = require(ReplicatedStorage.client.app.components.layouts.vlayout)
+local effect2 = require(ReplicatedStorage.client.app.features.ActiveEffect.effect2)
 
 local mount = vide.mount
 local px = use_px.px
@@ -18,7 +19,9 @@ local function story()
 	return frame {
 		color = Color3.fromRGB(),
 		size = UDim2.new(0.8, 0, 1, 0),
-		vlayout {},
+		vlayout {
+			pad = UDim.new(0, 32),
+		},
 		padding {
 			padding = padding_types.px48,
 		},
@@ -26,6 +29,11 @@ local function story()
 			size = UDim2.new(0.8, 0, 0, px(128)),
 			order = order(),
 			effect1 {},
+		},
+		frame {
+			size = UDim2.new(0.8, 0, 0, px(128)),
+			order = order(),
+			effect2 {},
 		},
 	}
 end

@@ -65,7 +65,7 @@ local function add_order_to_world(
 	world:set(order_id, c.EntityId, server_id)
 	world:set(order_id, c.DeliveryOrderDetails, delivery_details)
 	world:set(order_id, c.Gems, gems)
-	world:set(order_id, c.Coins, coins)
+	world:set(order_id, c.Roubins, coins)
 	world:add(order_id, c.Vacant)
 
 	if has_mystery_box then
@@ -98,13 +98,13 @@ local function create_order_to_world()
 end
 
 local vacant_orders_query =
-	world:query(c.DeliveryOrderDetails, c.EntityId, c.Coins, c.Gems):with(c.Vacant):cached()
+	world:query(c.DeliveryOrderDetails, c.EntityId, c.Roubins, c.Gems):with(c.Vacant):cached()
 local function display_orders_to_ui()
 	local orders_map = {} :: { [string]: types.DeliveryOrderType }
 
 	-- for client_id, details, server_id, coins, gems in vacant_orders_query:iter() do
 	for client_id, details, server_id, coins, gems in
-		world:query(c.DeliveryOrderDetails, c.EntityId, c.Coins, c.Gems):with(c.Vacant):iter()
+		world:query(c.DeliveryOrderDetails, c.EntityId, c.Roubins, c.Gems):with(c.Vacant):iter()
 	do
 		local key = tostring(server_id)
 		-- print(`building the key = {key} with client_id = {client_id}`)

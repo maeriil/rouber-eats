@@ -16,6 +16,12 @@ local __ = jecs.Wildcard
 local pair = jecs.pair
 
 local function setup_house_owner(server_owner_id: t.Entity, owner: Model, is_npc: boolean)
+	if server_id_map.residence_owner_map[server_owner_id] then
+		warn(`We have already setup this house owner, dropping req...`)
+		return
+	end
+
+	warn(`Setting up house owner {owner.Name}`)
 	local owner_id = world:entity() :: t.Entity
 	world:add(owner_id, c.HouseOwner)
 	world:set(owner_id, c.EntityId, server_owner_id)
@@ -40,6 +46,7 @@ local function setup_house_owner_event_handler()
 		-- do
 		local n = #server_id_list
 
+		print("==========")
 		warn(`Bulk setting up house {n} owners `)
 
 		for i = 1, n do
@@ -49,11 +56,15 @@ local function setup_house_owner_event_handler()
 
 			setup_house_owner(server_owner_id, owner_name, is_npc)
 		end
+		print("==========")
 	end
 
 	for _, server_owner_id, owner_model, is_npc in request_create_house_owner.iter() do
 		-- for _, server_owner_id, owner_model, is_npc in events.CreateHouseOwner:query():client():iter() do
+		print("==========")
+		print("non-bulk-house-owner-send")
 		setup_house_owner(server_owner_id :: never, owner_model, is_npc)
+		print("==========")
 	end
 end
 
@@ -92,6 +103,12 @@ local function setup_house_on_client(
 	owner_id: t.Entity
 )
 	-- local client_owner_id = get_clientownerid_fromserver(owner_id)
+	if server_id_map.residence_map[server_id] then
+		warn(`We have already setup this house, dropping req...`)
+		return
+	end
+
+	warn(`Setting up house {interior_model.Name}`)
 	local client_owner_id = server_id_map.residence_owner_map[owner_id]
 	assert(client_owner_id ~= nil, `It cannot be nILL!!!`)
 	local exterior_model = get_appropriate_exterior_house(exterior_house)
@@ -121,6 +138,7 @@ local function setup_house_on_client(
 
 	interior_root.Transparency = 1
 	exterior_root.Transparency = 1
+	exterior_model.Name = `{player_name} exterior house`
 
 	world:set(client_owner_id, c.Residence, house_id)
 
@@ -174,6 +192,7 @@ local function setup_house_event_handler()
 		request_bulk_create_houses.iter()
 	do
 		local n = #server_id_list
+		print("==========")
 		warn(`Bulk setting up {n} houses`)
 		for i = 1, n do
 			task.spawn(function()
@@ -186,6 +205,7 @@ local function setup_house_event_handler()
 				setup_house_on_client(server_id, doormat_cf, interior_model, exterior_type, server_owner_id)
 			end)
 		end
+		print("==========")
 
 		response_bulk_create_houses.fire()
 	end
@@ -201,6 +221,7 @@ local function setup_house_event_handler()
 			exterior_type,
 			server_owner_id
 		)
+		print("==========")
 	end
 end
 

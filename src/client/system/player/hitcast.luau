@@ -1,15 +1,17 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local basepartmap = require(ReplicatedStorage.client.store.basepartmap)
-local c = require(ReplicatedStorage.common.ecs.components)
-local complete_order_event =
-	require(ReplicatedStorage.common.events.restaurant.complete_order_event)
-local gizmo = require(ReplicatedStorage.common.utility.gizmo)
-local jecs = require(ReplicatedStorage.pkg.jecs)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
-local phases = require(ReplicatedStorage.common.ecs.phases)
-local types = require(ReplicatedStorage.types)
-local world = require(ReplicatedStorage.common.ecs.world)
-local __ = jecs.Wildcard
+-- stylua: ignore start
+local ReplicatedStorage  = game:GetService("ReplicatedStorage")
+local basepartmap        = require(ReplicatedStorage.client.store.basepartmap)
+local gizmo              = require(ReplicatedStorage.common.utility.gizmo)
+local jecs               = require(ReplicatedStorage.pkg.jecs)
+local try_drop_off_event = require(ReplicatedStorage.common.events.order.try_drop_off_order_event)
+
+local c                  = require(ReplicatedStorage.common.ecs.components)
+local t                  = require(ReplicatedStorage.types)
+local p                  = require(ReplicatedStorage.common.ecs.pairs)
+local phases             = require(ReplicatedStorage.common.ecs.phases)
+local world              = require(ReplicatedStorage.common.ecs.world)
+local __                 = jecs.Wildcard
+-- stylua: ignore end
 
 local function on_door_check(part: BasePart)
 	local id = basepartmap[part]
@@ -32,7 +34,7 @@ local function on_teleport_check(part: BasePart)
 		return false
 	end
 
-	if world:has(id, pairs.TPCooldown) then
+	if world:has(id, p.TPCooldown) then
 		return true
 	end
 
@@ -76,19 +78,13 @@ local function system()
 	for _, instance in result do
 		local id = basepartmap[instance]
 		if id ~= nil and world:contains(id) and world:has(id, c.HasCutscene) then
-			-- warn(`found cutscene, we are now going to be playign the cutscene`)
-			world:add(c.Client, c.IsCutscenePlaying)
-			world:add(c.Client, c.Start)
-			world:set(c.Client, c.Cutscene, {
-				triggered_id = id,
-			})
-
 			if world:has(id, c.HasOrderToBeDelivered) then
 				local exterior_id = world:parent(id)
 				local parent_id = world:exists_get(exterior_id, c.Parent)
-
 				local server_parent_id = world:exists_get(parent_id, c.EntityId)
-				complete_order_event.to_server(server_parent_id :: types.Entity)
+
+				try_drop_off_event.to_server(server_parent_id :: t.Entity)
+				world:remove(id, c.HasOrderToBeDelivered)
 			end
 		end
 

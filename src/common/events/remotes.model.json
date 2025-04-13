@@ -14,24 +14,54 @@
       "ClassName": "RemoteEvent"
     },
     {
-      "Name": "restaurant_pickup_order",
-      "ClassName": "RemoteEvent"
-    },
-    {
-      "Name": "restaurant_steal_order",
-      "ClassName": "RemoteEvent"
-    },
-    {
-      "Name": "restaurant_deliver_order",
-      "ClassName": "RemoteEvent"
-    },
-    {
-      "Name": "restaurant_alter_order",
-      "ClassName": "RemoteEvent"
-    },
-    {
-      "Name": "restaurant_complete_order",
-      "ClassName": "RemoteEvent"
+      "Name": "order_events",
+      "ClassName": "Folder",
+      "Children": [
+        {
+          "Name": "create_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "try_accept_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "try_pickup_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "try_keeping_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "try_altering_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "invoke_delivering_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "try_drop_off_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "try_strike_order_pose_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "invoke_complete_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "start_delivery_condition",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "delivery_condition_outcome",
+          "ClassName": "RemoteEvent"
+        }
+      ]
     },
     {
       "Name": "player_rating_change",
@@ -39,6 +69,10 @@
     },
     {
       "Name": "player_pose",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "player_personality_update",
       "ClassName": "RemoteEvent"
     }
   ]

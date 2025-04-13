@@ -7,6 +7,6 @@
 wally = "UpliftGames/wally@0.3.2"
 rojo = "rojo-rbx/rojo@7.4.4"
 wally-package-types = "JohnnyMorganz/wally-package-types@1.4.2"
-asphalt = "jacktabscode/asphalt@0.9.1"
 stylua = "johnnymorganz/stylua@2.0.2"
 blink = "1Axen/blink@0.17.0"
+asphalt = "jacktabscode/asphalt@1.0.0-pre.5"

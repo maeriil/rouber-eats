@@ -3,6 +3,11 @@
   we will need to modify these types as some of the libraries will update too so its useful to have
   a central types
 
+	It might be a good idea to split them up into multiple files, especially for things that are
+	specific to a feature / game
+
+	Change the convention to rouber_`type_here`_t
+	Primitives can continue to be P
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -25,12 +30,14 @@ export type GamePages =
 	| "RouberScreen"
 	| "DialogueScene"
 	| "BackpackScreen"
+	| "pose_screen"
 export type RouberScreenPages = "My Orders" | "Orders" | "My Profile"
 
 export type BuildingRemoteParams = {
 	can_enter: boolean,
 }
 
+--//TODO remove this shit
 export type DeliveryOrderDetailsComponentType = {
 	restaurant_id: Entity | Id,
 	destination_id: Entity | Id,
@@ -44,6 +51,19 @@ export type DeliveryOrderFoodType = {
 	image: string,
 	rarity: number,
 }
+
+export type rouber_delivery_details_t = {
+	restaurant_id: Entity,
+	destination_id: Entity,
+	foods_list_id: Array<Entity>,
+	conditions_list_id: Array<Entity>,
+	order_tier: number,
+}
+export type rouber_deliver_reward_details_t = {
+	roubins: number,
+	has_mystery_box: boolean,
+}
+
 export type DeliveryOrderType = {
 	--[[
 		I think this should be the client entity id. If it is client, then we need to dispatch
@@ -304,5 +324,58 @@ export type BackpackEnumConfigType = {
 	furnishing: number,
 	items: number,
 }
+
+-- export type game_events_t =
+-- 	"event_halloween"
+-- 	| "event_Christmas"
+-- 	| "event_Diwali"
+-- 	| "event_New_Years"
+-- 	| "event_CN_New_Years"
+-- 	| "event_NP_New_Years"
+
+export type rouber_pose_t = "default_deliver_pose" | "deliver_elegantly"
+export type rouber_pose_category_t =
+	"cool_pose"
+	| "elegant_pose"
+	| "spooky_pose"
+	| "stylish_pose"
+	| "rocky_pose"
+	| "quirky_pose"
+	| "shy_pose"
+	| "confident_pose"
+	| "unknown_pose"
+
+export type rouber_house_theme_t = "Spooky" | "Classy" | "Energetic"
+
+export type rouber_npc_config_t = {
+	name: string,
+
+	house_type: BuildingsType,
+	house_location_id: string,
+
+	preferred_pose_category: rouber_pose_category_t,
+	disliked_pose_category: rouber_pose_category_t,
+
+	model: Model,
+
+	-- Some NPC specific conditions, when met they provide additional rewards
+	-- These conditions needs to be performed when a player is about to do the delivery to the house
+	conditions: Array<Entity>,
+	conditions_met_rewards: Array<Entity>,
+}
+
+export type rouber_emotion_t =
+	"cheer_emotion"
+	| "frown_emotion"
+	| "happy_emotion"
+	| "hooray_emotion"
+	| "sob_emotion"
+
+export type error_handling_status_t = {
+	success: boolean,
+	error_msg: string,
+}
+
+export type rouber_delivery_conditions_t = "hot_food_condition"
 
 return greentea
