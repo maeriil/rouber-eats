@@ -11,6 +11,9 @@ type props = {
 	transparency: can<() -> number>,
 	color: can<() -> Color3>,
 	zindex: can<() -> number>,
+	mode: can<Enum.ResamplerMode>,
+	img_rect_offset: can<() -> Vector2>,
+	img_rect_size: can<() -> Vector2>,
 	[number]: any,
 }
 
@@ -30,6 +33,9 @@ local function base_image(props: props)
 		Image = props.img,
 		ImageColor3 = props.color or Color3.fromRGB(255, 0, 0),
 		ZIndex = props.zindex,
+		ResampleMode = props.mode,
+		ImageRectOffset = props.img_rect_offset,
+		ImageRectSize = props.img_rect_size,
 
 		unpack(props),
 	}

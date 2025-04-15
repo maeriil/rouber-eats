@@ -30,9 +30,8 @@ local function DialogueScene(props: props)
 	local char = player.Character
 
 	if char then
-		warn(`USING PLAYERS CHARACTER`)
 	else
-		warn(`USING FALLBACK CHARACTER.... UNFORTUNATENLY`)
+		warn(`Using a fallback dialogue character. This should never happen in Prod`)
 		char = workspace:FindFirstChild("Maeriil")
 	end
 

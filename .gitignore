@@ -8,3 +8,4 @@ api_key.txt
 Packages/
 .env/
 tests/
+sourcemap.json

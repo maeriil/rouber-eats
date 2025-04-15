@@ -1,7 +1,12 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- local DoorProximity = require(script.features.Proximity.Attaching.DoorProximity)
 
 -- stylua: ignore start
+local billboard = require(ReplicatedStorage.client.app.components.billboard)
+local Result = require(ReplicatedStorage.client.app.features.Result)
+local result_non_billboard = require(ReplicatedStorage.client.app.features.Result.result_non_billboard)
+local result_sources = require(ReplicatedStorage.client.app.features.Result.result_sources)
 local BackpackScreen    = require(script.pages.BackpackScreen)
 local DialogueProximity = require(script.features.Proximity.DialogueProximity)
 local DialogueScene     = require(script.pages.DialogueScene)
@@ -10,7 +15,7 @@ local HudScreen         = require(script.pages.HudScreen)
 local ItemProximity     = require(script.features.Proximity.ItemProximity)
 local MailboxProximity  = require(script.features.Proximity.MailboxProximity)
 local PhoneScreen       = require(script.pages.PhoneScreen)
-local PosesScreen = require(script.pages.PosesScreen)
+local PosesScreen       = require(script.pages.PosesScreen)
 local RouberScreen      = require(script.pages.RouberScreen)
 local frame             = require(script.components.pane.frame)
 local types             = require(ReplicatedStorage.types)
@@ -18,9 +23,10 @@ local uistore           = require(script.uistore)
 local use_px            = require(script.utility.use_px)
 local vide              = require(ReplicatedStorage.pkg.vide)
 
-local create  = vide.create
-local switch  = vide.switch
-local indexes = vide.indexes
+local create            = vide.create
+local switch            = vide.switch
+local indexes           = vide.indexes
+local show              = vide.show
 -- stylua: ignore end
 
 local function root(): { any }
@@ -31,6 +37,7 @@ local function root(): { any }
   local dialoguescene : types.GamePages = "DialogueScene"
   local backpack      : types.GamePages = "BackpackScreen"
   local poses         : types.GamePages = "pose_screen"
+  local reward        : types.GamePages = "reward_screen"
 
   local page          = uistore.page
   local alldoors      = uistore.DoorProximity
@@ -76,6 +83,40 @@ local function root(): { any }
 				end
 			),
 
+			-- show(result_sources.start_result_animation, function()
+			-- 	local player = Players.LocalPlayer
+			-- 	local character = player.Character
+			-- 	local camera = workspace.CurrentCamera
+			-- 	assert(character, "Character must be defined by now")
+
+			-- 	return {
+			-- 		billboard {
+			-- 			adornee = character,
+			-- 			offset = function()
+			-- 				return vector.create(-2, 0, 0)
+			-- 			end,
+			-- 			size = function()
+			-- 				-- Its off my a little bit, will need to investigate that part
+			-- 				local curr_viewport = camera.ViewportSize
+			-- 				local cam_cf = camera.CFrame
+			-- 				local fov = camera.FieldOfView
+			-- 				local my_cf = character.PrimaryPart.CFrame
+			-- 				local dist = (cam_cf.Position - my_cf.Position).Magnitude
+			-- 				local h = math.tan(math.rad(fov / 2)) * 2 * dist
+			-- 				local w = (curr_viewport.X / curr_viewport.y) * h
+
+			-- 				return UDim2.fromScale(w, h)
+			-- 			end,
+			-- 			-- Result {},
+			-- 			frame {
+			-- 				size = UDim2.new(1, 0, 1, 0),
+			-- 				color = Color3.fromRGB(255, 0, 0),
+			-- 			},
+			-- 		},
+			-- 		-- result_non_billboard {},
+			-- 	} :: { any }
+			-- end),
+
 			switch(page) {
 				[""] = function()
 					return frame {
@@ -105,6 +146,9 @@ local function root(): { any }
 				end,
 				[poses] = function()
 					return PosesScreen {}
+				end,
+				[reward] = function()
+					return Result {}
 				end,
 			},
 		},

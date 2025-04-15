@@ -2,6 +2,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local useEventListener = require(script.Parent.use_eventlistener)
 local vide = require(ReplicatedStorage.pkg.vide)
 
+--[[
+	NOTE: I use an imperative version of this in the play_deliver_reward
+	so any changes we make here, we would need to make there, OR we can move the use_px code from
+	there to here if needed /shrug
+
+]]
+
 local source = vide.source
 
 --[=[

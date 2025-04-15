@@ -31,6 +31,7 @@ export type GamePages =
 	| "DialogueScene"
 	| "BackpackScreen"
 	| "pose_screen"
+	| "reward_screen"
 export type RouberScreenPages = "My Orders" | "Orders" | "My Profile"
 
 export type BuildingRemoteParams = {
