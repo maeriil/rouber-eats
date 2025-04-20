@@ -1,19 +1,30 @@
+-- stylua: ignore start
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local jecs = require(ReplicatedStorage.pkg.jecs)
-local t = require(ReplicatedStorage.types)
+local jecs              = require(ReplicatedStorage.pkg.jecs)
+local t                 = require(ReplicatedStorage.types)
 
-local c = require(ReplicatedStorage.common.ecs.components)
-local for_each_target = require(ReplicatedStorage.common.utility.for_each_target)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
-local phases = require(ReplicatedStorage.common.ecs.phases)
-local world = require(ReplicatedStorage.common.ecs.world)
-local __ = jecs.Wildcard
+local c                 = require(ReplicatedStorage.common.ecs.components)
+local for_each_target   = require(ReplicatedStorage.common.utility.for_each_target)
+local p                 = require(ReplicatedStorage.common.ecs.pairs)
+local phases            = require(ReplicatedStorage.common.ecs.phases)
+local world             = require(ReplicatedStorage.common.ecs.world)
+local __                = jecs.Wildcard
 
-local cast_query = world:query(c.CastStatus, c.BasePart, c.OverParams):with(c.DoormatZone):cached()
-local door_query =
-	world:query(c.DoorStatus, pairs.previous(c.DoorStatus)):without(c.CannotOpen):cached()
-local doortween_query =
-	world:query(pairs.TweenStart, pairs.TweenEnd, c.DoorStatus, c.TweenStatus):with(c.Door):cached()
+local cast_query = world
+	:query(c.CastStatus, c.BasePart, c.OverParams)
+	:with(c.DoormatZone)
+	:cached()
+
+local door_query = world
+	:query(c.DoorStatus, p.previous(c.DoorStatus))
+	:without(c.CannotOpen)
+	:cached()
+
+local doortween_query = world
+	:query(p.Start(c.Tween), p.End(c.Tween), c.DoorStatus, c.TweenStatus)
+	:with(c.Door)
+	:cached()
+-- stylua: ignore end
 
 local function system()
 	for i, is_player_on_part, part, params in cast_query:iter() do
@@ -55,7 +66,7 @@ local function system()
 			world:set(target, c.TweenStatus, true)
 		end)
 
-		world:set(i, pairs.previous(c.DoorStatus), doorstatus)
+		world:set(i, p.previous(c.DoorStatus), doorstatus)
 	end
 
 	for i, starttween, endtween, doorstatus, tweenstatus in doortween_query:iter() do

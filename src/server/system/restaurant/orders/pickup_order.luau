@@ -2,7 +2,7 @@
 local ReplicatedStorage          = game:GetService("ReplicatedStorage")
 local ServerScriptService        = game:GetService("ServerScriptService")
 
-local start_delivery_conditions  = require(ServerScriptService.server.server_utils.start_delivery_conditions)
+local restaurant = require(ReplicatedStorage.common.configs.restaurant)
 local update_delivery_conditions = require(ServerScriptService.server.server_utils.update_delivery_conditions)
 local jecs                       = require(ReplicatedStorage.pkg.jecs)
 local phases                     = require(ReplicatedStorage.common.ecs.phases)
@@ -10,7 +10,6 @@ local playerstore                = require(ServerScriptService.server.store.play
 local try_pickup_order_event     = require(ReplicatedStorage.common.events.order.try_pickup_order_event)
 
 local c                          = require(ReplicatedStorage.common.ecs.components)
-local p                          = require(ReplicatedStorage.common.ecs.pairs)
 local ref                        = require(ReplicatedStorage.common.ecs.ref)
 local t                          = require(ReplicatedStorage.types)
 local world                      = require(ReplicatedStorage.common.ecs.world)
@@ -32,16 +31,22 @@ local function end_with_failure(player: Player, message: string)
 	})
 end
 
-local function try_pickup_order_request(player: Player, restaurant_id: t.Entity?)
+local function try_pickup_order_request(player: Player, restaurant_id: string?)
 	local player_id = ref(player)
-	if
-		not restaurant_id
-		or not world:contains(restaurant_id)
-		or not world:has(restaurant_id, c.Restaurant)
-	then
-		end_with_failure(player, `Could not find a valid restaurant. Ignoring your request`)
+	local config = restaurant[restaurant_id]
+
+	if config == nil then
+		end_with_failure(player, `Could not find a valid restaurant`)
 		return
 	end
+	-- if
+	-- 	not restaurant_id
+	-- 	or not world:contains(restaurant_id)
+	-- 	or not world:has(restaurant_id, c.Restaurant)
+	-- then
+	-- 	end_with_failure(player, `Could not find a valid restaurant. Ignoring your request`)
+	-- 	return
+	-- end
 
 	if not world:has(player_id, c.IsWorking) then
 		end_with_failure(
@@ -93,8 +98,8 @@ end
 local from_client_event = try_pickup_order_event.from_client()
 
 local function system()
-	for a, player, restaurant_id in from_client_event.iter() do
-		try_pickup_order_request(player, restaurant_id)
+	for a, player, restaurant_name in from_client_event.iter() do
+		try_pickup_order_request(player, restaurant_name)
 	end
 end
 

@@ -4,7 +4,7 @@ local basepartmap = require(ReplicatedStorage.client.store.basepartmap)
 local c = require(ReplicatedStorage.common.ecs.components)
 local get_true_ancestor = require(ReplicatedStorage.common.utility.get_true_ancestor)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
+local p = require(ReplicatedStorage.common.ecs.pairs)
 local t = require(ReplicatedStorage.types)
 local tags = require(ReplicatedStorage.types.tags)
 local world = require(ReplicatedStorage.common.ecs.world)
@@ -43,7 +43,7 @@ local function setup_doormatzone(doormat: Part, parent: t.Entity, params: Overla
 	local e = world:entity() :: t.Entity
 	world:add(parent, pair(c.DoormatZone, e))
 	world:add(e, c.DoormatZone)
-	world:add(e, pairs.childof(parent))
+	world:add(e, p.childof(parent))
 	world:set(e, c.OverParams, params)
 	world:set(e, c.CastStatus, false)
 	world:set(e, c.BasePart, doormat)
@@ -56,12 +56,12 @@ local function setup_door(door_hinge: Part, parent: t.Entity, open_cf_mul: CFram
 	local e = world:entity()
 	world:add(parent, pair(c.Door, e))
 	world:add(e, c.Door)
-	world:add(e, pairs.childof(parent))
+	world:add(e, p.childof(parent))
 	world:set(e, c.BasePart, door_hinge)
 	world:set(e, c.DoorStatus, false)
 	world:set(e, c.TweenStatus, false)
 	world:set(parent, c.DoorStatus, false)
-	world:set(parent, pairs.previous(c.DoorStatus), false)
+	world:set(parent, p.previous(c.DoorStatus), false)
 
 	local goal_time = 0.8
 	local repeat_count = 0
@@ -86,8 +86,8 @@ local function setup_door(door_hinge: Part, parent: t.Entity, open_cf_mul: CFram
 		CFrame = close_cf,
 	})
 
-	world:set(e, pairs.TweenStart, open_tween)
-	world:set(e, pairs.TweenEnd, close_tween)
+	world:set(e, p.Start(c.Tween), open_tween)
+	world:set(e, p.End(c.Tween), close_tween)
 	world:set(e, c.TweenParams, params)
 end
 

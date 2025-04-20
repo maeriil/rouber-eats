@@ -1,8 +1,11 @@
 -- stylua: ignore start
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local basefont          = require(ReplicatedStorage.common.configs.gamefont.basefont)
 local vide              = require(ReplicatedStorage.pkg.vide)
 local create            = vide.create
+local px = use_px.px
 
 type fontsize = "sm" | "md" | "lg"
 type can<T>   = T?
@@ -40,9 +43,9 @@ local function text(props: props)
 		FontFace = font,
 		TextSize = function()
 			return if props.size == "lg"
-				then basefont.sizes.large
-				elseif props.size == "md" then basefont.sizes.medium
-				else basefont.sizes.small
+				then px(basefont.sizes.large)
+				elseif props.size == "md" then px(basefont.sizes.medium)
+				else px(basefont.sizes.small)
 		end,
 		TextColor3 = props.color or function()
 			return Color3.fromRGB()

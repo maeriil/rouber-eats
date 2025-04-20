@@ -14,6 +14,7 @@ local rtext             = require(ReplicatedStorage.client.app.components.text.r
 local cleared           = require(ReplicatedStorage.client.app.features.Graffiti.Presets.cleared)
 local sp_graffiti       = require(ReplicatedStorage.client.app.features.Graffiti.sp_graffiti)
 local use_px            = require(ReplicatedStorage.client.app.utility.use_px)
+local colorscheme = require(ReplicatedStorage.client.store.colorscheme)
 local vide              = require(ReplicatedStorage.pkg.vide)
 local types             = require(ReplicatedStorage.types)
 
@@ -48,7 +49,7 @@ local function money_graffiti_text(props)
 					letter = function()
 						return curr_letter
 					end,
-					secondar_color = Color3.fromRGB(255, 0, 0),
+					secondar_color = colorscheme.blood_red,
 					primary_color = Color3.fromRGB(),
 					order = function()
 						return i
@@ -136,6 +137,7 @@ local function render_condition(props: {
 				bolded = true,
 				italic = true,
 				color = textcolor,
+				size = "sm",
 			},
 			flexfill {},
 		},

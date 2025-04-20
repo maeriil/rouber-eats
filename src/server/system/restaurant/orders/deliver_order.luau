@@ -10,8 +10,6 @@ local invoke_delivering_order   = require(ReplicatedStorage.common.events.order.
 local throw_error               = require(ReplicatedStorage.common.utility.throw_error)
 
 local c                         = require(ReplicatedStorage.common.ecs.components)
-local p                         = require(ReplicatedStorage.common.ecs.pairs)
-local ref                       = require(ReplicatedStorage.common.ecs.ref)
 local t                         = require(ReplicatedStorage.types)
 local world                     = require(ReplicatedStorage.common.ecs.world)
 local __                        = jecs.Wildcard

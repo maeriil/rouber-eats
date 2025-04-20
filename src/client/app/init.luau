@@ -4,9 +4,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- stylua: ignore start
 local billboard = require(ReplicatedStorage.client.app.components.billboard)
+local basebutton = require(ReplicatedStorage.client.app.components.button.basebutton)
+local rtext = require(ReplicatedStorage.client.app.components.text.rtext)
 local Result = require(ReplicatedStorage.client.app.features.Result)
 local result_non_billboard = require(ReplicatedStorage.client.app.features.Result.result_non_billboard)
 local result_sources = require(ReplicatedStorage.client.app.features.Result.result_sources)
+local FallbackScreen = require(ReplicatedStorage.client.app.pages.FallbackScreen)
+local eventqueue = require(ReplicatedStorage.client.app.uistore.eventqueue)
+local go_back_page = require(ReplicatedStorage.client.app.utility.go_back_page)
 local BackpackScreen    = require(script.pages.BackpackScreen)
 local DialogueProximity = require(script.features.Proximity.DialogueProximity)
 local DialogueScene     = require(script.pages.DialogueScene)
@@ -27,6 +32,8 @@ local create            = vide.create
 local switch            = vide.switch
 local indexes           = vide.indexes
 local show              = vide.show
+local effect = vide.effect
+local px = use_px.px
 -- stylua: ignore end
 
 local function root(): { any }
@@ -119,15 +126,7 @@ local function root(): { any }
 
 			switch(page) {
 				[""] = function()
-					return frame {
-						size = UDim2.new(1, 0, 1, 0),
-						create "TextLabel" {
-							Size = UDim2.new(1, 0, 1, 0),
-							BackgroundTransparency = 1,
-							TextSize = 96,
-							Text = "Unkown page is shown",
-						},
-					}
+					return FallbackScreen {}
 				end,
 				[hud] = function()
 					return HudScreen {}
@@ -136,7 +135,9 @@ local function root(): { any }
 					return PhoneScreen {}
 				end,
 				[rouber] = function()
-					return RouberScreen {}
+					return RouberScreen {
+						eventqueue.add_ui_openclose_event(rouber),
+					}
 				end,
 				[dialoguescene] = function()
 					return DialogueScene {}

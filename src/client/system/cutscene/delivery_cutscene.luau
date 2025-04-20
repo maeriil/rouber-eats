@@ -18,30 +18,30 @@
 		2. Player walks away, and then the victory screen should show up now
 ]]
 -- stylua: ignore start
-local ReplicatedStorage      = game:GetService("ReplicatedStorage")
-local animations             = require(ReplicatedStorage.assets.animations)
-local change_page            = require(ReplicatedStorage.client.app.utility.change_page)
-local freeze_player_movement = require(ReplicatedStorage.common.utility.freeze_player_movement)
-local jecs                   = require(ReplicatedStorage.pkg.jecs)
-local phases                 = require(ReplicatedStorage.common.ecs.phases)
-local soundasset             = require(ReplicatedStorage.assets.soundasset)
-local uistore = require(ReplicatedStorage.client.app.uistore)
-local go_back_page = require(ReplicatedStorage.client.app.utility.go_back_page)
-local server_id_map = require(ReplicatedStorage.client.store.server_id_map)
-local sounds                 = require(ReplicatedStorage.client.store.sounds)
-local emotes = require(ReplicatedStorage.common.configs.emotes)
-local poses = require(ReplicatedStorage.common.configs.poses)
+local ReplicatedStorage           = game:GetService("ReplicatedStorage")
+local animations                  = require(ReplicatedStorage.assets.animations)
+local change_page                 = require(ReplicatedStorage.client.app.utility.change_page)
+local freeze_player_movement      = require(ReplicatedStorage.common.utility.freeze_player_movement)
+local jecs                        = require(ReplicatedStorage.pkg.jecs)
+local phases                      = require(ReplicatedStorage.common.ecs.phases)
+local soundasset                  = require(ReplicatedStorage.assets.soundasset)
+local uistore                     = require(ReplicatedStorage.client.app.uistore)
+local go_back_page                = require(ReplicatedStorage.client.app.utility.go_back_page)
+local server_id_map               = require(ReplicatedStorage.client.store.server_id_map)
+local sounds                      = require(ReplicatedStorage.client.store.sounds)
+local emotes                      = require(ReplicatedStorage.common.configs.emotes)
+local poses                       = require(ReplicatedStorage.common.configs.poses)
 
-local all_targets            = require(ReplicatedStorage.common.ecs.target)
-local c                      = require(ReplicatedStorage.common.ecs.components)
-local p                      = require(ReplicatedStorage.common.ecs.pairs)
-local t                      = require(ReplicatedStorage.types)
-local world                  = require(ReplicatedStorage.common.ecs.world)
+local all_targets                 = require(ReplicatedStorage.common.ecs.target)
+local c                           = require(ReplicatedStorage.common.ecs.components)
+local p                           = require(ReplicatedStorage.common.ecs.pairs)
+local t                           = require(ReplicatedStorage.types)
+local world                       = require(ReplicatedStorage.common.ecs.world)
 local invoke_complete_order_event = require(ReplicatedStorage.common.events.order.invoke_complete_order_event)
 local try_strike_order_pose_event = require(ReplicatedStorage.common.events.order.try_strike_order_pose_event)
-local throw_error = require(ReplicatedStorage.common.utility.throw_error)
-local pair                   = jecs.pair
-local __                     = jecs.Wildcard
+local throw_error                 = require(ReplicatedStorage.common.utility.throw_error)
+local pair                        = jecs.pair
+local __                          = jecs.Wildcard
 
 
 local start_cutscene_query = world
@@ -57,7 +57,7 @@ local end_cutscene_query = world
 
 local function grab_house_and_owner_id(parent_house_id: t.Entity)
 	local occupied_by, exterior_house_id =
-		world:exists_get(parent_house_id, c.OccupiedByPlayer, p.BuildingExteriorId)
+		world:exists_get(parent_house_id, c.OccupiedByPlayer, p.EntityId(c.Exterior))
 
 	return exterior_house_id, occupied_by
 end
@@ -94,10 +94,12 @@ end
 
 local my_orders_to_drop_off = world:query(c.DeliveryOrderDetails):with(c.ToDropOff):cached()
 local function get_orders_to_drop_off(client_house_id: t.Entity)
+	local server_id = world:exists_get(client_house_id, c.EntityId)
 	local queue = {}
 
 	for client_order_id, details in my_orders_to_drop_off:iter() do
-		if details.destination_id == client_house_id then
+		if details.destination_id == server_id then
+			print("found an order to drop off!")
 			table.insert(queue, client_order_id)
 		end
 	end
@@ -129,6 +131,8 @@ local function start_cutscene(house_id: t.Entity, cutscene_id: t.Entity)
 	local cutsceneparts = cutsceneparts_ro:Clone()
 	cutsceneparts.Parent = exterior_model
 	cutsceneparts:PivotTo(exterior_pos)
+
+	print("ok we ar edoing some animation..")
 
 	world:set(c.Camera, c.CameraProperties, {
 		type = Enum.CameraType.Scriptable,

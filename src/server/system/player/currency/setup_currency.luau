@@ -10,7 +10,7 @@ local phases = require(ReplicatedStorage.common.ecs.phases)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
-local without_currency = world:query(c.Client):without(c.Roubins, c.Gems):cached()
+local without_currency = world:query(c.Client):without(c.Roubins):cached()
 local function system()
 	for player_id, client in without_currency:iter() do
 		local data = playerdatastore[client]
@@ -21,10 +21,7 @@ local function system()
 
 		--//TODO: update name to roubins
 		local coins = data.coins
-		local gems = data.gems
-
 		world:set(player_id, c.Roubins, coins)
-		world:set(player_id, c.Gems, gems)
 	end
 end
 

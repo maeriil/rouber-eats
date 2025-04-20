@@ -8,6 +8,10 @@ return {
   Restaurant      = "Restaurant",
   Store           = "Store",
   StoreNoInterior = "StoreNoInterior",
+  House           = "House",
+  Interior        = "Interior",
+  Exterior        = "Exterior",
+  HouseOwner      = "HouseOwner",
 
 
 	-- Only DialogueConfiguration contains this tag. But basically it means that any instance

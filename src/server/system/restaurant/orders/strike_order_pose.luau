@@ -79,6 +79,10 @@ local function try_strike_pose(player: Player, order_id: t.Entity?, pose_kind: t
 	local owner_id = world:exists_get(house_id, c.OccupiedByNPC)
 		or world:exists_get(house_id, c.OccupiedByPlayer)
 	local owner_preferences = world:exists_get(owner_id, c.PreferredPoseCategory)
+	print(`Looking for preferences for owner {owner_id}`)
+	print("pref = ", owner_preferences)
+	print("pose kind = ", pose_kind)
+
 	world:set(order_id, c.Pose, pose_kind)
 
 	if table.find(owner_preferences.likes, category) then

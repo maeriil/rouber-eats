@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local vide = require(ReplicatedStorage.pkg.vide)
 
 local types = require(ReplicatedStorage.types)
+local display_types = require(ReplicatedStorage.types.display_types)
 type Entity = types.Entity
 type source<T> = vide.Source<T>
 local source = vide.source
@@ -70,18 +71,15 @@ local sources = {
 	poses_that_i_dislike = source({} :: { types.rouber_pose_category_t }),
 	pose_list = source({
 		"default_deliver_pose",
-		"default_deliver_pose",
-		"default_deliver_pose",
-		"default_deliver_pose",
-		"default_deliver_pose",
-		"default_deliver_pose",
-		"default_deliver_pose",
-		"default_deliver_pose",
 		-- "deliver_elegantly",
 	} :: { types.rouber_pose_t }),
 	hint_description = source(
 		`JohnDoe likes <font color="#00A2FF">flashy poses</font> but he hates poses with <font color="#FF0000">props!</font>`
 	),
+
+	backpack = source({} :: types.Array<types.Entity>),
+	backpack_furnishings = source({} :: types.Array<display_types.BackpackFurnishings>),
+	backpack_poses = source({} :: types.Array<display_types.BackpackPoses>),
 }
 
 return sources

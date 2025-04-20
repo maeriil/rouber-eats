@@ -1,20 +1,19 @@
-local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- stylua: ignore start
+local CollectionService   = game:GetService("CollectionService")
+local ReplicatedStorage   = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local gamedata = require(ServerScriptService.server.store.gamedata)
-local jecs = require(ReplicatedStorage.pkg.jecs)
-local p = require(ReplicatedStorage.common.ecs.pairs)
-local phases = require(ReplicatedStorage.common.ecs.phases)
-local restaurant_list = require(ReplicatedStorage.common.configs.restaurant)
+local gamedata            = require(ServerScriptService.server.store.gamedata)
+local p                   = require(ReplicatedStorage.common.ecs.pairs)
+local phases              = require(ReplicatedStorage.common.ecs.phases)
+local restaurant_list     = require(ReplicatedStorage.common.configs.restaurant)
+local attributes          = require(ReplicatedStorage.types.attributes)
 
-local attributes = require(ReplicatedStorage.types.attributes)
-local c = require(ReplicatedStorage.common.ecs.components)
-local planck = require(ReplicatedStorage.pkg.planck)
-local ref = require(ReplicatedStorage.common.ecs.ref)
-local tags = require(ReplicatedStorage.types.tags)
-local world = require(ReplicatedStorage.common.ecs.world)
-local __ = jecs.Wildcard
-
+local planck              = require(ReplicatedStorage.pkg.planck)
+local c                   = require(ReplicatedStorage.common.ecs.components)
+local ref                 = require(ReplicatedStorage.common.ecs.ref)
+local tags                = require(ReplicatedStorage.types.tags)
+local world               = require(ReplicatedStorage.common.ecs.world)
+-- stylua: ignore end
 --[[
   This needs to run initially before the map is unloaded to the server storage
 
@@ -99,11 +98,13 @@ local function system()
 		local interior_id = ref(interior)
 		local exterior_id = ref(exterior)
 		local display_name = restaurant_config.display_name
+		local config_name = restaurant_config.string_id
 
 		world:add(parent_id, c.Restaurant)
 		world:set(parent_id, c.Name, display_name)
-		world:set(parent_id, p.BuildingInteriorId, interior_id)
-		world:set(parent_id, p.BuildingExteriorId, exterior_id)
+		world:set(parent_id, p.ConfigOf(c.Name), config_name)
+		world:set(parent_id, p.EntityId(c.Interior), interior_id)
+		world:set(parent_id, p.EntityId(c.Exterior), exterior_id)
 
 		world:add(interior_id, c.Restaurant)
 		world:add(interior_id, c.Interior)
@@ -131,15 +132,29 @@ local function system()
     ]]
 
 		gamedata.restaurant_map[restaurant_id] = restaurant_config
-
 		-- We provide parent entity id for all instances
 		interior:SetAttribute(attributes.serverid, parent_id)
 		exterior:SetAttribute(attributes.serverid, parent_id)
 		folder:SetAttribute(attributes.serverid, parent_id)
-	end
 
-	table.clear(restaurant_list)
-	restaurant_list = nil :: never
+		--[[
+		The reason we do this way is cuz client right now expects interior and exterior to be
+			seperate. We could instead make it so client read the folder, and inside the folder
+			contains interior/exterior.
+
+			Upto you if u wanna do that, cuz rn this way works so not much difference
+		]]
+
+		interior:AddTag(tags.Interior)
+		interior:AddTag(tags.Restaurant)
+		interior:SetAttribute(attributes.restaurant_name_id, restaurant_name)
+		interior.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
+
+		exterior:AddTag(tags.Exterior)
+		exterior:AddTag(tags.Restaurant)
+		exterior:SetAttribute(attributes.restaurant_name_id, restaurant_name)
+		exterior.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
+	end
 end
 
 return {

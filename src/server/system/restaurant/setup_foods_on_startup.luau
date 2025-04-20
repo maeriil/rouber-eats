@@ -24,8 +24,8 @@ local function system()
 		gamedata.food_map[food_id] = food
 	end
 
-	table.clear(food_list)
-	food_list = nil :: never
+	-- table.clear(food_list)
+	-- food_list = nil :: never
 end
 
 return {

@@ -47,15 +47,7 @@ local components = {
 	Lifetime = world:component() :: t.Id<number>,
 	-- Typically should be used for component only I would say
 
-	-- Questionable names tbh...
-	--//TODO, turn them into  a single table like so
-	-- However, i am unsure about the names too so theres that
-	-- Currency = world:component() :: t.Id<{
-	-- 	coins: number,
-	-- 	gems: number,
-	-- }>,
 	Roubins = world:component() :: t.Id<number>,
-	Gems = world:component() :: t.Id<number>,
 	Rating = world:component() :: t.Id<number>,
 
 	--//TODO Do we even use Position?? If we don't remove it
@@ -103,7 +95,8 @@ local components = {
 	--//TODO Deprecate the usage of OwnerOf, as its too generic. The entities are on thing that
 	-- makes more sense that their aren't generic because they are super cheap to create
 	OwnerOf = world:entity() :: t.Entity,
-	Claim = world:entity() :: t.Entity,
+	Claimed = world:entity() :: t.Entity,
+	ClaimedBy = world:entity() :: t.Entity,
 
 	Vacant = world:entity() :: t.Entity,
 	-- Residence is basically any place a player can claim as their own living space
@@ -222,6 +215,7 @@ local components = {
 	Invalid = world:entity() :: t.Entity,
 
 	Item = world:entity() :: t.Entity,
+	-- Really we should only be using this on the server I think. On client, it might be better to spawn an entity? thoughts?
 	Backpack = world:component() :: t.Id<{
 		items: {
 			[t.Entity]: {
@@ -258,6 +252,14 @@ local components = {
 	PickupOrderPhase = world:entity() :: t.Entity,
 	DropOffOrderPhase = world:entity() :: t.Entity,
 	CompleteOrderPhase = world:entity() :: t.Entity,
+
+	Create = world:entity() :: t.Entity,
+	Config = world:entity() :: t.Entity,
+
+	-- UI Specific stuff
+	UI_EVENT = world:entity() :: t.Entity,
+	UIPage = world:component() :: t.Id<t.GamePages>,
+	UI_update_orders_list = world:entity() :: t.Entity,
 }
 
 do
@@ -280,11 +282,11 @@ end
 
 world:set(components.Model, jecs.OnRemove, function(entity)
 	local model = world:get(entity, components.Model)
-
 	if model and not world:has(entity, components.DoNotDelete) then
 		model:Destroy()
 	end
 end)
+world:add(components.Model, jecs.pair(jecs.OnDeleteTarget, jecs.Remove))
 
 world:set(components.PrimaryPart, jecs.OnRemove, function(entity)
 	local basepart = world:get(entity, components.PrimaryPart)
@@ -302,6 +304,15 @@ world:set(components.BasePart, jecs.OnRemove, function(entity)
 	end
 end)
 
+world:set(components.Cleanup, jecs.OnRemove, function(entity)
+	local cleanup = world:get(entity, components.Cleanup)
+
+	if cleanup and not world:has(entity, components.DoNotDelete) then
+		cleanup()
+	end
+end)
+
+world:add(components.Parent, jecs.pair(jecs.OnDeleteTarget, jecs.Remove))
 world:add(components.Parent, jecs.pair(jecs.OnDeleteTarget, jecs.Delete))
 
 do

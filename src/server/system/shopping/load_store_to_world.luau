@@ -95,8 +95,8 @@ local function setup_interior_exterior_store()
 
 		world:add(parent_id, c.Store)
 		world:set(parent_id, c.Name, display_name)
-		world:set(parent_id, p.BuildingInteriorId, interior_id)
-		world:set(parent_id, p.BuildingExteriorId, exterior_id)
+		world:set(parent_id, p.EntityId(c.Interior), interior_id)
+		world:set(parent_id, p.EntityId(c.Exterior), exterior_id)
 
 		world:add(interior_id, c.Store)
 		world:add(interior_id, c.Interior)

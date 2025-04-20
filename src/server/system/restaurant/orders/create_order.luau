@@ -3,28 +3,27 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local hot_food_condition =
 	require(ReplicatedStorage.common.configs.delivery_conditions.hot_food_condition)
-local gamedata = require(ServerScriptService.server.store.gamedata)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local playerdatastore = require(ServerScriptService.server.store.playerdatastore)
 local playersetupconfig = require(ServerScriptService.server.store.playersetupconfig)
 local playerstore = require(ServerScriptService.server.store.playerstore)
-local serverevents = require(ServerScriptService.server.serverevents)
 
 local star_0 = require(ReplicatedStorage.common.configs.rating.star_0)
 local star_1 = require(ReplicatedStorage.common.configs.rating.star_1)
 local star_2 = require(ReplicatedStorage.common.configs.rating.star_2)
 local star_3 = require(ReplicatedStorage.common.configs.rating.star_3)
 local star_4 = require(ReplicatedStorage.common.configs.rating.star_4)
+local restaurant = require(ReplicatedStorage.common.configs.restaurant)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local t = require(ReplicatedStorage.types)
 local pair = jecs.pair
-local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local last_fired = require(ReplicatedStorage.common.utility.last_fired)
 local world = require(ReplicatedStorage.common.ecs.world)
+local create_order_event = require(ReplicatedStorage.common.events.order.create_order_event)
 local __ = jecs.Wildcard
 
 local all_clients = world:query(c.Client):cached()
@@ -40,9 +39,9 @@ local function determine_if_should_create_order(list: { Player })
 			continue
 		end
 
-		if not config.restaurant_setup.client_completed then
-			continue
-		end
+		-- if not config.restaurant_setup.client_completed then
+		-- 	continue
+		-- end
 
 		local num_of_orders = #store.my_orders
 
@@ -122,17 +121,18 @@ end
 
 ]]
 local all_restaurants =
-	world:query(c.Name):with(c.Restaurant):without(c.Interior, c.Exterior):cached()
+	world:query(p.ConfigOf(c.Name)):with(c.Restaurant):without(c.Interior, c.Exterior):cached()
 local function select_a_restaurant(order_tier: number)
 	local restaurant_list = {}
 	for restaurant_id, name in all_restaurants:iter() do
-		table.insert(restaurant_list, restaurant_id)
+		print(`adding {name} to tablel..`)
+		table.insert(restaurant_list, name)
 	end
 
 	local random = Random.new(os.clock())
 	local index = random:NextInteger(1, #restaurant_list)
 
-	return restaurant_list[index] :: t.Entity
+	return restaurant_list[index]
 end
 
 --[[
@@ -237,22 +237,22 @@ local function create_orders(list: { Player })
 
 		local selected_order_tier, is_high_tier = select_order_tier(client)
 		local order_dest_owner_id = select_a_house_owner()
-		local residence_id = world:exists_get(order_dest_owner_id, c.Residence)
+		local residence_id = world:exists_get(order_dest_owner_id, c.Residence) :: t.Entity
 
-		local restaurant_id = select_a_restaurant(selected_order_tier)
-		local restaurant_config_data = gamedata.restaurant_map[restaurant_id]
+		local restaurant_name = select_a_restaurant(selected_order_tier)
+		local restaurant_config_data = restaurant[restaurant_name]
 		local foods = restaurant_config_data.foods
 		local selected_food = select_foods_from_restaurant(foods)
 		local order_base_rating = determine_order_rating_amount()
 
 		local order_id = world:entity()
 		local delivery_details: t.DeliveryOrderDetailsComponentType = {
-			restaurant_id = restaurant_id,
+			restaurant_id = restaurant_name,
 			destination_id = residence_id,
 			foods_list_id = { selected_food.id },
 			conditions_list_id = {
 				-- Conditions aren't created yet
-				hot_food_condition.entity_id,
+				hot_food_condition.name,
 			},
 			order_tier = selected_order_tier,
 		}
@@ -271,21 +271,15 @@ local function create_orders(list: { Player })
 
 		world:set(order_id, c.Roubins, coins_reward)
 		world:set(order_id, c.Rating, order_base_rating)
-		world:set(order_id, c.Gems, 0)
 		world:add(order_id, pair(c.Client, client_id))
 		world:add(order_id, c.Vacant)
 
-		serverevents.RouberOrders.create_order.fire(client, blink_conv.from_entity(order_id), {
-			conditions_list_id = delivery_details.conditions_list_id,
-			destination_id = delivery_details.destination_id,
-			foods_list_id = delivery_details.foods_list_id,
-			order_tier = delivery_details.order_tier,
-			restaurant_id = delivery_details.restaurant_id,
-		}, {
-			coins = coins_reward,
-			gems = 0,
+		local reward_details = {
+			roubins = coins_reward,
 			has_mystery_box = should_have_mystery_box,
-		})
+		}
+
+		create_order_event.to_client(client, order_id :: t.Entity, delivery_details, reward_details)
 
 		table.insert(livestore.my_orders, order_id)
 		update_cooldown(client)

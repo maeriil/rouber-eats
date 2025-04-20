@@ -4,7 +4,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local start_delivery_conditions = require(ServerScriptService.server.server_utils.start_delivery_conditions)
 local update_delivery_conditions = require(ServerScriptService.server.server_utils.update_delivery_conditions)
-local serverevents = require(ServerScriptService.server.serverevents)
 local poses = require(ReplicatedStorage.common.configs.poses)
 local playerstore = require(ServerScriptService.server.store.playerstore)
 local jecs = require(ReplicatedStorage.pkg.jecs)
@@ -18,6 +17,7 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local tr = require(ReplicatedStorage.common.ecs.target)
 local world = require(ReplicatedStorage.common.ecs.world)
+local delete_invalid_order_event = require(ReplicatedStorage.common.events.order.delete_invalid_order_event)
 local __ = jecs.Wildcard
 -- stylua: ignore end
 
@@ -75,6 +75,7 @@ local function complete_order(player: Player, house_id: t.Entity?)
 
 		local owner_id = world:exists_get(house_id, c.OccupiedByNPC)
 			or world:exists_get(house_id, c.OccupiedByPlayer)
+
 		local owner_preferences = world:exists_get(owner_id, c.PreferredPoseCategory)
 
 		if details.destination_id ~= house_id then
@@ -97,7 +98,8 @@ local function complete_order(player: Player, house_id: t.Entity?)
 		total_net_ratings += final_rating
 		total_net_roubins += final_roubins
 
-		serverevents.RouberOrders.delete_order.fire(player, order_id :: any)
+		-- serverevents.RouberOrders.delete_order.fire(player, order_id :: any)
+		delete_invalid_order_event.to_client(player, order_id)
 		world:delete(order_id)
 		dropped_off_orders[i] = nil
 	end

@@ -40,10 +40,10 @@ export type BuildingRemoteParams = {
 
 --//TODO remove this shit
 export type DeliveryOrderDetailsComponentType = {
-	restaurant_id: Entity | Id,
+	restaurant_id: string,
 	destination_id: Entity | Id,
-	foods_list_id: { Entity | Id },
-	conditions_list_id: { Entity | Id },
+	foods_list_id: Array<string>,
+	conditions_list_id: Array<rouber_delivery_conditions_t>,
 	order_tier: number,
 }
 
@@ -54,10 +54,13 @@ export type DeliveryOrderFoodType = {
 }
 
 export type rouber_delivery_details_t = {
-	restaurant_id: Entity,
+	-- we probbaly lshold have a type for this?
+	restaurant_id: string,
 	destination_id: Entity,
-	foods_list_id: Array<Entity>,
-	conditions_list_id: Array<Entity>,
+	-- we probbaly lshold have a type for this?
+	foods_list_id: Array<string>,
+
+	conditions_list_id: Array<rouber_delivery_conditions_t>,
 	order_tier: number,
 }
 export type rouber_deliver_reward_details_t = {
@@ -251,7 +254,7 @@ export type FoodConfigType = {
 }
 
 export type RestaurantFoodConfigType = {
-	id: Entity,
+	id: string,
 	star: { number },
 }
 

@@ -3,7 +3,7 @@ local event_handle = require(ReplicatedStorage.common.utility.remote_util)
 local types = require(ReplicatedStorage.types)
 
 local remotes = ReplicatedStorage.common.events.remotes
-local remote = remotes.player_rating_change
+local remote = remotes.player_events.player_rating_change
 
 --[[
   New rating is our clients new rating value, which is a value from [-1, 5)

@@ -5,7 +5,8 @@ local Mock_Delivery_list = require(ReplicatedStorage.client.app.pages.RouberScre
 local PhoneScreen        = require(script.Parent.PhoneScreen)
 local RouberScreen       = require(script.Parent.RouberScreen)
 local change_page        = require(ReplicatedStorage.client.app.utility.change_page)
-local frame              = require(ReplicatedStorage.client.app.components.pane.frame)
+local BackpackScreen     = require(ReplicatedStorage.client.app.pages.BackpackScreen)
+local FallbackScreen     = require(ReplicatedStorage.client.app.pages.FallbackScreen)
 local PosesScreen        = require(ReplicatedStorage.client.app.pages.PosesScreen)
 local types              = require(ReplicatedStorage.types)
 local uistore            = require(ReplicatedStorage.client.app.uistore)
@@ -14,34 +15,26 @@ local vide               = require(ReplicatedStorage.pkg.vide)
 
 local mount              = vide.mount
 local switch             = vide.switch
-local create             = vide.create
 -- stylua: ignore end
 
 local function story()
 	-- stylua: ignore start
 	local order_list = uistore.DeliveryOrderList
 	local page = uistore.page
-  local hud    : types.GamePages = "HudScreen"
-  local phone  : types.GamePages = "PhoneScreen"
-  local rouber : types.GamePages = "RouberScreen"
-  local poses  : types.GamePages = "pose_screen"
+  local hud      : types.GamePages = "HudScreen"
+  local phone    : types.GamePages = "PhoneScreen"
+  local rouber   : types.GamePages = "RouberScreen"
+  local poses    : types.GamePages = "pose_screen"
+  local backpack : types.GamePages = "BackpackScreen"
 	-- stylua: ignore end
 
 	use_px.use_px()
 	order_list(Mock_Delivery_list :: never)
-	change_page("pose_screen")
+	change_page("BackpackScreen")
 
 	return switch(page) {
 		[""] = function()
-			return frame {
-				size = UDim2.new(1, 0, 1, 0),
-				create "TextLabel" {
-					Size = UDim2.new(1, 0, 1, 0),
-					BackgroundTransparency = 1,
-					TextSize = 96,
-					Text = "Unkown page is shown",
-				},
-			}
+			return FallbackScreen {}
 		end,
 		[hud] = function()
 			return HudScreen {}
@@ -54,6 +47,9 @@ local function story()
 		end,
 		[poses] = function()
 			return PosesScreen {}
+		end,
+		[backpack] = function()
+			return BackpackScreen {}
 		end,
 	}
 end

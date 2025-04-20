@@ -49,7 +49,7 @@ local function from_server()
 end
 
 local function to_server(building_id: types.Entity, going_interior: boolean)
-	remote:FireClient(building_id, going_interior)
+	remote:FireServer(building_id, going_interior)
 end
 
 local function from_client()

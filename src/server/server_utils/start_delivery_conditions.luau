@@ -9,13 +9,6 @@ local playerstore         = require(ServerScriptService.server.store.playerstore
 local t                   = require(ReplicatedStorage.types)
 -- stylua: ignore end
 
-local function get_condition_key(condition_id: t.Entity): t.rouber_delivery_conditions_t
-	local key = world:exists_get(condition_id, c.Name)
-
-	-- Never cast because it somehow stays as string | string
-	return key :: never
-end
-
 --[[
   Similar to update_deliver_conditions, given a phase and an order_id, we want to
   start some conditions as well. Its created as a function for similar reasons since we would
@@ -30,8 +23,7 @@ local function start_delivery_conditions(currphase: t.Entity, player: Player, or
 	local delivery_details = world:exists_get(order_id, c.DeliveryOrderDetails)
 	local order_conditions = delivery_details.conditions_list_id
 
-	for _, condition_id in order_conditions do
-		local condition_key: t.rouber_delivery_conditions_t = get_condition_key(condition_id :: never)
+	for _, condition_key: t.rouber_delivery_conditions_t in order_conditions do
 		local details = delivery_conditions[condition_key]
 
 		-- We havent reached the point in phase to start it or we are already past it
@@ -39,7 +31,7 @@ local function start_delivery_conditions(currphase: t.Entity, player: Player, or
 			continue
 		end
 
-		warn(`Starting the condition {condition_key} 4 phase {world:exists_get(condition_id, c.Name)}`)
+		warn(`Starting the condition {condition_key} 4 phase`)
 		local ticket_id = details.create_order_condition(order_id)
 		local active_conditions = store.my_active_delivery_conditions
 		table.insert(active_conditions, ticket_id)

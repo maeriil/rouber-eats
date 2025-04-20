@@ -9,7 +9,7 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local tween_camera_query = world
-	:query(c.TweenParams, pairs.EndTransform)
+	:query(c.TweenParams, pairs.End(c.Transform))
 	:with(pairs.childof(c.Camera), c.StartAnimation)
 	:without(c.Tween)
 	:cached()
@@ -23,7 +23,7 @@ local function system()
 
 		world:set(i, c.Tween, tween)
 		world:remove(i, c.StartAnimation)
-		world:remove(i, pairs.EndTransform)
+		world:remove(i, pairs.End(c.Transform))
 
 		tween:Play()
 	end

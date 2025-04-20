@@ -1,12 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local clientevents = require(ReplicatedStorage.common.clientevents)
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local phases = require(ReplicatedStorage.common.ecs.phases)
-local pair = jecs.pair
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
@@ -68,15 +65,6 @@ local function system()
 		world:clear(c.Client)
 
 		character_removed[i] = nil
-	end
-
-	for _, server_id in clientevents.PlayerEvents.player_loaded_in.iter() do
-		-- for _, server_id in events.PlayerLoadIn:query():client():iter() do
-		warn(`Player has loaded in. After 2 seconds, we will setup their house`)
-		-- task.delay(2, function()
-		-- events.IHaveLoadedIn:send()
-		clientevents.PlayerEvents.i_have_loaded_in.fire()
-		-- end)
 	end
 end
 

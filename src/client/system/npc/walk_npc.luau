@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local t = require(ReplicatedStorage.types)
 
 local c = require(ReplicatedStorage.common.ecs.components)
@@ -33,24 +32,24 @@ local __ = jecs.Wildcard
 -- 	end
 -- end
 
-local test_walk_npc =
-	world:query(c.TweenParams, pairs.EndTransform):with(c.StartAnimation):without(c.Tween):cached()
-local function test_walk_npc_system()
-	for i, params, goal in test_walk_npc:iter() do
-		local parent = world:parent(i)
-		local primarypart = world:get(parent, c.PrimaryPart) :: Part
-		local currpos = primarypart.Position
-		primarypart.CFrame = CFrame.lookAt(currpos, goal.Position)
+-- local test_walk_npc =
+-- 	world:query(c.TweenParams, pairs.EndTransform):with(c.StartAnimation):without(c.Tween):cached()
+-- local function test_walk_npc_system()
+-- 	for i, params, goal in test_walk_npc:iter() do
+-- 		local parent = world:parent(i)
+-- 		local primarypart = world:get(parent, c.PrimaryPart) :: Part
+-- 		local currpos = primarypart.Position
+-- 		primarypart.CFrame = CFrame.lookAt(currpos, goal.Position)
 
-		local goals = { CFrame = goal }
+-- 		local goals = { CFrame = goal }
 
-		local tween = TweenService:Create(primarypart, params, goals)
-		world:set(i, c.Tween, tween)
-		world:set(i, c.TweenStatus, true)
-		tween:Play()
-		world:remove(i, c.StartAnimation)
-	end
-end
+-- 		local tween = TweenService:Create(primarypart, params, goals)
+-- 		world:set(i, c.Tween, tween)
+-- 		world:set(i, c.TweenStatus, true)
+-- 		tween:Play()
+-- 		world:remove(i, c.StartAnimation)
+-- 	end
+-- end
 
 -- local npc_walk_ended = world:query(c.Tween, c.AnimationTrack):with(c.NPC):cached()
 -- local function on_npc_walk_ended()

@@ -74,12 +74,14 @@ local function add_ui_openclose_event(page: string)
 	end
 
 	return action(function()
+		warn(`Opening the page {page}`)
 		event_queue:add({
 			type = "UIOpen",
 			payload = payload,
 		})
 
 		cleanup(function()
+			warn(`Closing the page {page}`)
 			event_queue:add({
 				type = "UIClose",
 				payload = payload,

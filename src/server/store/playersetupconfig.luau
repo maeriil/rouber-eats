@@ -14,11 +14,6 @@ type RequestStatus = {
 
 type Config = {
 	loaded_in: RequestStatus,
-	restaurant_setup: RequestStatus,
-	house_setup: RequestStatus,
-	map_setup: RequestStatus,
-	order_setup: RequestStatus,
-	food_setup: RequestStatus,
 }
 
 return {} :: { [Player]: Config }

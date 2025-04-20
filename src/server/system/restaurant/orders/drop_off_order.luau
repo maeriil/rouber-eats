@@ -10,8 +10,6 @@ local playerstore                = require(ServerScriptService.server.store.play
 local try_drop_off_order_event   = require(ReplicatedStorage.common.events.order.try_drop_off_order_event)
 
 local c                          = require(ReplicatedStorage.common.ecs.components)
-local p                          = require(ReplicatedStorage.common.ecs.pairs)
-local ref                        = require(ReplicatedStorage.common.ecs.ref)
 local world                      = require(ReplicatedStorage.common.ecs.world)
 local t                          = require(ReplicatedStorage.types)
 local __                         = jecs.Wildcard

@@ -1,4 +1,5 @@
 -- stylua: ignore start
+local Players               = game:GetService("Players")
 local ReplicatedStorage     = game:GetService("ReplicatedStorage")
 
 local basebutton            = require(ReplicatedStorage.client.app.components.button.basebutton)
@@ -24,6 +25,7 @@ local px                    = use_px.px
 local source                = vide.source
 local effect                = vide.effect
 local show                  = vide.show
+local player                = Players.LocalPlayer
 -- stylua: ignore end
 --[[
   The screen will really only show up when we are delivering the food to the house and
@@ -56,7 +58,8 @@ local function PosesScreen(props)
   local selected_pose     = source(1)
   local active_order      = uistore.ActiveOrder
   local pose_list         = uistore.pose_list
-  local mymodel           = uistore.MyModel :: types.Source<Model>
+  -- local mymodel           = uistore.MyModel :: types.Source<Model>
+	local mymodel = source(player.Character)
   local confirm_selection = source(false)
   local hint_description  = uistore.hint_description
 	-- stylua: ignore end

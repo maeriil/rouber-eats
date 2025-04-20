@@ -11,7 +11,6 @@ local function has_enough_space(
 	count: { number }
 )
 	local n = #item_to_add
-
 	local required_space = 0
 
 	for i = 1, n do

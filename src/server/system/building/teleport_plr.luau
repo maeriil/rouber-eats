@@ -1,7 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local jecs = require(ReplicatedStorage.pkg.jecs)
-local serverevents = require(ServerScriptService.server.serverevents)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
@@ -13,10 +11,10 @@ local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
 local teleport = world:query(c.Model, c.TeleportTo, c.PrimaryPart):without(p.TPCooldown):cached()
-local teleport_event = serverevents.Building.IWantToTeleportInOrOut
 
+local teleport_event_from_client = teleport_player_event.from_client()
 local function system()
-	for _, player, _building_id, curr_building in teleport_event.iter() do
+	for _, player, _building_id, curr_building in teleport_event_from_client.iter() do
 		local building_id = (_building_id :: never) :: types.Entity
 		if not building_id or not world:contains(building_id) then
 			local error_msg = `The specified building id = {building_id} does not exist. Aborting request`
@@ -30,8 +28,8 @@ local function system()
 		end
 
 		local e = ref(player)
-		local interior_id = world:get(building_id, p.BuildingInteriorId)
-		local exterior_id = world:get(building_id, p.BuildingExteriorId)
+		local interior_id = world:exists_get(building_id, p.EntityId(c.Interior))
+		local exterior_id = world:exists_get(building_id, p.EntityId(c.Exterior))
 
 		-- For that, we need to know whether a player is outside or inside
 		-- We also need to store the exterior position of the building in our server, which we don't right now
@@ -39,9 +37,16 @@ local function system()
 		-- Typically, these aren't very sensitive stuff, but if later on we need toimplemetn things like
 		-- only specific players can enter and etc, we would need to add validations here
 
-		assert(interior_id ~= nil, `Interior id must exist for the building`)
-		assert(exterior_id ~= nil, `Exterior id must exist for the building`)
-		local going_interior = curr_building == "exterior"
+		--[[
+
+		We need to use this, which will yield until it succeds or fails. While this is doing, we need to
+		send to client letting them know that we are loading this area, aka a loading screen
+		player:RequestStreamAroundAsync(destination.Position)
+		Once it completes, we fire to client letting them know to remove the loading screen
+
+		]]
+
+		local going_interior = curr_building
 
 		if going_interior then
 			local destination = world:get(interior_id, c.Transform) :: CFrame

@@ -9,15 +9,14 @@ local delivery_conditions = require(ReplicatedStorage.common.configs.delivery_co
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local playerstore = require(ServerScriptService.server.store.playerstore)
-local serverevents = require(ServerScriptService.server.serverevents)
 
 local c = require(ReplicatedStorage.common.ecs.components)
 local p = require(ReplicatedStorage.common.ecs.pairs)
 local ref = require(ReplicatedStorage.common.ecs.ref)
 local t = require(ReplicatedStorage.types)
 local pair = jecs.pair
-local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local world = require(ReplicatedStorage.common.ecs.world)
+local try_accept_order_event = require(ReplicatedStorage.common.events.order.try_accept_order_event)
 local __ = jecs.Wildcard
 
 --[[
@@ -31,10 +30,13 @@ local __ = jecs.Wildcard
 ]]
 local function end_with_failure(player: Player, message: string)
 	warn(`The server failed, with message = {message}`)
-	return serverevents.RouberOrders.accept_order_response.fire(player, false, -1, message)
+	try_accept_order_event.to_client(player, {
+		error_msg = message,
+		success = false,
+	}, -1 :: never)
 end
 
-local function try_accept_order_request(player: Player, order_id: t.Entity)
+local function try_accept_order_request(player: Player, order_id: t.Entity?)
 	local player_id = ref(player)
 	if order_id == nil then
 		end_with_failure(
@@ -58,7 +60,7 @@ local function try_accept_order_request(player: Player, order_id: t.Entity)
       needs to be tweaked up a bit
     ]]
 
-	local another_userid = world:get(order_id, pair(c.EntityId, c.Claim))
+	local another_userid = world:get(order_id, p.EntityId(c.ClaimedBy))
 	if another_userid ~= nil and another_userid ~= player_id then
 		end_with_failure(player, `Another user has already claimed this order. Aborting request`)
 		return
@@ -88,12 +90,16 @@ local function try_accept_order_request(player: Player, order_id: t.Entity)
 	end
 
 	-- We don't need this i dont think
-	world:set(order_id, p.ClaimedBy, player_id)
+	world:set(order_id, p.EntityId(c.ClaimedBy), player_id)
 	world:remove(order_id, c.Vacant)
 
 	table.remove(livestore.my_orders, order_id_index)
 	table.insert(livestore.my_accepted_orders, order_id)
-	serverevents.RouberOrders.accept_order_response.fire_all(true, blink_conv.from_entity(order_id))
+	-- serverevents.RouberOrders.accept_order_response.fire_all(true, blink_conv.from_entity(order_id))
+	try_accept_order_event.to_client(player, {
+		success = true,
+		error_msg = "",
+	}, order_id)
 
 	-- Determine if the order has conditions and check to see if they belong in the category
 	update_delivery_conditions(c.AcceptOrderPhase, player, order_id)
@@ -115,10 +121,9 @@ local function try_accept_order_request(player: Player, order_id: t.Entity)
 	-- end
 end
 
+local from_client_attmepts = try_accept_order_event.from_client()
 local function system()
-	for _, player, _order_id in serverevents.RouberOrders.i_want_to_accept_order.iter() do
-		local order_id = blink_conv.as_entity(_order_id)
-
+	for _, player, order_id in from_client_attmepts.iter() do
 		try_accept_order_request(player, order_id)
 	end
 end

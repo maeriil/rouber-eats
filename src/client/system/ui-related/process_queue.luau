@@ -1,14 +1,13 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local change_page = require(ReplicatedStorage.client.app.utility.change_page)
-local clientevents = require(ReplicatedStorage.common.clientevents)
 local dialogues = require(ReplicatedStorage.common.configs.dialogues)
 local eventqueue = require(ReplicatedStorage.client.app.uistore.eventqueue)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local t = require(ReplicatedStorage.types)
 local uistore = require(ReplicatedStorage.client.app.uistore)
+local CREATE_UI_EVENT = require(ReplicatedStorage.client.client_utils.CREATE_UI_EVENT)
 
-local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
 local c = require(ReplicatedStorage.common.ecs.components)
 local handle_proximity_interaction =
 	require(ReplicatedStorage.common.utility.handle_proximity_interaction)
@@ -16,6 +15,7 @@ local last_fired = require(ReplicatedStorage.common.utility.last_fired)
 local phases = require(ReplicatedStorage.common.ecs.phases)
 local throw_error = require(ReplicatedStorage.common.utility.throw_error)
 local world = require(ReplicatedStorage.common.ecs.world)
+local try_accept_order_event = require(ReplicatedStorage.common.events.order.try_accept_order_event)
 local try_strike_order_pose_event =
 	require(ReplicatedStorage.common.events.order.try_strike_order_pose_event)
 local __ = jecs.Wildcard
@@ -95,14 +95,14 @@ local map: {
 	["OrderAccept"] = function(payload: () -> t.Entity)
 		local player = Players.LocalPlayer
 		if not is_valid_time(player) then
-			return warn(`You are spam clicking it too much. Aborting the request`)
+			warn(`You are spam clicking it too much. Aborting the request`)
+			return
 		end
 
 		local client_order_id = payload()
 		if client_order_id == nil or not world:contains(client_order_id) then
-			return warn(
-				`Client world could not find a client id {client_order_id}. This has to be abug...`
-			)
+			warn(`Client world could not find a client id {client_order_id}. This has to be abug...`)
+			return
 		end
 
 		-- When we select order it must have order details component right
@@ -112,19 +112,28 @@ local map: {
 		end
 
 		local server_entity_id = world:get(client_order_id, c.EntityId) :: t.Entity
-		clientevents.RouberOrders.i_want_to_accept_order.fire(blink_conv.from_entity(server_entity_id))
+		-- clientevents.RouberOrders.i_want_to_accept_order.fire(blink_conv.from_entity(server_entity_id))
 
+		try_accept_order_event.to_server(server_entity_id)
 		update(player)
 	end,
 	["pose_select"] = function(payload: () -> (t.rouber_pose_t, t.Entity))
 		local pose_kind: t.rouber_pose_t, order_id = payload()
 
 		if not order_id or not world:contains(order_id) then
-			return throw_error(`Sending an unknown order_id to pose_select`)
+			throw_error(`Sending an unknown order_id to pose_select`)
+			return
 		end
 
 		local server_order_id = world:exists_get(order_id, c.EntityId) :: t.Entity
 		try_strike_order_pose_event.to_server(server_order_id, pose_kind)
+	end,
+	["UIOpen"] = function(payload: () -> t.GamePages)
+		local page_changed_to: t.GamePages = payload()
+
+		if page_changed_to == "RouberScreen" then
+			CREATE_UI_EVENT(c.UI_update_orders_list)
+		end
 	end,
 }
 

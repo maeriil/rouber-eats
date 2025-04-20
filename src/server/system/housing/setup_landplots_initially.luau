@@ -1,13 +1,15 @@
+-- stylua: ignore start
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local jecs = require(ReplicatedStorage.pkg.jecs)
+local jecs              = require(ReplicatedStorage.pkg.jecs)
 
-local c = require(ReplicatedStorage.common.ecs.components)
-local pairs = require(ReplicatedStorage.common.ecs.pairs)
-local phases = require(ReplicatedStorage.common.ecs.phases)
-local planck = require(ReplicatedStorage.pkg.planck)
-local world = require(ReplicatedStorage.common.ecs.world)
-local __ = jecs.Wildcard
+local c                 = require(ReplicatedStorage.common.ecs.components)
+local p                 = require(ReplicatedStorage.common.ecs.pairs)
+local phases            = require(ReplicatedStorage.common.ecs.phases)
+local planck            = require(ReplicatedStorage.pkg.planck)
+local world             = require(ReplicatedStorage.common.ecs.world)
+local __                = jecs.Wildcard
+-- stylua: ignore end
 
 local function system()
 	local landplots = "LandPlot"
@@ -20,17 +22,16 @@ local function system()
 		local doormat_location = landplot:FindFirstChild("DoorMatLocation") :: Part?
 		local player_tp_location = landplot:FindFirstChild("PlayerTPLocation") :: Part?
 
-		assert(plot, `Baseplot part does not exist for one of the land plots`)
-		assert(doormat_location, `Doormat part does not exist for one of the land plots`)
-		assert(player_tp_location, `Playertp part does not exist for one of the land plots`)
+		assert(plot, "Baseplot part does not exist for one of the land plots")
+		assert(doormat_location, "Doormat part does not exist for one of the land plots")
+		assert(player_tp_location, "Playertp part does not exist for one of the land plots")
 
 		local land = world:entity()
-		world:add(land, c.LandPlot)
 		world:set(land, c.Transform, plot.CFrame)
-		-- world:set(land, c.Size, plot.Size :: never)
+		world:set(land, p.Transform(c.DoormatZone), doormat_location.CFrame)
+		world:set(land, p.Transform(c.TeleportZone), player_tp_location.CFrame)
+		world:add(land, c.LandPlot)
 		world:add(land, c.Vacant)
-		world:set(land, pairs.DoormatTransform, doormat_location.CFrame)
-		world:set(land, pairs.PlayerExteriorTPTransform, player_tp_location.CFrame)
 
 		plot:Destroy()
 	end

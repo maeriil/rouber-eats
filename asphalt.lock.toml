@@ -24,9 +24,21 @@ asset_id = 80440253136479
 hash = "e375a9da67b3e34e4c388c1de99cdb0b87de2bc45aa904de8b252dc17d4751c8"
 asset_id = 112789224181629
 
+[inputs.assets."assets/images/Bottom_text_pattern.svg"]
+hash = "9c46b1b36d1dcfc23a39c681906d88b103f547116dd3ea04ee8a13ff6c382728"
+asset_id = 78472711996747
+
 [inputs.assets."assets/images/CardEffect_test.svg"]
 hash = "50cb27d588b6e7d5584b64df1b62a74cdc7cb6abcff3c35617e5b612937419cf"
 asset_id = 91204713529641
+
+[inputs.assets."assets/images/Cheese_Pizza_Pet.svg"]
+hash = "34681c109f59018d51df61af38848282d6c501d5fe916e58351cb66b124096b5"
+asset_id = 116665977006111
+
+[inputs.assets."assets/images/ContainerTitlePack.svg"]
+hash = "61166b42676fbcc700e9ea8cd9ea7adada73e0ff130ff29ee537893dc461dd84"
+asset_id = 81917967342658
 
 [inputs.assets."assets/images/Dialogue.svg"]
 hash = "977b072f2235744caf2515a0f28309e3fe70a4e33f57e10f8df2a9c1710d2b00"
@@ -68,6 +80,14 @@ asset_id = 86168630452495
 hash = "c3d7b29a8bfda1afa42e05b6d33ef76eda626668c106771de716a4ab68adfc56"
 asset_id = 121742107016552
 
+[inputs.assets."assets/images/IconPack1.svg"]
+hash = "5a0ecdac1db025802ffbdcac1cf69dd000dff05cd51dab352bd05e6cbc63d857"
+asset_id = 73205813429987
+
+[inputs.assets."assets/images/JaegarsCafeLogo.svg"]
+hash = "83a51301cbdb29ef8f5d160d64322de0166f0094da3e11f3c958f0c426fcea7b"
+asset_id = 103130946133023
+
 [inputs.assets."assets/images/Label.svg"]
 hash = "c1158690b981d2af2d208f542f5d539cbfed47004bd8a430dab0f71eb5f963d3"
 asset_id = 74544873090118
@@ -104,6 +124,26 @@ asset_id = 111673599591318
 hash = "275498200b567a0245839469ee7e3f52171fa3681d54017bf70e11c9017f7d83"
 asset_id = 111701628898861
 
+[inputs.assets."assets/images/Tutorial_LargeIcon.svg"]
+hash = "be4c88e953be06133c40e32be7ef5f1165780e3d94ea87f6014778acdfee91d2"
+asset_id = 90147633522235
+
 [inputs.assets."assets/images/blur.png"]
 hash = "d1b211a8eaaf1a834836d63b984aaf85538b10e34a714d06fc65ba0faf440af6"
 asset_id = 114895176910548
+
+[inputs.assets."assets/images/container_frame1.svg"]
+hash = "d98995290090bf77a1310fd035c65f6782f557edcd821a9fd270b6e6c4c3f1b5"
+asset_id = 85602987921173
+
+[inputs.assets."assets/images/receipt_container.svg"]
+hash = "026ec12b023e064afea275c3116f484b12bc693dda004c390c30a02f14aa8d4b"
+asset_id = 112546305395826
+
+[inputs.assets."assets/images/result_screen_vec_top_1.svg"]
+hash = "f58fba0f49124bcad91ae78fa5aa2309b366bb0c58be05e6074f052b3ecc933a"
+asset_id = 133078840672898
+
+[inputs.assets."assets/images/result_screen_vec_top_2.svg"]
+hash = "dcb664a10b083362485caf4c26faa371bf28154a7b3d41234488a809bd8887fa"
+asset_id = 71050877474054

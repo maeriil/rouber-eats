@@ -60,12 +60,16 @@
         {
           "Name": "delivery_condition_outcome",
           "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "delete_invalid_order_event",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "update_order_destination_event",
+          "ClassName": "RemoteEvent"
         }
       ]
-    },
-    {
-      "Name": "player_rating_change",
-      "ClassName": "RemoteEvent"
     },
     {
       "Name": "player_pose",
@@ -74,6 +78,34 @@
     {
       "Name": "player_personality_update",
       "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "house_events",
+      "ClassName": "Folder",
+      "Children": [
+        {
+          "Name": "delete_house_owner",
+          "ClassName": "RemoteEvent"
+        }
+      ]
+    },
+    {
+      "Name": "player_events",
+      "ClassName": "Folder",
+      "Children": [
+        {
+          "Name": "increase_roubins",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "decrease_roubins",
+          "ClassName": "RemoteEvent"
+        },
+        {
+          "Name": "player_rating_change",
+          "ClassName": "RemoteEvent"
+        }
+      ]
     }
   ]
 }

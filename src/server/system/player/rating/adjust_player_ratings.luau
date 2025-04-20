@@ -40,7 +40,7 @@ end
 
 local function increase_rating()
 	for client_id, client, rating, increase_amount in
-		world:query(c.Client, c.Rating, p.IncreaseRating):iter()
+		world:query(c.Client, c.Rating, p.Increase(c.Rating)):iter()
 	do
 		local new_rating = rating + increase_amount
 		local curr_int_rating = math.floor(rating)
@@ -70,7 +70,7 @@ local function increase_rating()
 		world:set(client_id, c.Rating, new_rating)
 		datastore.rating = new_rating
 		player_rating_event.to_client(client, new_rating, going_next_tier)
-		world:remove(client_id, p.IncreaseRating)
+		world:remove(client_id, p.Increase(c.Rating))
 	end
 end
 
@@ -83,7 +83,7 @@ end
 
 local function decrease_rating()
 	for client_id, client, rating, decrease_amount in
-		world:query(c.Client, c.Rating, p.DecreaseRating):iter()
+		world:query(c.Client, c.Rating, p.Decrease(c.Rating)):iter()
 	do
 		local new_rating = rating - decrease_amount
 		local datastore = playerdatastore[client]
@@ -96,7 +96,7 @@ local function decrease_rating()
 		world:set(client_id, c.Rating, new_rating)
 		datastore.rating = new_rating
 
-		world:remove(client_id, p.DecreaseRating)
+		world:remove(client_id, p.Decrease(c.Rating))
 		player_rating_event.to_client(client, new_rating, going_next_tier)
 	end
 end

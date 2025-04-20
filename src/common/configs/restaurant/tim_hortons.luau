@@ -15,15 +15,15 @@ local restaurant: types.RestaurantConfigType = {
 
 	foods = {
 		{
-			id = tim_hortons_signature_coffee.id,
+			id = tim_hortons_signature_coffee.string_id,
 			star = { 1, 2 },
 		},
 		{
-			id = iced_capp.id,
+			id = iced_capp.string_id,
 			star = { 2, 3 },
 		},
 		{
-			id = cream_cheese_bagel.id,
+			id = cream_cheese_bagel.string_id,
 			star = { 1 },
 		},
 	},

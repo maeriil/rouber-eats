@@ -113,8 +113,8 @@ local function try_steal_order_request(player: Player)
 
 		-- Once every check passes, we simply add the item to backpack
 		world:set(player_id, pair(c.BackpackItem, c.Increase), to_add_to_backpack)
-		world:set(player_id, p.DecreaseRating, 0.85)
-		world:set(player_id, p.DecreaseCoins, 50)
+		world:set(player_id, p.Decrease(c.Rating), 0.85)
+		world:set(player_id, p.Decrease(c.Roubins), 50)
 
 		try_keeping_order_event.to_client(player, {
 			success = true,

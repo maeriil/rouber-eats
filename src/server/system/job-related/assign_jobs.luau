@@ -3,26 +3,25 @@ local c = require(ReplicatedStorage.common.ecs.components)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local job_configs = require(ReplicatedStorage.common.configs.job_configs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
-local planckrunservice = require(ReplicatedStorage.pkg.planckrunservice)
 local world = require(ReplicatedStorage.common.ecs.world)
 local pair = jecs.pair
 local __ = jecs.Wildcard
 
-local function assign_job()
-	for e, player, job in world:query(c.Client, pair(c.Job, c.Assign)):iter() do
-		world:remove(e, pair(c.Job, c.Assign))
+-- local function assign_job()
+-- 	for e, player, job in world:query(c.Client, pair(c.Job, c.Assign)):iter() do
+-- 		world:remove(e, pair(c.Job, c.Assign))
 
-		local previous_job = world:target(e, c.Job)
-		if previous_job ~= nil then
-			world:remove(e, pair(c.Job, previous_job))
-		end
+-- 		local previous_job = world:target(e, c.Job)
+-- 		if previous_job ~= nil then
+-- 			world:remove(e, pair(c.Job, previous_job))
+-- 		end
 
-		local job_details = job_configs[job]
+-- 		local job_details = job_configs[job]
 
-		world:add(e, pair(c.Job, job))
-		player.Team = job_details.team
-	end
-end
+-- 		world:add(e, pair(c.Job, job))
+-- 		player.Team = job_details.team
+-- 	end
+-- end
 
 local without_jobs = world:query(c.Client):without(pair(c.Job, __)):cached()
 local function system() -- Query for all new players who wont have any jobs

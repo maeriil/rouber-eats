@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BackpackIconButton = require(ReplicatedStorage.client.app.features.Icons.BackpackIconButton)
+local basebutton = require(ReplicatedStorage.client.app.components.button.basebutton)
 local RouberPhone = require(ReplicatedStorage.client.app.features.RouberPhone)
 local TaxiButton = require(ReplicatedStorage.client.app.features.Icons.TaxiButton)
 local basefont = require(ReplicatedStorage.common.configs.gamefont.basefont)
@@ -14,6 +14,15 @@ local uistore = require(ReplicatedStorage.client.app.uistore)
 local use_px = require(ReplicatedStorage.client.app.utility.use_px)
 local vide = require(ReplicatedStorage.pkg.vide)
 local vlayout = require(ReplicatedStorage.client.app.components.layouts.vlayout)
+local AchievementsIcon = require(ReplicatedStorage.client.app.features.Icons.AchievementsIcon)
+local BackpackIcon = require(ReplicatedStorage.client.app.features.Icons.BackpackIcon)
+local CompanionIcon = require(ReplicatedStorage.client.app.features.Icons.CompanionIcon)
+local HomeIcon = require(ReplicatedStorage.client.app.features.Icons.HomeIcon)
+local JournalIcon = require(ReplicatedStorage.client.app.features.Icons.JournalIcon)
+local OrdersIcon = require(ReplicatedStorage.client.app.features.Icons.OrdersIcon)
+local ReputationIcon = require(ReplicatedStorage.client.app.features.Icons.ReputationIcon)
+local ShopIcon = require(ReplicatedStorage.client.app.features.Icons.ShopIcon)
+local TutorialIcon = require(ReplicatedStorage.client.app.features.Icons.TutorialIcon)
 
 local px = use_px.px
 local create = vide.create
@@ -83,16 +92,23 @@ local function PhoneScreen(props)
 							it needs to go on a new row and be at Left most
 					]]
 					CellSize = function()
-						return UDim2.new(0, math.max(36, px(96)), 0, math.max(52, px(96)))
+						-- return UDim2.new(0, math.max(36, px(96)), 0, math.max(52, px(96)))
+						return UDim2.new(0.2, 0, 0, px(96))
 					end,
 
 					CellPadding = function()
 						return UDim2.fromOffset(px(16), px(16))
 					end,
 
+					create "UIAspectRatioConstraint" {
+						AspectRatio = 1.0,
+						AspectType = Enum.AspectType.ScaleWithParentSize,
+					},
+
 					FillDirection = Enum.FillDirection.Horizontal,
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					FillDirectionMaxCells = 4,
 				},
 
 				TaxiButton {
@@ -101,11 +117,70 @@ local function PhoneScreen(props)
 					end,
 					order = order,
 				},
-				BackpackIconButton {
-					click = function()
-						change_page("BackpackScreen")
-					end,
-					order = order,
+
+				pane {
+					BackpackIcon {},
+					basebutton {
+						click = function()
+							change_page("BackpackScreen")
+						end,
+					},
+				},
+				pane {
+					OrdersIcon {},
+					basebutton {
+						click = function()
+							change_page("RouberScreen")
+						end,
+					},
+				},
+				pane {
+					ShopIcon {},
+					basebutton {
+						click = function()
+							change_page("")
+						end,
+					},
+				},
+				pane {
+					CompanionIcon {},
+					basebutton {
+						click = function()
+							change_page("")
+						end,
+					},
+				},
+				pane {
+					TutorialIcon {},
+					basebutton {
+						click = function()
+							change_page("")
+						end,
+					},
+				},
+				pane {
+					AchievementsIcon {},
+					basebutton {
+						click = function()
+							change_page("")
+						end,
+					},
+				},
+				pane {
+					JournalIcon {},
+					basebutton {
+						click = function()
+							change_page("")
+						end,
+					},
+				},
+				pane {
+					ReputationIcon {},
+					basebutton {
+						click = function()
+							change_page("")
+						end,
+					},
 				},
 			},
 		},

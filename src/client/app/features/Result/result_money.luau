@@ -11,6 +11,7 @@ local gained                 = require(ReplicatedStorage.client.app.features.Gra
 local sp_graffiti            = require(ReplicatedStorage.client.app.features.Graffiti.sp_graffiti)
 local translate_number_async = require(ReplicatedStorage.client.app.utility.translate_number_async)
 local use_px                 = require(ReplicatedStorage.client.app.utility.use_px)
+local colorscheme = require(ReplicatedStorage.client.store.colorscheme)
 local vide                   = require(ReplicatedStorage.pkg.vide)
 
 local source                 = vide.source
@@ -37,7 +38,7 @@ local function money_graffiti_text(props)
 					letter = function()
 						return curr_letter
 					end,
-					secondar_color = Color3.fromRGB(255, 0, 0),
+					secondar_color = colorscheme.blood_red,
 					primary_color = Color3.fromRGB(),
 					order = function()
 						return i

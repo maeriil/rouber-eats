@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local clientevents = require(ReplicatedStorage.common.clientevents)
 local clientgamedata = require(ReplicatedStorage.client.store.clientgamedata)
 local jecs = require(ReplicatedStorage.pkg.jecs)
 local phases = require(ReplicatedStorage.common.ecs.phases)
@@ -11,7 +10,6 @@ local p = require(ReplicatedStorage.common.ecs.pairs)
 local t = require(ReplicatedStorage.types)
 local pair = jecs.pair
 local blink_conv = require(ReplicatedStorage.common.utility.blink_conv)
-local remotes = require(ReplicatedStorage.types.remotes)
 local types = require(ReplicatedStorage.types)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
@@ -64,7 +62,7 @@ local function add_order_to_world(
 	}
 	world:set(order_id, c.EntityId, server_id)
 	world:set(order_id, c.DeliveryOrderDetails, delivery_details)
-	world:set(order_id, c.Gems, gems)
+	-- world:set(order_id, c.Gems, gems)
 	world:set(order_id, c.Roubins, coins)
 	world:add(order_id, c.Vacant)
 
@@ -97,14 +95,14 @@ local function create_order_to_world()
 	end
 end
 
-local vacant_orders_query =
-	world:query(c.DeliveryOrderDetails, c.EntityId, c.Roubins, c.Gems):with(c.Vacant):cached()
+-- local vacant_orders_query =
+-- 	world:query(c.DeliveryOrderDetails, c.EntityId, c.Roubins, c.Gems):with(c.Vacant):cached()
 local function display_orders_to_ui()
 	local orders_map = {} :: { [string]: types.DeliveryOrderType }
 
 	-- for client_id, details, server_id, coins, gems in vacant_orders_query:iter() do
-	for client_id, details, server_id, coins, gems in
-		world:query(c.DeliveryOrderDetails, c.EntityId, c.Roubins, c.Gems):with(c.Vacant):iter()
+	for client_id, details, server_id, coins in
+		world:query(c.DeliveryOrderDetails, c.EntityId, c.Roubins):with(c.Vacant):iter()
 	do
 		local key = tostring(server_id)
 		-- print(`building the key = {key} with client_id = {client_id}`)
@@ -185,9 +183,9 @@ local function mark_order_as_claimed()
 end
 
 local function system()
-	create_order_to_world()
-	display_orders_to_ui()
-	mark_order_as_claimed()
+	-- create_order_to_world()
+	-- display_orders_to_ui()
+	-- mark_order_as_claimed()
 end
 
 return {

@@ -10,16 +10,16 @@ local delivery_condition_outcome_remote = remotes.order_events.delivery_conditio
 local function to_client(
 	player: Player,
 	order_id: types.Entity,
-	condition_id: types.Entity,
+	condition_name: types.rouber_delivery_conditions_t,
 	status: boolean
 )
-	delivery_condition_outcome_remote:FireClient(player, order_id, condition_id, status)
+	delivery_condition_outcome_remote:FireClient(player, order_id, condition_name, status)
 end
 
 local function from_server()
 	return event_handle.create_client(
 			delivery_condition_outcome_remote
-		) :: event_handle.create_client<types.Entity, types.Entity, boolean>
+		) :: event_handle.create_client<types.Entity, types.rouber_delivery_conditions_t, boolean>
 end
 
 return {

@@ -17,14 +17,12 @@ local function from_server()
 		) :: event_handle.create_client<t.error_handling_status_t>
 end
 
-local function to_server(restaurant_id: t.Entity)
-	try_pickup_order_remote:FireServer(restaurant_id)
+local function to_server(restaurant_name: string)
+	try_pickup_order_remote:FireServer(restaurant_name)
 end
 
 local function from_client()
-	return event_handle.create_server(
-			try_pickup_order_remote
-		) :: event_handle.create_server<t.Entity?>
+	return event_handle.create_server(try_pickup_order_remote) :: event_handle.create_server<string?>
 end
 
 return {

@@ -9,6 +9,7 @@ local pane              = require(ReplicatedStorage.client.app.components.pane.p
 local rtext             = require(ReplicatedStorage.client.app.components.text.rtext)
 local sp_graffiti       = require(ReplicatedStorage.client.app.features.Graffiti.sp_graffiti)
 local use_px            = require(ReplicatedStorage.client.app.utility.use_px)
+local colorscheme = require(ReplicatedStorage.client.store.colorscheme)
 local basefont          = require(ReplicatedStorage.common.configs.gamefont.basefont)
 
 local px                = use_px.px
@@ -37,7 +38,7 @@ local function exp_graffiti_text(props)
 					letter = function()
 						return curr_letter
 					end,
-					secondar_color = Color3.fromRGB(255, 0, 0),
+					secondar_color = colorscheme.blood_red,
 					primary_color = Color3.fromRGB(),
 					order = function()
 						return i

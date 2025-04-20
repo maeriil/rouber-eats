@@ -13,11 +13,18 @@ local types = require(ReplicatedStorage.types)
 type EntityTable = { [types.Entity]: types.Entity }
 
 return {
+	-- This is unnecessary, we can simply send the restaurant name to the client
 	restaurant_map = {} :: EntityTable,
-	order_map = {} :: EntityTable,
+	-- unsure
 	residence_map = {} :: EntityTable,
+	-- unsure
 	residence_owner_map = {} :: EntityTable,
+	-- this is unnecessary, we can simply send the food name to the client
 	food_map = {} :: EntityTable,
+	-- this is unnecessary, we can simply send the food name to the client
 	store_map = {} :: EntityTable,
+	-- this is unnecessary, we can simply send the food name to the client
 	item_map = {} :: EntityTable,
+	-- unsure
+	order_map = {} :: EntityTable,
 }

@@ -15,14 +15,6 @@ local tags = require(ReplicatedStorage.types.tags)
 local world = require(ReplicatedStorage.common.ecs.world)
 local __ = jecs.Wildcard
 
---[[
-	Ensure that load dialouges run after dialogue graphs are first generated to world
-]]
-
-local conversation_map = {
-	["test_dialogue"] = basic_convo_1,
-}
-
 local function system()
 	local instances = CollectionService:GetTagged(tags.Dialogue)
 
@@ -37,6 +29,11 @@ local function system()
 		if parent == nil then
 			error(`Configuration object is not a descendant of a model. What should happen in this case?`)
 		end
+
+		if ref.contains(parent) then
+			continue
+		end
+
 		local root = parent.PrimaryPart
 		assert(root ~= nil, "Primary part must exist for the model")
 

@@ -22,6 +22,7 @@ local function RouberScreen(props)
 	local original_canvas_size = Vector2.new(1280, 720)
 
 	return pane {
+		unpack(props),
 		size = function()
 			return UDim2.new(1, 0, 1, 0)
 		end,

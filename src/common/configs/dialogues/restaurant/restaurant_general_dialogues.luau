@@ -4,6 +4,7 @@ local attributes                    = require(ReplicatedStorage.types.attributes
 local create_dialogue               = require(ReplicatedStorage.common.utility.create_dialogue)
 local luausignal                    = require(ReplicatedStorage.common.utility.luausignal)
 local server_id_map                 = require(ReplicatedStorage.client.store.server_id_map)
+local restaurant = require(ReplicatedStorage.common.configs.restaurant)
 
 local try_altering_order_event      = require(ReplicatedStorage.common.events.order.try_altering_order_event)
 local invoke_delivering_order_event = require(ReplicatedStorage.common.events.order.invoke_delivering_order_event)
@@ -43,19 +44,10 @@ local function dialogue(props: props)
 	]]
 	local npc_folder = props.npc.Parent :: Folder
 	local interior = npc_folder.Parent :: Model
-	local server_restaurant_id = interior:GetAttribute(attributes.serverid) :: t.Entity?
+	local restaurant_attribute_name = interior:GetAttribute(attributes.restaurant_name_id) :: string
+	local restaurant_config = restaurant[restaurant_attribute_name]
 
-	if server_restaurant_id == nil then
-		error(
-			`We could not find a server entity id on the model... This is definitely not right either`
-		)
-	else
-		warn(`LMAO we found the server id, this is hacky though, {server_restaurant_id}`)
-	end
-
-	local client_mapped = server_id_map.restaurant_map[server_restaurant_id]
 	local error_msg_handling = ``
-	local restaurant_name = world:exists_get(client_mapped, c.Name)
 
 	local function select_choice_to_steal()
 		return function()
@@ -90,9 +82,9 @@ local function dialogue(props: props)
 		invoke_delivering_order_event.to_server()
 	end
 
-	local function await_server_pickup_verification(restaurant_id: t.Entity)
+	local function await_server_pickup_verification(restaurant_name: string)
 		return function()
-			try_picking_up_order_event.to_server(restaurant_id)
+			try_picking_up_order_event.to_server(restaurant_name)
 
 			local res, msg = verify_order_signal:wait()
 			if not res then
@@ -106,7 +98,7 @@ local function dialogue(props: props)
 	local dialogue_id = DIALOGUE {
 		key = key,
 		RESPONSE {
-			text = `Welcome to {restaurant_name}!`,
+			text = `Welcome to {restaurant_attribute_name}!`,
 			RESPONSE {
 				text = `How can I help you today?`,
 				key = "root_goto",
@@ -118,7 +110,7 @@ local function dialogue(props: props)
 				},
 				CHOICE {
 					text = `Here to pickup my order!`,
-					IF(await_server_pickup_verification(server_restaurant_id)) {
+					IF(await_server_pickup_verification(restaurant_attribute_name)) {
 						success = {
 							RESPONSE {
 								text = function()

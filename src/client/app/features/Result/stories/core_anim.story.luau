@@ -8,9 +8,7 @@ local mount = vide.mount
 
 local function story()
 	task.delay(1, function()
-		result_sources.start_animation_title(true)
-		task.wait(3)
-		result_sources.start_pose1(true)
+		result_sources.animate_lines(true)
 	end)
 
 	return Result {}
